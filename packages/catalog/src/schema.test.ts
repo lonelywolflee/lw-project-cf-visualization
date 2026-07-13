@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { safeParseCatalog, type Catalog } from './index.js';
+import { idSlugSchema, safeParseCatalog, type Catalog } from './index.js';
 
 function first<T>(items: readonly T[]): T {
   const item = items[0];
@@ -215,5 +215,15 @@ describe('catalogSchema shape validation', () => {
     const catalog = buildValidCatalog();
     first(catalog.sources).retrievedAt = '2026-07-14T00:00:00';
     expectSingleShapeIssue(catalog, 'sources[0].retrievedAt');
+  });
+});
+
+describe('idSlugSchema', () => {
+  it('accepts kebab-case slugs and rejects invalid forms', () => {
+    expect(idSlugSchema.safeParse('workers').success).toBe(true);
+    expect(idSlugSchema.safeParse('www-products-overview').success).toBe(true);
+    expect(idSlugSchema.safeParse('Bad-Slug').success).toBe(false);
+    expect(idSlugSchema.safeParse('trailing-').success).toBe(false);
+    expect(idSlugSchema.safeParse('a'.repeat(65)).success).toBe(false);
   });
 });

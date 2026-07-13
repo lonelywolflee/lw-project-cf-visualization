@@ -54,8 +54,13 @@ const approvedHostnamePattern = new RegExp(
   `^(?:${APPROVED_SOURCE_HOSTNAMES.map((hostname) => hostname.replaceAll('.', '\\.')).join('|')})$`,
 );
 
-/** Stable lowercase kebab-case identifier; never a URL or an array index. */
-const idSlug = z
+/**
+ * Stable lowercase kebab-case identifier; never a URL or an array index.
+ *
+ * Shared contract: crawler source config ids must satisfy this schema
+ * because they become catalog Source ids verbatim.
+ */
+export const idSlugSchema = z
   .string()
   .max(64)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
@@ -72,7 +77,7 @@ const nonBlankString = (maxLength: number) =>
 
 /** At least one source reference, without duplicates. */
 const sourceIdList = z
-  .array(idSlug)
+  .array(idSlugSchema)
   .min(1)
   .refine((ids) => new Set(ids).size === ids.length, {
     error: 'sourceIds must not contain duplicate ids',
@@ -113,7 +118,7 @@ const canonicalSourceUrl = z
 
 const sourceSchema = z
   .strictObject({
-    id: idSlug,
+    id: idSlugSchema,
     url: canonicalSourceUrl,
     pageKind: z.enum(SOURCE_PAGE_KINDS),
     title: nonBlankString(200),
@@ -142,29 +147,29 @@ const sourceSchema = z
   });
 
 const productFamilySchema = z.strictObject({
-  id: idSlug,
+  id: idSlugSchema,
   name: nonBlankString(120),
   summary: nonBlankString(500),
   sourceIds: sourceIdList,
 });
 
 const productSchema = z.strictObject({
-  id: idSlug,
+  id: idSlugSchema,
   name: nonBlankString(120),
   summary: nonBlankString(500),
-  familyId: idSlug,
+  familyId: idSlugSchema,
   sourceIds: sourceIdList,
 });
 
 const solutionSchema = z.strictObject({
-  id: idSlug,
+  id: idSlugSchema,
   name: nonBlankString(120),
   summary: nonBlankString(500),
   sourceIds: sourceIdList,
 });
 
 const useCaseSchema = z.strictObject({
-  id: idSlug,
+  id: idSlugSchema,
   name: nonBlankString(120),
   summary: nonBlankString(500),
   sourceIds: sourceIdList,
@@ -172,8 +177,8 @@ const useCaseSchema = z.strictObject({
 
 const relationshipSchema = z.strictObject({
   type: z.enum(RELATIONSHIP_TYPES),
-  fromId: idSlug,
-  toId: idSlug,
+  fromId: idSlugSchema,
+  toId: idSlugSchema,
   sourceIds: sourceIdList,
 });
 
