@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import validMinimal from './fixtures/valid-minimal.json' with { type: 'json' };
 import { CatalogValidationError, parseCatalog, safeParseCatalog } from './index.js';
 
 const invalidDocument: unknown = { schemaVersion: '999' };
 
 describe('parseCatalog', () => {
+  it('returns the parsed catalog for valid input', () => {
+    expect(parseCatalog(validMinimal)).toEqual(validMinimal);
+  });
+
   it('throws CatalogValidationError with every issue listed in the message', () => {
     let caught: unknown;
     try {
@@ -20,8 +25,10 @@ describe('parseCatalog', () => {
     expect(caught.message).toContain('Catalog validation failed');
     expect(caught.message).toContain('schemaVersion:');
   });
+});
 
-  it('returns the parsed catalog for valid input', () => {
+describe('safeParseCatalog', () => {
+  it('reports shape failures as invalid-shape issues with non-empty paths', () => {
     const result = safeParseCatalog(invalidDocument);
     expect(result.success).toBe(false);
     if (result.success) {
