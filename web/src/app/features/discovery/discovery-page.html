@@ -47,7 +47,13 @@
     @if (criteria().q !== '') {
     <li class="chip">
       <span>검색: {{ criteria().q }}</span>
-      <button type="button" (click)="clearSearch()" aria-label="검색어 제거">×</button>
+      <button
+        type="button"
+        (click)="clearSearch()"
+        [attr.aria-label]="'검색어 제거: ' + criteria().q"
+      >
+        ×
+      </button>
     </li>
     } @if (familyName(); as name) {
     <li class="chip">

@@ -230,7 +230,7 @@ describe('DiscoveryPage', () => {
 
     // Remove only the q chip; the useCase filter stays applied.
     const qChipRemove = element?.querySelector<HTMLButtonElement>(
-      'button[aria-label="검색어 제거"]',
+      'button[aria-label^="검색어 제거"]',
     );
     qChipRemove!.click();
     await harness.fixture.whenStable();
@@ -326,7 +326,7 @@ describe('DiscoveryPage', () => {
     }
 
     expect(element?.querySelector('ul[aria-label="적용된 필터"]')).not.toBeNull();
-    expect(element?.querySelector('button[aria-label="검색어 제거"]')).not.toBeNull();
+    expect(element?.querySelector('button[aria-label^="검색어 제거"]')).not.toBeNull();
     expect(
       element?.querySelector('button[aria-label="family 필터 제거: Security"]'),
     ).not.toBeNull();
