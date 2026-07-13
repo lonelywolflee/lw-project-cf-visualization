@@ -1,5 +1,5 @@
 /** Pipeline stage a crawl failure is attributed to. */
-export type CrawlStage = 'config' | 'robots' | 'fetch';
+export type CrawlStage = 'config' | 'robots' | 'fetch' | 'parse' | 'normalize' | 'validate';
 
 /**
  * Stage-tagged crawler failure.
