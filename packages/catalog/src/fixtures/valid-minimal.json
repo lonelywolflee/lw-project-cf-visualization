@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-07-14T00:00:00Z",
+  "sources": [
+    {
+      "id": "waf-product-page",
+      "url": "https://www.cloudflare.com/application-services/products/waf/",
+      "pageKind": "marketing-product",
+      "title": "Cloudflare Web Application Firewall",
+      "retrievedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "id": "waf-docs",
+      "url": "https://developers.cloudflare.com/waf/",
+      "pageKind": "developer-docs",
+      "title": "Cloudflare WAF documentation",
+      "retrievedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "productFamilies": [
+    {
+      "id": "application-security",
+      "name": "Application security",
+      "summary": "Products that protect web applications and APIs at the edge.",
+      "sourceIds": ["waf-product-page"]
+    }
+  ],
+  "products": [
+    {
+      "id": "waf",
+      "name": "Web Application Firewall",
+      "summary": "Filters and blocks malicious HTTP traffic before it reaches an application.",
+      "familyId": "application-security",
+      "sourceIds": ["waf-product-page", "waf-docs"]
+    }
+  ],
+  "solutions": [
+    {
+      "id": "protect-web-applications",
+      "name": "Protect web applications",
+      "summary": "Defend public-facing web applications against common attacks.",
+      "sourceIds": ["waf-product-page"]
+    }
+  ],
+  "useCases": [
+    {
+      "id": "block-malicious-traffic",
+      "name": "Block malicious traffic",
+      "summary": "Stop injection, bot, and denial-of-service traffic at the edge.",
+      "sourceIds": ["waf-docs"]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "product-solution",
+      "fromId": "waf",
+      "toId": "protect-web-applications",
+      "sourceIds": ["waf-product-page"]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "waf",
+      "toId": "block-malicious-traffic",
+      "sourceIds": ["waf-docs"]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "protect-web-applications",
+      "toId": "block-malicious-traffic",
+      "sourceIds": ["waf-product-page"]
+    }
+  ]
+}
