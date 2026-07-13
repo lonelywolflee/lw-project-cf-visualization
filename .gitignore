@@ -147,3 +147,6 @@ vite.config.ts.timestamp-*
 
 # Angular build cache
 .angular/
+
+# Crawler atomic-write staging (cleaned automatically; insurance for crashes)
+web/public/data/.catalog.json.*.tmp
