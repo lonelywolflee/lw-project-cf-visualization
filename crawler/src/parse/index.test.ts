@@ -105,7 +105,7 @@ describe('parsePage', () => {
     );
     expect(result.kind).toBe('products-overview');
     if (result.kind === 'products-overview') {
-      expect(result.families).toHaveLength(2);
+      expect(result.families).toHaveLength(3);
     }
   });
 

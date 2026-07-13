@@ -66,6 +66,16 @@ describe('parseProductsOverview', () => {
             },
           ],
         },
+        {
+          heading: 'Application performance',
+          items: [
+            {
+              name: 'CDN',
+              summary: 'Ultra-fast static and dynamic content delivery',
+              href: 'https://www.cloudflare.com/products/cdn/',
+            },
+          ],
+        },
       ],
     });
   });
