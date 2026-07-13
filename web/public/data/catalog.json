@@ -1,48 +1,48 @@
 {
   "schemaVersion": "1",
-  "generatedAt": "2026-07-13T20:14:18.334Z",
+  "generatedAt": "2026-07-13T20:30:30.148Z",
   "sources": [
     {
       "id": "developers-docs-directory",
       "url": "https://developers.cloudflare.com/directory/",
       "pageKind": "developer-docs",
       "title": "Docs directory | Cloudflare Docs",
-      "retrievedAt": "2026-07-13T20:14:25.427Z"
+      "retrievedAt": "2026-07-13T20:30:37.242Z"
     },
     {
       "id": "www-product-cdn",
       "url": "https://www.cloudflare.com/products/cdn/",
       "pageKind": "marketing-product",
       "title": "Cloudflare CDN - Global Content Delivery Network",
-      "retrievedAt": "2026-07-13T20:14:23.196Z"
+      "retrievedAt": "2026-07-13T20:30:34.867Z"
     },
     {
       "id": "www-product-workers",
       "url": "https://www.cloudflare.com/products/workers/",
       "pageKind": "marketing-product",
       "title": "Cloudflare Workers - Global Serverless Functions Platform",
-      "retrievedAt": "2026-07-13T20:14:24.067Z"
+      "retrievedAt": "2026-07-13T20:30:35.862Z"
     },
     {
       "id": "www-products-overview",
       "url": "https://www.cloudflare.com/products/",
       "pageKind": "marketing-overview",
       "title": "Products | Cloudflare",
-      "retrievedAt": "2026-07-13T20:14:21.518Z"
+      "retrievedAt": "2026-07-13T20:30:32.906Z"
     },
     {
       "id": "www-solution-sase",
       "url": "https://www.cloudflare.com/sase/",
       "pageKind": "marketing-solution",
       "title": "Cloudflare One | The agile SASE platform | Cloudflare",
-      "retrievedAt": "2026-07-13T20:14:24.920Z"
+      "retrievedAt": "2026-07-13T20:30:36.985Z"
     },
     {
       "id": "www-solutions-overview",
       "url": "https://www.cloudflare.com/solutions/",
       "pageKind": "marketing-overview",
       "title": "Solutions | Cloudflare",
-      "retrievedAt": "2026-07-13T20:14:22.013Z"
+      "retrievedAt": "2026-07-13T20:30:34.492Z"
     }
   ],
   "productFamilies": [
@@ -751,7 +751,7 @@
     {
       "id": "ai",
       "name": "AI",
-      "summary": "(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event(\"astro:load\"));})();Build intelligent applications with AI at the edge",
+      "summary": "Build intelligent applications with AI at the edge",
       "sourceIds": [
         "www-solutions-overview"
       ]
