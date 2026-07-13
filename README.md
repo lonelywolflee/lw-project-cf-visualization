@@ -8,8 +8,8 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 > 완료되어 아래 command를 실행할 수 있습니다. `pnpm crawl`이 공식 source 수집, schema
 > validation, `web/public/data/catalog.json` 갱신까지 수행합니다. 시각화 기능은 후속
 > issue에서 구현하며, 현재 web은 `catalog.json`을 schema validation과 함께 불러와
-> product family 계층 탐색, product·solution 상세(공식 출처 링크 포함),
-> loading·오류·빈 데이터 상태를 제공합니다.
+> product family 계층 탐색, product·solution 상세(공식 출처 링크 포함), URL로 공유
+> 가능한 검색·필터, loading·오류·빈 데이터 상태를 제공합니다.
 
 ## 목표
 
