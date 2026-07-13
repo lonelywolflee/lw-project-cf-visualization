@@ -6,8 +6,8 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 
 > 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
 > 완료되어 아래 command를 실행할 수 있습니다. 데이터 수집과 시각화 기능은 후속 issue에서
-> 구현합니다. 그 전까지 crawler는 placeholder 메시지만 출력하고, web은 Angular 기본 화면을
-> 보여줍니다.
+> 구현합니다. 그 전까지 crawler는 승인된 source 설정(`crawler/config/sources.json`)을 검증해
+> 요약만 출력하고(network 요청 없음), web은 Angular 기본 화면을 보여줍니다.
 
 ## 목표
 
@@ -48,7 +48,7 @@ file을 변경하지 않습니다.
 ├── web/                         # Angular 정적 visualization web
 │   └── public/data/             # Crawler가 생성하는 JSON data
 ├── crawler/                     # 수집을 시작하는 Node.js TypeScript script
-│   └── config/                  # 수집 대상과 허용 source 설정 (crawler 구현 issue에서 추가)
+│   └── config/                  # 수집 대상 seed와 허용 host, fetch 정책 (sources.json)
 └── packages/                    # 공통 library, schema, TypeScript type
     └── catalog/                 # Crawler와 web이 공유하는 data contract
 ```
@@ -98,9 +98,10 @@ pnpm test
 pnpm build
 ```
 
-`pnpm crawl` command는 crawler 구현 issue에서 추가됩니다. 현재 crawler package는
-workspace 연결을 확인하는 placeholder 실행(`pnpm --filter @cf-viz/crawler run crawl`)만
-제공합니다. Crawler가 구현되면 일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다.
+`pnpm crawl` command는 수집 pipeline이 완성되는 issue에서 root에 추가됩니다. 현재
+`pnpm --filter @cf-viz/crawler run crawl`은 `crawler/config/sources.json`을 검증하고 수집
+대상 요약을 출력하며, network 요청은 보내지 않습니다. Crawler가 완성되면 일반적인 사용
+순서는 `pnpm crawl` 후 `pnpm dev`입니다.
 
 ## 공식 Source
 

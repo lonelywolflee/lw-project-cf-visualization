@@ -9,6 +9,7 @@ export {
   RELATIONSHIP_TYPES,
   SOURCE_PAGE_KINDS,
   catalogSchema,
+  idSlugSchema,
   type Catalog,
   type Product,
   type ProductFamily,
