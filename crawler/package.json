@@ -12,7 +12,8 @@
     "crawl": "tsx src/main.ts"
   },
   "dependencies": {
-    "@cf-viz/catalog": "workspace:*"
+    "@cf-viz/catalog": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

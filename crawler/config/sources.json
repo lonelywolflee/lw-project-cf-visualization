@@ -1,0 +1,41 @@
+{
+  "allowedHosts": ["www.cloudflare.com", "developers.cloudflare.com"],
+  "fetch": {
+    "timeoutMs": 10000,
+    "maxRetries": 2,
+    "concurrency": 2,
+    "minRequestIntervalMs": 1000
+  },
+  "sources": [
+    {
+      "id": "www-products-overview",
+      "url": "https://www.cloudflare.com/products/",
+      "pageKind": "marketing-overview"
+    },
+    {
+      "id": "www-solutions-overview",
+      "url": "https://www.cloudflare.com/solutions/",
+      "pageKind": "marketing-overview"
+    },
+    {
+      "id": "www-product-cdn",
+      "url": "https://www.cloudflare.com/products/cdn/",
+      "pageKind": "marketing-product"
+    },
+    {
+      "id": "www-product-workers",
+      "url": "https://www.cloudflare.com/products/workers/",
+      "pageKind": "marketing-product"
+    },
+    {
+      "id": "www-solution-sase",
+      "url": "https://www.cloudflare.com/sase/",
+      "pageKind": "marketing-solution"
+    },
+    {
+      "id": "developers-docs-directory",
+      "url": "https://developers.cloudflare.com/directory/",
+      "pageKind": "developer-docs"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "allowedHosts": ["www.cloudflare.com", "developers.cloudflare.com"],
+  "fetch": {
+    "timeoutMs": 10000,
+    "maxRetries": 2,
+    "concurrency": 2,
+    "minRequestIntervalMs": 1000
+  },
+  "sources": [
+    {
+      "id": "blog-deep-dive",
+      "url": "https://blog.cloudflare.com/deep-dive/",
+      "pageKind": "marketing-overview"
+    }
+  ]
+}
