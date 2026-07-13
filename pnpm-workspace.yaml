@@ -15,3 +15,6 @@ allowBuilds:
   esbuild: true
   lmdb: true
   msgpackr-extract: true
+
+minimumReleaseAgeExclude:
+  - tsx@4.23.1
