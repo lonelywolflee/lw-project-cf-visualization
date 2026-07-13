@@ -59,7 +59,7 @@ const SAMPLE_CATALOG: Catalog = {
   relationships: [],
 };
 
-let sandbox: string;
+let sandbox: string | undefined;
 const restoreModes: { dir: string; mode: number }[] = [];
 
 function makeSandbox(): string {
@@ -72,7 +72,10 @@ afterEach(async () => {
   for (const { dir, mode } of restoreModes.splice(0)) {
     await chmod(dir, mode);
   }
-  await rm(sandbox, { recursive: true, force: true });
+  if (sandbox !== undefined) {
+    await rm(sandbox, { recursive: true, force: true });
+    sandbox = undefined;
+  }
 });
 
 async function expectWriteFailure(promise: Promise<void>): Promise<CrawlError> {
