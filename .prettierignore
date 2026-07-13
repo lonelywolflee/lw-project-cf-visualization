@@ -1,0 +1,3 @@
+# Prettier 3 already honors .gitignore by default; list only
+# committed-but-generated files here.
+pnpm-lock.yaml
