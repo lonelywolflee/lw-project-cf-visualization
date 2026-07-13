@@ -328,3 +328,9 @@ a:focus-visible {
   position: absolute;
   white-space: nowrap;
 }
+
+.pivot-button {
+  margin-inline-start: 0.5rem;
+  min-block-size: 1.5rem;
+  font-size: 0.85rem;
+}

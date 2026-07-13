@@ -101,6 +101,11 @@
           <path class="edge edge-solution-use-case" d="M 0 4 H 28" /></svg
         >{{ typeLabels['solution-use-case'] }}</span
       >
+      <span class="legend-item"
+        ><svg viewBox="0 0 28 8" aria-hidden="true" focusable="false" class="legend-swatch">
+          <path class="edge edge-product-solution" d="M 0 4 H 28" /></svg
+        >{{ typeLabels['product-solution'] }}</span
+      >
       <span class="legend-item"><span class="badge-chip">P</span> Product</span>
       <span class="legend-item"><span class="badge-chip">S</span> Solution</span>
       <span class="legend-item"><span class="badge-chip">U</span> Use case</span>
@@ -134,7 +139,7 @@
               <span class="badge-chip" aria-hidden="true"
                 >{{ kindLabels[edge.to.kind].badge }}</span
               >
-              {{ edge.to.name }}
+              {{ edge.to.name }}<span class="visually-hidden">(으)로 연결</span>
             </button>
           </li>
           }
@@ -167,6 +172,14 @@
             @if (selected.detail.edge.from.detailRoute; as route) {
             <a [routerLink]="route">{{ selected.detail.edge.from.name }}</a>
             } @else { {{ selected.detail.edge.from.name }} }
+            <button
+              type="button"
+              class="pivot-button"
+              (click)="selectNode(selected.detail.edge.from.key)"
+              [attr.aria-label]="'이 항목의 관계 보기: ' + selected.detail.edge.from.name"
+            >
+              관계 보기
+            </button>
           </dd>
         </div>
         <div>
@@ -179,6 +192,14 @@
             <span class="endpoint-name">{{ selected.detail.edge.to.name }}</span>
             <span class="endpoint-summary">{{ selected.detail.edge.to.summary }}</span>
             }
+            <button
+              type="button"
+              class="pivot-button"
+              (click)="selectNode(selected.detail.edge.to.key)"
+              [attr.aria-label]="'이 항목의 관계 보기: ' + selected.detail.edge.to.name"
+            >
+              관계 보기
+            </button>
           </dd>
         </div>
       </dl>

@@ -164,6 +164,27 @@ describe('RelationshipsPage', () => {
     expect(sourceLink?.getAttribute('target')).toBe('_blank');
   });
 
+  it('reaches the node detail by keyboard through the edge-detail pivot button', async () => {
+    const harness = await RouterTestingHarness.create('/relationships');
+    const element = harness.routeNativeElement!;
+
+    const edgeButton = Array.from(
+      element.querySelectorAll<HTMLButtonElement>('.edge-list .edge-button'),
+    ).find((candidate) => candidate.textContent?.includes('Workers'));
+    edgeButton!.click();
+    await harness.fixture.whenStable();
+
+    // The pivot buttons make node detail reachable without the pointer-only SVG.
+    const pivot = element.querySelector<HTMLButtonElement>('.detail-panel .pivot-button');
+    expect(pivot?.getAttribute('aria-label')).toContain('이 항목의 관계 보기');
+    pivot!.click();
+    await harness.fixture.whenStable();
+
+    const panel = element.querySelector('.detail-panel')!;
+    expect(panel.querySelector('.node-title')).not.toBeNull();
+    expect(panel.querySelectorAll('.connected-list .edge-button').length).toBeGreaterThan(0);
+  });
+
   it('clicking an SVG node selects it and lists its connected edges', async () => {
     const harness = await RouterTestingHarness.create('/relationships');
     const element = harness.routeNativeElement!;
