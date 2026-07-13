@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import type { CatalogIssue } from '@cf-viz/catalog';
 
 import { CatalogStore } from '../../core/catalog/catalog-store';
@@ -8,13 +8,14 @@ import { CatalogStore } from '../../core/catalog/catalog-store';
 const MAX_VISIBLE_ISSUES = 10;
 
 /**
- * Route-level shell for the catalog feature. Renders one of the five data
- * states exposed by {@link CatalogStore}; later issues replace the success
- * summary with the real hierarchy/list UI.
+ * Layout gate for every catalog route. Renders the loading, fetch-error,
+ * invalid-data, and empty states itself and only mounts the child
+ * `<router-outlet>` once the catalog reached `success` — child routes can
+ * therefore rely on {@link CatalogStore.catalog} being present.
  */
 @Component({
   selector: 'app-catalog-shell',
-  imports: [DatePipe],
+  imports: [RouterOutlet],
   templateUrl: './catalog-shell.html',
   styleUrl: './catalog-shell.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

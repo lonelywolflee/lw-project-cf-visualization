@@ -1,10 +1,12 @@
-import { signal, type WritableSignal } from '@angular/core';
+import { computed, signal, type WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { RouterTestingHarness } from '@angular/router/testing';
 import type { Catalog, CatalogIssue } from '@cf-viz/catalog';
 
+import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
-import { CatalogShell } from './catalog-shell';
 
 const emptyCatalog: Catalog = {
   schemaVersion: '1',
@@ -90,24 +92,39 @@ describe('CatalogShell', () => {
   let state: WritableSignal<CatalogState>;
   let reload: ReturnType<typeof vi.fn>;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     state = signal<CatalogState>({ kind: 'loading' });
     reload = vi.fn();
-    await TestBed.configureTestingModule({
-      imports: [CatalogShell],
-      providers: [{ provide: CatalogStore, useValue: { state: state.asReadonly(), reload } }],
-    }).compileComponents();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter(routes),
+        {
+          provide: CatalogStore,
+          useValue: {
+            state: state.asReadonly(),
+            catalog: computed(() => {
+              const current = state();
+              return current.kind === 'success' || current.kind === 'empty'
+                ? current.catalog
+                : undefined;
+            }),
+            reload,
+          },
+        },
+      ],
+    });
   });
 
   /**
    * The store is stubbed with a plain signal-backed object, so no
    * httpResource request is ever pending and `whenStable()` settles
    * immediately (no `TestBed.tick()`-before-flush dance needed here).
+   * Route-level harness: the shell is activated as the layout gate of the
+   * root route, exactly as in production.
    */
   async function createShell() {
-    const fixture = TestBed.createComponent(CatalogShell);
-    await fixture.whenStable();
-    return { fixture, element: fixture.nativeElement as HTMLElement };
+    const harness = await RouterTestingHarness.create('/');
+    return { harness, element: harness.fixture.nativeElement as HTMLElement };
   }
 
   it('renders the feature heading and announces loading politely', async () => {
@@ -121,10 +138,10 @@ describe('CatalogShell', () => {
   });
 
   it('renders the fetch-error alert with a focusable retry button that reloads', async () => {
-    const { fixture, element } = await createShell();
+    const { harness, element } = await createShell();
 
     state.set({ kind: 'fetch-error', status: 503 });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
     expect(element.querySelector('[role="alert"]')).not.toBeNull();
     const button = element.querySelector('button');
@@ -138,10 +155,10 @@ describe('CatalogShell', () => {
   });
 
   it('caps the invalid-data issue list at ten entries and reports the rest', async () => {
-    const { fixture, element } = await createShell();
+    const { harness, element } = await createShell();
 
     state.set({ kind: 'invalid-data', issues: makeIssues(12) });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
     expect(element.querySelector('[role="alert"]')).not.toBeNull();
     const items = element.querySelectorAll('.issue-list li');
@@ -153,20 +170,20 @@ describe('CatalogShell', () => {
   });
 
   it('lists every issue without a cap notice when ten or fewer', async () => {
-    const { fixture, element } = await createShell();
+    const { harness, element } = await createShell();
 
     state.set({ kind: 'invalid-data', issues: makeIssues(3) });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
     expect(element.querySelectorAll('.issue-list li')).toHaveLength(3);
     expect(element.textContent).not.toContain('문제가 더 있습니다');
   });
 
   it('shows the crawl guidance for an empty catalog without an alert role', async () => {
-    const { fixture, element } = await createShell();
+    const { harness, element } = await createShell();
 
     state.set({ kind: 'empty', catalog: emptyCatalog });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
     expect(element.querySelector('.state-empty')?.textContent).toContain(
       '카탈로그가 비어 있습니다',
@@ -174,19 +191,20 @@ describe('CatalogShell', () => {
     expect(element.querySelector('[role="alert"]')).toBeNull();
   });
 
-  it('summarises entity counts, sources, and generation time on success', async () => {
-    const { fixture, element } = await createShell();
+  it('mounts the child outlet only on success, replacing the state markup', async () => {
+    const { harness, element } = await createShell();
+
+    expect(element.querySelector('app-catalog-overview')).toBeNull();
 
     state.set({ kind: 'success', catalog: successCatalog });
-    await fixture.whenStable();
+    await harness.fixture.whenStable();
 
-    expect(element.querySelector('#summary-heading')?.textContent).toContain('카탈로그 요약');
-    const counts = Array.from(element.querySelectorAll('.summary-counts dd')).map((dd) =>
-      dd.textContent?.trim(),
+    expect(element.querySelector('.catalog-shell')).toBeNull();
+    const headings = element.querySelectorAll('h1');
+    expect(headings).toHaveLength(1);
+    expect(headings[0]?.textContent).toContain('Cloudflare 제품 카탈로그');
+    expect(element.querySelector('#family-heading-application-security')?.textContent).toContain(
+      'Application security',
     );
-    expect(counts).toEqual(['1', '2', '1', '1', '1']);
-    const meta = element.querySelector('.summary-meta')?.textContent;
-    expect(meta).toContain('출처 1곳');
-    expect(meta).toContain('생성 시각');
   });
 });
