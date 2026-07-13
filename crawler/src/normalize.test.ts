@@ -4,8 +4,9 @@ import type { SourcePageKind } from '@cf-viz/catalog';
 import { describe, expect, it } from 'vitest';
 
 import type { FetchResult } from './http-client.js';
+import { CrawlError } from './errors.js';
 import { normalizePage, type CatalogFragment } from './normalize.js';
-import { parsePage } from './parse/index.js';
+import { parsePage, type ParsedPage } from './parse/index.js';
 
 const RETRIEVED_AT = '2026-07-01T00:00:00.000Z';
 
@@ -290,5 +291,29 @@ describe('normalizePage', () => {
         { slug: null, sourceId: 'developers-docs-directory' },
       ],
     });
+  });
+
+  it('errors at stage normalize on a relative docs entry href', () => {
+    const page: ParsedPage = {
+      kind: 'developer-docs',
+      sourceId: 'developers-docs-directory',
+      canonicalUrl: 'https://developers.cloudflare.com/directory/',
+      title: 'Docs directory | Cloudflare Docs',
+      description: 'Explore the different areas of our documentation site.',
+      retrievedAt: RETRIEVED_AT,
+      entries: [{ name: 'Workers', summary: 'Serverless platform docs.', href: '/workers/' }],
+    };
+    let caught: unknown;
+    try {
+      normalizePage(page, 'developer-docs');
+    } catch (error) {
+      caught = error;
+    }
+    expect(caught).toBeInstanceOf(CrawlError);
+    if (caught instanceof CrawlError) {
+      expect(caught.stage).toBe('normalize');
+      expect(caught.url).toBe('https://developers.cloudflare.com/directory/');
+      expect(caught.message).toContain('docs entry href is not an absolute URL');
+    }
   });
 });

@@ -8,7 +8,7 @@
  */
 import { extractUseCaseCards, parseBase, requireBounded } from './base.js';
 import { requireText, type HtmlPage } from './html.js';
-import { FIELD_CAPS } from './text.js';
+import { FIELD_CAPS } from '../text.js';
 import type { PageMeta, ParsedPage } from './types.js';
 
 /** The marketing-solution variant of {@link ParsedPage}. */

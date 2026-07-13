@@ -9,7 +9,7 @@
 import { CrawlError } from '../errors.js';
 import { pathKeyOf } from '../ids.js';
 import { requireAttr, requireText, type HtmlPage } from './html.js';
-import { boundedField, collapseWhitespace, FIELD_CAPS, trimSummary } from './text.js';
+import { boundedField, collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPageBase, ParsedPageKind, RawEntityCard } from './types.js';
 
 /**

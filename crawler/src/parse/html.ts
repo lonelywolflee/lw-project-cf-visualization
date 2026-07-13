@@ -17,7 +17,7 @@
 import * as cheerio from 'cheerio';
 
 import { CrawlError } from '../errors.js';
-import { collapseWhitespace } from './text.js';
+import { collapseWhitespace } from '../text.js';
 
 /** Opaque handle for a loaded HTML document. */
 export type HtmlPage = ReturnType<typeof cheerio.load>;

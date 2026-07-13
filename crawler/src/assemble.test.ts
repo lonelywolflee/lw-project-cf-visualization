@@ -322,6 +322,50 @@ describe('assembleCatalog', () => {
     }
   });
 
+  it('errors at stage normalize when two different pages mint the same product id', () => {
+    const fragments: readonly CatalogFragment[] = [
+      makeFragment(
+        makeSource('hand-a', 'https://www.cloudflare.com/products/', 'marketing-overview', 'A'),
+        {
+          familyClaims: [{ id: 'compute', name: 'Compute', sourceId: 'hand-a' }],
+          productClaims: [
+            {
+              key: '/products/waf',
+              id: 'waf',
+              name: 'WAF',
+              summary: 'Web application firewall.',
+              familyId: 'compute',
+              sourceId: 'hand-a',
+            },
+          ],
+        },
+      ),
+      makeFragment(
+        makeSource('hand-b', 'https://www.cloudflare.com/waf/', 'marketing-product', 'B'),
+        {
+          productClaims: [
+            {
+              key: '/waf',
+              id: 'waf',
+              name: null,
+              summary: 'A different page whose path also slugs to waf.',
+              familyId: null,
+              sourceId: 'hand-b',
+            },
+          ],
+        },
+      ),
+    ];
+    const caught = captureError(() => assembleCatalog(fragments, { generatedAt: GENERATED_AT }));
+    expect(caught).toBeInstanceOf(CrawlError);
+    if (caught instanceof CrawlError) {
+      expect(caught.stage).toBe('normalize');
+      expect(caught.message).toContain("two different product pages minted the same id 'waf'");
+      expect(caught.message).toContain('https://www.cloudflare.com/products/');
+      expect(caught.message).toContain('https://www.cloudflare.com/waf/');
+    }
+  });
+
   it('errors at stage normalize on conflicting family names for one slug', () => {
     const fragments: readonly CatalogFragment[] = [
       makeFragment(

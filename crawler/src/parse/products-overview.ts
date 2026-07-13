@@ -8,7 +8,7 @@
 import { CrawlError } from '../errors.js';
 import { parseBase, requireBounded, resolveHref } from './base.js';
 import type { HtmlPage } from './html.js';
-import { collapseWhitespace, FIELD_CAPS, trimSummary } from './text.js';
+import { collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPage, RawEntityCard, RawTaxonomySection } from './types.js';
 
 /** The products-overview variant of {@link ParsedPage}. */

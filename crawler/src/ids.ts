@@ -13,7 +13,7 @@
  * All functions are pure: no clock, network, or filesystem.
  */
 import { CrawlError } from './errors.js';
-import { collapseWhitespace } from './parse/text.js';
+import { collapseWhitespace } from './text.js';
 
 /**
  * Derive a catalog-valid kebab-case slug from an official name or URL

@@ -203,7 +203,7 @@ export function normalizePage(page: ParsedPage, configuredKind: SourcePageKind):
       // Docs pages mint NO entities: each entry only offers a slug for
       // provenance enrichment when its href path has exactly one segment.
       const docsEntryClaims = page.entries.map((entry): DocsEntryClaim => ({
-        slug: docsSlugOf(entry.href),
+        slug: docsSlugOf(entry.href, source.url),
         sourceId: source.id,
       }));
       return buildFragment(source, { docsEntryClaims });
@@ -267,11 +267,23 @@ function toEdgeClaims(
  * '/workers/' → 'workers'); multi-segment hrefs identify sub-pages, not
  * products, and yield null.
  */
-function docsSlugOf(href: string | null): string | null {
+function docsSlugOf(href: string | null, pageUrl: string): string | null {
   if (href === null) {
     return null;
   }
-  const segments = new URL(href).pathname.split('/').filter((segment) => segment.length > 0);
+  let pathname: string;
+  try {
+    pathname = new URL(href).pathname;
+  } catch (cause) {
+    // Parsers guarantee absolute hrefs; a relative one here is a parser bug
+    // and must surface stage-tagged, not as a raw TypeError.
+    throw new CrawlError(`[normalize ${pageUrl}] docs entry href is not an absolute URL`, {
+      stage: 'normalize',
+      url: pageUrl,
+      cause,
+    });
+  }
+  const segments = pathname.split('/').filter((segment) => segment.length > 0);
   const [only] = segments;
   if (segments.length !== 1 || only === undefined) {
     return null;

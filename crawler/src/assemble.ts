@@ -202,6 +202,7 @@ function assembleProducts(
     (fragment) => fragment.productClaims,
     (claim) => claim.key,
   );
+  requireDistinctIds(groups, 'product');
   return [...groups.values()]
     .map((group) => {
       const { key, id } = requireAgreedIdentity(group, 'product');
@@ -253,6 +254,7 @@ function assembleSolutions(sorted: readonly CatalogFragment[]): Catalog['solutio
     (fragment) => fragment.solutionClaims,
     (claim) => claim.key,
   );
+  requireDistinctIds(groups, 'solution');
   return [...groups.values()]
     .map((group) => {
       const { key, id } = requireAgreedIdentity(group, 'solution');
@@ -420,6 +422,34 @@ function groupClaims<TClaim>(
     }
   }
   return groups;
+}
+
+/**
+ * Two DIFFERENT identity keys minting the same serialized id is a cross-page
+ * collision (e.g. '/products/waf' and '/waf' both slugging to 'waf') — an
+ * explicit normalization error naming both pages, caught here rather than
+ * surfacing later as an opaque duplicate-id validation issue.
+ */
+function requireDistinctIds<TClaim extends { readonly id: string }>(
+  groups: ReadonlyMap<string, readonly Attributed<TClaim>[]>,
+  entityKind: string,
+): void {
+  const owners = new Map<string, { key: string; group: readonly Attributed<TClaim>[] }>();
+  for (const [key, group] of groups) {
+    const [head] = group;
+    if (head === undefined) {
+      continue;
+    }
+    const prior = owners.get(head.claim.id);
+    if (prior !== undefined && prior.key !== key) {
+      const urls = distinctSortedUrls([...prior.group, ...group]);
+      throw new CrawlError(
+        `[normalize] two different ${entityKind} pages minted the same id '${head.claim.id}' between ${urls}`,
+        { stage: 'normalize' },
+      );
+    }
+    owners.set(head.claim.id, { key, group });
+  }
 }
 
 /**
