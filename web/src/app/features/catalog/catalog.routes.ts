@@ -13,7 +13,7 @@ import { CatalogShell } from './catalog-shell';
  * honesty for the instant before the gate settles).
  *
  * The overview is imported statically (it is the first paint of the default
- * route).
+ * route); the two detail pages stay behind `loadComponent` chunks.
  */
 export const CATALOG_ROUTES: Routes = [
   {
@@ -25,6 +25,16 @@ export const CATALOG_ROUTES: Routes = [
         pathMatch: 'full',
         component: CatalogOverview,
         title: 'Cloudflare Product & Solution Explorer',
+      },
+      {
+        path: 'products/:productId',
+        loadComponent: () => import('./product-detail').then((m) => m.ProductDetail),
+        title: 'Product 상세 | Cloudflare Product & Solution Explorer',
+      },
+      {
+        path: 'solutions/:solutionId',
+        loadComponent: () => import('./solution-detail').then((m) => m.SolutionDetail),
+        title: 'Solution 상세 | Cloudflare Product & Solution Explorer',
       },
     ],
   },
