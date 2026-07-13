@@ -18,3 +18,11 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - tsx@4.23.1
+  - '@angular-eslint/builder@22.1.0'
+  - '@angular-eslint/bundled-angular-compiler@22.1.0'
+  - '@angular-eslint/eslint-plugin-template@22.1.0'
+  - '@angular-eslint/eslint-plugin@22.1.0'
+  - '@angular-eslint/schematics@22.1.0'
+  - '@angular-eslint/template-parser@22.1.0'
+  - '@angular-eslint/utils@22.1.0'
+  - angular-eslint@22.1.0
