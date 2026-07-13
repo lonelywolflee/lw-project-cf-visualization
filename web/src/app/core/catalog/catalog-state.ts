@@ -25,14 +25,26 @@ export class CatalogInvalidDataError extends Error {
   }
 }
 
-/** A catalog is empty when every entity collection has zero entries. */
+/** Array-valued keys of the Catalog contract (the entity collections). */
+type CatalogCollectionKey = keyof {
+  [K in keyof Catalog as Catalog[K] extends readonly unknown[] ? K : never]: true;
+};
+
+/**
+ * A catalog is empty when every entity collection has zero entries.
+ *
+ * The Record annotation is exhaustive against the schema: a future collection
+ * added to the Catalog contract fails compilation here instead of being
+ * silently ignored by the emptiness check.
+ */
 export function isCatalogEmpty(catalog: Catalog): boolean {
-  return (
-    catalog.sources.length === 0 &&
-    catalog.productFamilies.length === 0 &&
-    catalog.products.length === 0 &&
-    catalog.solutions.length === 0 &&
-    catalog.useCases.length === 0 &&
-    catalog.relationships.length === 0
-  );
+  const collectionSizes: Record<CatalogCollectionKey, number> = {
+    sources: catalog.sources.length,
+    productFamilies: catalog.productFamilies.length,
+    products: catalog.products.length,
+    solutions: catalog.solutions.length,
+    useCases: catalog.useCases.length,
+    relationships: catalog.relationships.length,
+  };
+  return Object.values(collectionSizes).every((count) => count === 0);
 }

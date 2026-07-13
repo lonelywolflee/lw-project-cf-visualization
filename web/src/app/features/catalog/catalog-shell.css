@@ -47,3 +47,16 @@
 .summary-meta {
   color: #57606a;
 }
+
+.issue-list li {
+  overflow-wrap: anywhere;
+}
+
+.state-loading {
+  color: #57606a;
+  font-style: italic;
+}
+
+.state-empty {
+  border: 1px dashed #57606a;
+}

@@ -148,7 +148,10 @@ describe('CatalogStore', () => {
     expect(store.state().kind).toBe('fetch-error');
 
     store.reload();
-    expectCatalogRequest().flush(validCatalog);
+    const request = expectCatalogRequest();
+    expect(store.state().kind).toBe('loading');
+    expect(store.isLoading()).toBe(true);
+    request.flush(validCatalog);
     await whenStable();
 
     expect(store.state().kind).toBe('success');

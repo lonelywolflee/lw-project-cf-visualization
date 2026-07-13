@@ -13,7 +13,7 @@
   } @case ('invalid-data') {
   <div class="state state-error" role="alert">
     <p>
-      카탈로그 데이터가 schema 검증을 통과하지 못했습니다.
+      카탈로그 데이터가 스키마 검증을 통과하지 못했습니다.
       <code>pnpm crawl</code>로 데이터를 다시 생성해 주세요.
     </p>
     <ul class="issue-list">
@@ -26,7 +26,7 @@
     }
   </div>
   } @case ('empty') {
-  <p class="state state-empty">
+  <p class="state state-empty" role="status">
     카탈로그가 비어 있습니다. <code>pnpm crawl</code>을 실행해 제품 데이터를 수집해 주세요.
   </p>
   } @case ('success') {
@@ -34,23 +34,23 @@
     <h2 id="summary-heading">카탈로그 요약</h2>
     <dl class="summary-counts">
       <div>
-        <dt>Product family</dt>
+        <dt lang="en">Product family</dt>
         <dd>{{ state.catalog.productFamilies.length }}</dd>
       </div>
       <div>
-        <dt>Product</dt>
+        <dt lang="en">Product</dt>
         <dd>{{ state.catalog.products.length }}</dd>
       </div>
       <div>
-        <dt>Solution</dt>
+        <dt lang="en">Solution</dt>
         <dd>{{ state.catalog.solutions.length }}</dd>
       </div>
       <div>
-        <dt>Use case</dt>
+        <dt lang="en">Use case</dt>
         <dd>{{ state.catalog.useCases.length }}</dd>
       </div>
       <div>
-        <dt>Relationship</dt>
+        <dt lang="en">Relationship</dt>
         <dd>{{ state.catalog.relationships.length }}</dd>
       </div>
     </dl>
