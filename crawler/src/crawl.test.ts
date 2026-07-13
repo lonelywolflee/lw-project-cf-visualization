@@ -209,7 +209,7 @@ describe('runCrawl failure matrix', () => {
       'config: 5 sources (www.cloudflare.com 4, developers.cloudflare.com 1)',
       'fetch: 5/5 pages fetched (robots-gated)',
       'parse: 5 pages parsed and normalized',
-      'assemble: 3 families, 4 products, 3 solutions, 4 use cases, 4 relationships — schema valid',
+      'assemble: 3 families, 5 products, 3 solutions, 4 use cases, 4 relationships — schema valid',
       `write: replaced ${target}`,
     ]);
     expect(await readdir(dataDir)).toEqual(['catalog.json']);

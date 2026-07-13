@@ -190,7 +190,12 @@ function assembleFamilies(sorted: readonly CatalogFragment[]): ProductFamily[] {
  * the products overview (dedicated pages claim both as null), so a group
  * without them is a product missing from the overview — an explicit error
  * naming the product page. Summary takes the highest-precedence non-null
- * value (the dedicated page's description beats the overview tagline).
+ * value (the dedicated page's description beats the overview tagline); when
+ * NO claim states a summary (the live overview ships tagline-less product
+ * cards), it falls back to a deterministic provenance-true template — exactly
+ * like the family summary template and for the same reason: the schema
+ * requires a non-blank summary, and the template states only what we know
+ * (the name and where it was listed) without inventing product copy.
  * Docs entries enrich sourceIds by exact slug === id match only.
  */
 function assembleProducts(
@@ -219,7 +224,7 @@ function assembleProducts(
         `product '${id}'`,
         (claim) => claim.familyId,
       );
-      if (name === null || summary === null || familyId === null) {
+      if (name === null || familyId === null) {
         const url = highestPrecedenceUrl(group, key);
         throw new CrawlError(
           `[normalize ${url}] product '${id}' is missing from the products overview`,
@@ -235,7 +240,8 @@ function assembleProducts(
       return {
         id,
         name,
-        summary,
+        summary:
+          summary ?? `Cloudflare product "${name}" as listed on the official products overview.`,
         familyId,
         sourceIds: [...sourceIds].sort(compareCodepoints),
       };

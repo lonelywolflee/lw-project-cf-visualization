@@ -127,19 +127,20 @@ export function normalizePage(page: ParsedPage, configuredKind: SourcePageKind):
     case 'products-overview': {
       // One FamilyClaim per section (heading = the only stable family
       // handle) and one ProductClaim per card; the overview owns official
-      // names, taglines, and family membership. It states no edges.
+      // names, taglines, and family membership. It states no edges. A card's
+      // tagline may be null (the live overview ships tagline-less product
+      // cards), which maps straight onto the nullable claim summary.
       const familyClaims: FamilyClaim[] = [];
       const productClaims: ProductClaim[] = [];
       for (const family of page.families) {
         const familyId = slugify(family.heading);
         familyClaims.push({ id: familyId, name: family.heading, sourceId: source.id });
         for (const card of family.items) {
-          const href = requireCardHref(card, 'product', page.canonicalUrl);
           productClaims.push({
-            key: pathKeyOf(href),
-            id: idFromPath(href),
+            key: pathKeyOf(card.href),
+            id: idFromPath(card.href),
             name: card.name,
-            summary: card.summary,
+            summary: card.tagline,
             familyId,
             sourceId: source.id,
           });
@@ -262,18 +263,22 @@ function toEdgeClaims(
   return useCaseClaims.map((useCase): EdgeClaim => ({ type, fromId, toId: useCase.id, sourceId }));
 }
 
+/** The only host whose docs-entry hrefs may enrich product provenance. */
+const DOCS_HOST = 'developers.cloudflare.com';
+
 /**
- * Slug of a docs-entry href when its path has EXACTLY one segment (e.g.
- * '/workers/' → 'workers'); multi-segment hrefs identify sub-pages, not
- * products, and yield null.
+ * Slug of a docs-entry href when it stays on {@link DOCS_HOST} and its path
+ * has EXACTLY one segment (e.g. '/workers/' → 'workers'). Multi-segment
+ * hrefs identify sub-pages, not products, and external-host hrefs (e.g.
+ * github.com cards) must never enrich provenance; both yield null.
  */
 function docsSlugOf(href: string | null, pageUrl: string): string | null {
   if (href === null) {
     return null;
   }
-  let pathname: string;
+  let parsed: URL;
   try {
-    pathname = new URL(href).pathname;
+    parsed = new URL(href);
   } catch (cause) {
     // Parsers guarantee absolute hrefs; a relative one here is a parser bug
     // and must surface stage-tagged, not as a raw TypeError.
@@ -283,7 +288,10 @@ function docsSlugOf(href: string | null, pageUrl: string): string | null {
       cause,
     });
   }
-  const segments = pathname.split('/').filter((segment) => segment.length > 0);
+  if (parsed.hostname !== DOCS_HOST) {
+    return null;
+  }
+  const segments = parsed.pathname.split('/').filter((segment) => segment.length > 0);
   const [only] = segments;
   if (segments.length !== 1 || only === undefined) {
     return null;

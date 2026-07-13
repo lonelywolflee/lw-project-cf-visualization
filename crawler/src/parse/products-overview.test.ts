@@ -46,12 +46,12 @@ describe('parseProductsOverview', () => {
           items: [
             {
               name: 'Workers',
-              summary: 'Global serverless functions',
+              tagline: 'Global serverless functions',
               href: 'https://www.cloudflare.com/products/workers/',
             },
             {
               name: 'Cloudflare Pages',
-              summary: 'Build & deploy frontend sites',
+              tagline: 'Build & deploy frontend sites',
               href: 'https://www.cloudflare.com/products/pages/',
             },
           ],
@@ -61,8 +61,15 @@ describe('parseProductsOverview', () => {
           items: [
             {
               name: 'Access',
-              summary: 'Zero trust access to private resources',
+              tagline: 'Zero trust access to private resources',
               href: 'https://www.cloudflare.com/products/access/',
+            },
+            {
+              // Live anomaly: a genuine card with no tagline p parses with
+              // tagline null instead of failing the crawl.
+              name: 'DDoS for Web',
+              tagline: null,
+              href: 'https://www.cloudflare.com/products/ddos-for-web/',
             },
           ],
         },
@@ -71,7 +78,7 @@ describe('parseProductsOverview', () => {
           items: [
             {
               name: 'CDN',
-              summary: 'Ultra-fast static and dynamic content delivery',
+              tagline: 'Ultra-fast static and dynamic content delivery',
               href: 'https://www.cloudflare.com/products/cdn/',
             },
           ],

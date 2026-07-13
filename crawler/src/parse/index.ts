@@ -53,7 +53,8 @@ export type {
   ParsedPage,
   ParsedPageBase,
   ParsedPageKind,
+  ProductCard,
+  ProductTaxonomySection,
   RawEntityCard,
   RawLink,
-  RawTaxonomySection,
 } from './types.js';
