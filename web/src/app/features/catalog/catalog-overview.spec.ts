@@ -88,7 +88,7 @@ describe('CatalogOverview', () => {
     const headings = Array.from(element.querySelectorAll('section.family h2')).map((heading) =>
       heading.textContent?.replace(/\s+/g, ' ').trim(),
     );
-    expect(headings).toEqual(['Compute product 2개', 'Security product 1개']);
+    expect(headings).toEqual(['Compute Product 2개', 'Security Product 1개']);
 
     const computeSection = element.querySelector('#family-compute');
     expect(computeSection?.getAttribute('aria-labelledby')).toBe('family-heading-compute');

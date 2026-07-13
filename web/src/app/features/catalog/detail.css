@@ -75,3 +75,7 @@
   color: #57606a;
   font-style: italic;
 }
+
+.not-found code {
+  overflow-wrap: anywhere;
+}

@@ -17,7 +17,7 @@
   >
     <h2 [id]="'family-heading-' + group.family.id">
       {{ group.family.name }}
-      <span class="count">product {{ group.products.length }}개</span>
+      <span class="count"><span lang="en">Product</span> {{ group.products.length }}개</span>
     </h2>
     <p class="family-summary">{{ group.family.summary }}</p>
     @if (group.products.length > 0) {

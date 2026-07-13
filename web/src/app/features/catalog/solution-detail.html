@@ -9,7 +9,9 @@
 </section>
 } @case ('found') {
 <article class="detail" aria-labelledby="detail-heading">
-  <p class="back"><a routerLink="/">← 카탈로그 개요</a></p>
+  <p class="back">
+    <a routerLink="/"><span aria-hidden="true">←</span> 카탈로그 개요</a>
+  </p>
   <h1 id="detail-heading">{{ state.detail.solution.name }}</h1>
   <p class="detail-summary">{{ state.detail.solution.summary }}</p>
 
