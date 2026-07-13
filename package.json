@@ -9,6 +9,10 @@
     "node": "^22.22.3 || ^24.15.0"
   },
   "scripts": {
+    "dev": "pnpm --filter @cf-viz/web run start",
+    "build": "pnpm -r run build",
+    "lint": "pnpm --filter @cf-viz/catalog run build && pnpm -r run lint",
+    "test": "pnpm -r run test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
