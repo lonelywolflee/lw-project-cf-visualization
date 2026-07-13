@@ -35,6 +35,12 @@ export const CATALOG_ROUTES: Routes = [
         title: '검색과 필터 | Cloudflare Product & Solution Explorer',
       },
       {
+        path: 'relationships',
+        loadComponent: () =>
+          import('../relationships/relationships-page').then((m) => m.RelationshipsPage),
+        title: '관계 보기 | Cloudflare Product & Solution Explorer',
+      },
+      {
         path: 'products/:productId',
         loadComponent: () => import('./product-detail').then((m) => m.ProductDetail),
         title: 'Product 상세 | Cloudflare Product & Solution Explorer',

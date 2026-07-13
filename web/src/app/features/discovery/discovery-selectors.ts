@@ -1,6 +1,7 @@
 import type { Catalog, Product, Solution } from '@cf-viz/catalog';
 
 import { compareByNameThenId } from '../../core/catalog/catalog-selectors';
+import { firstParamValue } from '../../core/routing/query-params';
 
 /**
  * Pure discovery layer: URL params -> validated criteria -> derived results.
@@ -25,17 +26,9 @@ export interface ParsedDiscoveryParams {
   readonly dropped: readonly ('family' | 'useCase')[];
 }
 
-/**
- * First string out of a raw query param value. Query params can legally
- * repeat (`?family=a&family=b`), in which case the router hands the bound
- * input a string array despite the input's declared type; the first
- * occurrence wins.
- */
-export function firstParamValue(value: unknown): string | undefined {
-  if (typeof value === 'string') return value;
-  if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
-  return undefined;
-}
+// Moved to core so the relationships feature can share it without a
+// cross-feature dependency; re-exported to keep this module's public surface.
+export { firstParamValue };
 
 /**
  * Normalizes raw query params against the catalog. Unknown `family` /

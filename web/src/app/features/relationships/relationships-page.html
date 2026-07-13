@@ -1,0 +1,257 @@
+<section class="relationships" aria-labelledby="relationships-heading">
+  <h1 id="relationships-heading">관계 보기</h1>
+
+  @if (!hasAnyRelationship()) {
+  <p class="state-empty" role="status">
+    아직 수집된 관계가 없습니다. <code>pnpm crawl</code>을 실행해 공식 페이지에서 관계 데이터를
+    수집해 주세요.
+  </p>
+  } @else {
+  <p class="intro">
+    공식 Cloudflare 페이지에서 확인된 관계만 표시합니다. 아래 다이어그램과 목록은 같은 데이터를
+    보여주며, 목록에서 키보드로 모든 정보를 확인할 수 있습니다.
+  </p>
+
+  <form class="controls" (submit)="$event.preventDefault()">
+    <div class="control">
+      <label for="relationships-type">관계 유형</label>
+      <select id="relationships-type" (change)="onTypeChange($any($event.target).value)">
+        <option value="" [selected]="filter().type === null">전체</option>
+        @for (relationshipType of relationshipTypes; track relationshipType) {
+        <option [value]="relationshipType" [selected]="relationshipType === filter().type">
+          {{ typeLabels[relationshipType] }}
+        </option>
+        }
+      </select>
+    </div>
+    <div class="control">
+      <label for="relationships-category">항목 분류</label>
+      <select id="relationships-category" (change)="onCategoryChange($any($event.target).value)">
+        <option value="" [selected]="filter().category === null">전체</option>
+        @for (kind of nodeKinds; track kind) {
+        <option [value]="kind" [selected]="kind === filter().category">
+          {{ kindLabels[kind].en }}
+        </option>
+        }
+      </select>
+    </div>
+    @if (hasActiveFilter()) {
+    <button type="button" class="clear-filters" (click)="clearFilters()">필터 초기화</button>
+    }
+  </form>
+
+  <p class="result-count" role="status">관계 {{ filteredEdges().length }}건</p>
+
+  @if (filteredEdges().length === 0) {
+  <p class="no-results">
+    조건에 맞는 관계가 없습니다.
+    <button type="button" (click)="clearFilters()">필터 초기화</button>
+  </p>
+  } @else {
+
+  <!--
+    Pointer-bonus diagram. aria-hidden: the HTML list below is the complete,
+    keyboard-accessible representation of the same filtered projection; the
+    SVG adds no information and holds no focusable elements.
+  -->
+  <figure class="graph-figure">
+    <svg
+      class="graph"
+      [attr.viewBox]="'0 0 ' + layout.viewBoxWidth + ' ' + graph().viewBoxHeight"
+      aria-hidden="true"
+      focusable="false"
+    >
+      @for (edge of graph().edges; track edge.key) {
+      <path
+        class="edge"
+        [class.edge-product-use-case]="edge.type === 'product-use-case'"
+        [class.edge-solution-use-case]="edge.type === 'solution-use-case'"
+        [class.edge-product-solution]="edge.type === 'product-solution'"
+        [class.selected]="isSelectedEdge(edge.key)"
+        [attr.d]="edge.path"
+        (click)="selectEdge(edge.key)"
+      >
+        <title>{{ edge.label }}</title>
+      </path>
+      } @for (node of graph().nodes; track node.key) {
+      <g class="node" [class.selected]="isSelectedNode(node.key)" (click)="selectNode(node.key)">
+        <title>{{ kindLabels[node.kind].en }}: {{ node.name }}</title>
+        <rect
+          [attr.x]="node.x"
+          [attr.y]="node.y"
+          [attr.width]="layout.nodeWidth"
+          [attr.height]="layout.nodeHeight"
+          rx="6"
+        />
+        <text [attr.x]="node.x + 12" [attr.y]="node.y + 23">
+          <tspan class="badge">{{ kindLabels[node.kind].badge }}</tspan>
+          <tspan [attr.x]="node.x + 34" [attr.y]="node.y + 23">{{ node.displayName }}</tspan>
+        </text>
+      </g>
+      }
+    </svg>
+    <figcaption class="legend">
+      <span class="legend-item"
+        ><svg viewBox="0 0 28 8" aria-hidden="true" focusable="false" class="legend-swatch">
+          <path class="edge edge-product-use-case" d="M 0 4 H 28" /></svg
+        >{{ typeLabels['product-use-case'] }}</span
+      >
+      <span class="legend-item"
+        ><svg viewBox="0 0 28 8" aria-hidden="true" focusable="false" class="legend-swatch">
+          <path class="edge edge-solution-use-case" d="M 0 4 H 28" /></svg
+        >{{ typeLabels['solution-use-case'] }}</span
+      >
+      <span class="legend-item"
+        ><svg viewBox="0 0 28 8" aria-hidden="true" focusable="false" class="legend-swatch">
+          <path class="edge edge-product-solution" d="M 0 4 H 28" /></svg
+        >{{ typeLabels['product-solution'] }}</span
+      >
+      <span class="legend-item"><span class="badge-chip">P</span> Product</span>
+      <span class="legend-item"><span class="badge-chip">S</span> Solution</span>
+      <span class="legend-item"><span class="badge-chip">U</span> Use case</span>
+    </figcaption>
+  </figure>
+
+  <div class="fallback">
+    <section class="edge-list" aria-labelledby="edge-list-heading">
+      <h2 id="edge-list-heading">관계 목록</h2>
+      @for (group of groups(); track group.type) {
+      <section class="edge-group" [attr.aria-labelledby]="'group-' + group.type">
+        <h3 [id]="'group-' + group.type">
+          <span lang="en">{{ group.label }}</span>
+          <span class="count">{{ group.edges.length }}건</span>
+        </h3>
+        <ul>
+          @for (edge of group.edges; track edge.key) {
+          <li>
+            <button
+              type="button"
+              class="edge-button"
+              [attr.aria-pressed]="isSelectedEdge(edge.key)"
+              (click)="selectEdge(edge.key)"
+            >
+              <span class="badge-chip" aria-hidden="true"
+                >{{ kindLabels[edge.from.kind].badge }}</span
+              >
+              {{ edge.from.name }}
+              <span class="arrow" aria-hidden="true">→</span
+              ><span class="visually-hidden">에서</span>
+              <span class="badge-chip" aria-hidden="true"
+                >{{ kindLabels[edge.to.kind].badge }}</span
+              >
+              {{ edge.to.name }}<span class="visually-hidden">(으)로 연결</span>
+            </button>
+          </li>
+          }
+        </ul>
+      </section>
+      }
+    </section>
+
+    <section class="detail-panel" aria-labelledby="detail-heading">
+      <h2 id="detail-heading">선택한 항목</h2>
+      <p class="selection-status" role="status">
+        @if (detail(); as selected) { @if (selected.kind === 'edge') { 관계 선택됨: {{
+        selected.detail.edge.label }} } @else { 항목 선택됨: {{ selected.detail.node.name }} } }
+        @else { 선택된 항목이 없습니다. }
+      </p>
+
+      @if (detail(); as selected) { @if (selected.kind === 'edge') {
+      <dl class="facts">
+        <div>
+          <dt>유형</dt>
+          <dd>
+            <span lang="en">{{ typeLabels[selected.detail.edge.type] }}</span>
+            <code>{{ selected.detail.edge.type }}</code>
+          </dd>
+        </div>
+        <div>
+          <dt>시작</dt>
+          <dd>
+            <span class="badge-chip">{{ kindLabels[selected.detail.edge.from.kind].badge }}</span>
+            @if (selected.detail.edge.from.detailRoute; as route) {
+            <a [routerLink]="route">{{ selected.detail.edge.from.name }}</a>
+            } @else { {{ selected.detail.edge.from.name }} }
+            <button
+              type="button"
+              class="pivot-button"
+              (click)="selectNode(selected.detail.edge.from.key)"
+              [attr.aria-label]="'이 항목의 관계 보기: ' + selected.detail.edge.from.name"
+            >
+              관계 보기
+            </button>
+          </dd>
+        </div>
+        <div>
+          <dt>대상</dt>
+          <dd>
+            <span class="badge-chip">{{ kindLabels[selected.detail.edge.to.kind].badge }}</span>
+            @if (selected.detail.edge.to.detailRoute; as route) {
+            <a [routerLink]="route">{{ selected.detail.edge.to.name }}</a>
+            } @else {
+            <span class="endpoint-name">{{ selected.detail.edge.to.name }}</span>
+            <span class="endpoint-summary">{{ selected.detail.edge.to.summary }}</span>
+            }
+            <button
+              type="button"
+              class="pivot-button"
+              (click)="selectNode(selected.detail.edge.to.key)"
+              [attr.aria-label]="'이 항목의 관계 보기: ' + selected.detail.edge.to.name"
+            >
+              관계 보기
+            </button>
+          </dd>
+        </div>
+      </dl>
+      <h3>출처</h3>
+      <ul class="source-list">
+        @for (source of selected.detail.sources; track source.id) {
+        <li>
+          <a [href]="source.url" target="_blank" rel="noopener noreferrer">
+            {{ source.title }} <span class="new-window">(새 창)</span>
+          </a>
+        </li>
+        }
+      </ul>
+      } @else {
+      <p class="node-title">
+        <span class="badge-chip">{{ kindLabels[selected.detail.node.kind].badge }}</span>
+        <strong>{{ selected.detail.node.name }}</strong>
+        <span lang="en" class="kind-name">{{ kindLabels[selected.detail.node.kind].en }}</span>
+      </p>
+      <p class="node-summary">{{ selected.detail.node.summary }}</p>
+      @if (selected.detail.node.detailRoute; as route) {
+      <p><a [routerLink]="route">카탈로그 상세 보기</a></p>
+      }
+      <h3>연결된 항목</h3>
+      <ul class="connected-list">
+        @for (edge of selected.detail.edges; track edge.key) {
+        <li>
+          <button
+            type="button"
+            class="edge-button"
+            [attr.aria-pressed]="isSelectedEdge(edge.key)"
+            (click)="selectEdge(edge.key)"
+          >
+            {{ edge.label }}
+          </button>
+        </li>
+        }
+      </ul>
+      } } @else {
+      <p class="placeholder">
+        목록의 관계 버튼을 누르면 유형, 연결된 항목, 출처가 여기에 표시됩니다.
+      </p>
+      }
+    </section>
+  </div>
+  } @if (disconnected(); as counts) { @if (counts.products > 0 || counts.solutions > 0 ||
+  counts.useCases > 0) {
+  <p class="disconnected-note">
+    아직 수집된 관계가 없는 항목 — <span lang="en">product</span> {{ counts.products }}개,
+    <span lang="en">solution</span> {{ counts.solutions }}개, <span lang="en">use case</span>
+    {{ counts.useCases }}개. 관계는 공식 페이지에서 확인된 것만 표시하며, 각 항목의 정보는
+    <a routerLink="/">카탈로그 개요</a>에서 볼 수 있습니다.
+  </p>
+  } } }
+</section>
