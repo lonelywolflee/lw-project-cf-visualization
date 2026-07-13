@@ -13,7 +13,10 @@ import { CatalogShell } from './catalog-shell';
  * honesty for the instant before the gate settles).
  *
  * The overview is imported statically (it is the first paint of the default
- * route); the two detail pages stay behind `loadComponent` chunks.
+ * route); the discovery page and the two detail pages stay behind
+ * `loadComponent` chunks. Discovery lives in `features/discovery/` but mounts
+ * here so it shares the shell gate — a second app-level route would either
+ * bypass the gate or instantiate a second shell.
  */
 export const CATALOG_ROUTES: Routes = [
   {
@@ -25,6 +28,11 @@ export const CATALOG_ROUTES: Routes = [
         pathMatch: 'full',
         component: CatalogOverview,
         title: 'Cloudflare Product & Solution Explorer',
+      },
+      {
+        path: 'discovery',
+        loadComponent: () => import('../discovery/discovery-page').then((m) => m.DiscoveryPage),
+        title: '검색과 필터 | Cloudflare Product & Solution Explorer',
       },
       {
         path: 'products/:productId',

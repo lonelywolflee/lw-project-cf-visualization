@@ -30,6 +30,40 @@ describe('App', () => {
     expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 
+  it('renders the primary navigation with catalog and discovery links', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const nav = compiled.querySelector('nav[aria-label="주요 메뉴"]');
+    expect(nav).not.toBeNull();
+    const catalogLink = nav?.querySelector<HTMLAnchorElement>('a[href="/"]');
+    expect(catalogLink?.textContent).toContain('카탈로그');
+    const discoveryLink = nav?.querySelector<HTMLAnchorElement>('a[href="/discovery"]');
+    expect(discoveryLink?.textContent).toContain('검색');
+  });
+
+  it('marks the discovery link active on /discovery while 카탈로그 stays exact', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+
+    await TestBed.inject(Router).navigateByUrl('/discovery');
+    // Zoneless pattern: the activated shell holds a pending catalog request,
+    // so whenStable() would deadlock; TestBed.tick() renders synchronously.
+    TestBed.tick();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const catalogLink = compiled.querySelector<HTMLAnchorElement>('nav a[href="/"]');
+    const discoveryLink = compiled.querySelector<HTMLAnchorElement>('nav a[href="/discovery"]');
+    expect(discoveryLink?.classList.contains('active')).toBe(true);
+    expect(catalogLink?.classList.contains('active')).toBe(false);
+
+    // Settle the outstanding request so verify() passes.
+    TestBed.inject(HttpTestingController)
+      .expectOne(CATALOG_URL)
+      .flush('gone', { status: 404, statusText: 'Not Found' });
+  });
+
   it('lazy-loads the catalog shell on the root route with accessible landmarks', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
