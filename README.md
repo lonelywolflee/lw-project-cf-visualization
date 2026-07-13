@@ -4,8 +4,10 @@ Cloudflare의 공식 제품군과 solution을 학습하기 위한 정적 visuali
 TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고, Angular web application이
 생성된 JSON을 읽어 제품과 관계를 보여줍니다.
 
-> 현재 repository는 documentation 및 planning 단계입니다. 아래 폴더와 command는 구현할
-> interface이며 아직 실행할 수 없습니다.
+> 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
+> 완료되어 아래 command를 실행할 수 있습니다. 데이터 수집과 시각화 기능은 후속 issue에서
+> 구현합니다. 그 전까지 crawler는 placeholder 메시지만 출력하고, web은 Angular 기본 화면을
+> 보여줍니다.
 
 ## 목표
 
@@ -70,26 +72,24 @@ TypeScript type, validator를 제공하며 data 구조의 single source of truth
 
 ## 기술 구성
 
-- Angular CLI와 standalone Angular component
+- Angular CLI와 standalone Angular component (zoneless)
 - strict TypeScript
-- Node.js LTS
+- Node.js LTS (`.nvmrc` 기준 24)
 - `pnpm` workspace
+- Vitest unit test와 ESLint, Prettier
 - Cloudflare Pages static hosting
 
 초기 범위에는 Nx, SSR, NgRx를 사용하지 않습니다.
 
 ## 설정과 실행
 
-Workspace 구현 후 사용할 planned command입니다.
+다음 command를 repository root에서 실행합니다.
 
 ```bash
 corepack enable
 pnpm install
 
-# 공식 source를 수집해 web/public/data를 갱신
-pnpm crawl
-
-# 갱신된 data를 시각화
+# 갱신된 data를 시각화 (Angular dev server)
 pnpm dev
 
 # 품질 검증과 production build
@@ -98,8 +98,9 @@ pnpm test
 pnpm build
 ```
 
-일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다. 이미 생성된 JSON이 있다면 crawler를
-다시 실행하지 않고 `pnpm dev`만 실행할 수 있습니다.
+`pnpm crawl` command는 crawler 구현 issue에서 추가됩니다. 현재 crawler package는
+workspace 연결을 확인하는 placeholder 실행(`pnpm --filter @cf-viz/crawler run crawl`)만
+제공합니다. Crawler가 구현되면 일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다.
 
 ## 공식 Source
 
