@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global base styles: light-only for now; theme tokens live here so a dark
+   scheme can later be added by overriding the custom properties. */
+:root {
+  color-scheme: light;
+  --color-text: #1f2328;
+  --color-background: #ffffff;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Noto Sans KR',
+    'Apple SD Gothic Neo',
+    sans-serif;
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

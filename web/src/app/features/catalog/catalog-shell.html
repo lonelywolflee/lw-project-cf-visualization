@@ -1,0 +1,63 @@
+<section class="catalog-shell" aria-labelledby="catalog-heading">
+  <h1 id="catalog-heading">Cloudflare 제품 카탈로그</h1>
+
+  @let state = store.state(); @switch (state.kind) { @case ('loading') {
+  <p class="state state-loading" role="status" aria-live="polite">
+    카탈로그 데이터를 불러오는 중입니다…
+  </p>
+  } @case ('fetch-error') {
+  <div class="state state-error" role="alert">
+    <p>카탈로그 데이터를 불러오지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.</p>
+    <button type="button" (click)="store.reload()">다시 시도</button>
+  </div>
+  } @case ('invalid-data') {
+  <div class="state state-error" role="alert">
+    <p>
+      카탈로그 데이터가 schema 검증을 통과하지 못했습니다.
+      <code>pnpm crawl</code>로 데이터를 다시 생성해 주세요.
+    </p>
+    <ul class="issue-list">
+      @for (issue of visibleIssues(); track $index) {
+      <li><code>{{ issue.path }}</code> — {{ issue.message }}</li>
+      }
+    </ul>
+    @if (hiddenIssueCount() > 0) {
+    <p>외 {{ hiddenIssueCount() }}건의 문제가 더 있습니다.</p>
+    }
+  </div>
+  } @case ('empty') {
+  <p class="state state-empty">
+    카탈로그가 비어 있습니다. <code>pnpm crawl</code>을 실행해 제품 데이터를 수집해 주세요.
+  </p>
+  } @case ('success') {
+  <section class="summary" aria-labelledby="summary-heading">
+    <h2 id="summary-heading">카탈로그 요약</h2>
+    <dl class="summary-counts">
+      <div>
+        <dt>Product family</dt>
+        <dd>{{ state.catalog.productFamilies.length }}</dd>
+      </div>
+      <div>
+        <dt>Product</dt>
+        <dd>{{ state.catalog.products.length }}</dd>
+      </div>
+      <div>
+        <dt>Solution</dt>
+        <dd>{{ state.catalog.solutions.length }}</dd>
+      </div>
+      <div>
+        <dt>Use case</dt>
+        <dd>{{ state.catalog.useCases.length }}</dd>
+      </div>
+      <div>
+        <dt>Relationship</dt>
+        <dd>{{ state.catalog.relationships.length }}</dd>
+      </div>
+    </dl>
+    <p class="summary-meta">
+      출처 {{ state.catalog.sources.length }}곳 · 생성 시각 {{ state.catalog.generatedAt | date:
+      'medium' }}
+    </p>
+  </section>
+  } }
+</section>
