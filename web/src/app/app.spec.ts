@@ -30,7 +30,7 @@ describe('App', () => {
     expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 
-  it('renders the primary navigation with catalog and discovery links', async () => {
+  it('renders the primary navigation with catalog, discovery, and relationships links', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
 
@@ -41,6 +41,8 @@ describe('App', () => {
     expect(catalogLink?.textContent).toContain('카탈로그');
     const discoveryLink = nav?.querySelector<HTMLAnchorElement>('a[href="/discovery"]');
     expect(discoveryLink?.textContent).toContain('검색');
+    const relationshipsLink = nav?.querySelector<HTMLAnchorElement>('a[href="/relationships"]');
+    expect(relationshipsLink?.textContent).toContain('관계');
   });
 
   it('marks the discovery link active on /discovery while 카탈로그 stays exact', async () => {
