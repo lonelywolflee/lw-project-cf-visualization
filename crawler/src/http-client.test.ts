@@ -2,11 +2,13 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import type { SourceConfig } from './config.js';
 import { CrawlError } from './errors.js';
 import {
   CRAWLER_USER_AGENT,
   CRAWLER_USER_AGENT_TOKEN,
   HttpClient,
+  httpClientFromConfig,
   type FetchLike,
   type FetchPageRequest,
   type HttpClientOptions,
@@ -529,5 +531,39 @@ describe('HttpClient against a local node:http server (no public network)', () =
     expect(error.message).toMatch(/network failure \(ECONNREFUSED\)/);
     expect(error.cause).toBeInstanceOf(TypeError);
     expect(delays).toEqual([1000]);
+  });
+});
+
+describe('httpClientFromConfig', () => {
+  it('builds a working HttpClient that enforces the validated config allowlist', async () => {
+    const config: SourceConfig = {
+      allowedHosts: ['www.cloudflare.com', 'developers.cloudflare.com'],
+      fetch: { timeoutMs: 1000, maxRetries: 0, concurrency: 1, minRequestIntervalMs: 250 },
+      sources: [
+        {
+          id: 'www-products-overview',
+          url: 'https://www.cloudflare.com/products/',
+          pageKind: 'marketing-overview',
+        },
+      ],
+    };
+
+    const client = httpClientFromConfig(config);
+    expect(client).toBeInstanceOf(HttpClient);
+
+    // 127.0.0.1 is NOT in the config's allowlist, so the client must veto the
+    // request before any connection attempt — proving the factory installed
+    // config.allowedHosts. The port is a freshly closed loopback port, so
+    // even a broken mapping could not reach a live socket.
+    const port = await findClosedPort();
+    const error = await client
+      .fetchPage({ sourceId: 'factory-veto', url: `http://127.0.0.1:${String(port)}/x` })
+      .then(() => null)
+      .catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(CrawlError);
+    if (!(error instanceof CrawlError)) return;
+    expect(error.stage).toBe('fetch');
+    expect(error.message).toContain("hostname '127.0.0.1' is not allowlisted");
   });
 });
