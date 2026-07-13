@@ -19,8 +19,12 @@
     "lint": "eslint .",
     "test": "vitest run"
   },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
+    "@types/node": "^24.13.3",
     "eslint": "^10.0.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.63.0",

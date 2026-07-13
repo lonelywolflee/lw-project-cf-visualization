@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-07-14T00:00:00Z",
+  "sources": [
+    {
+      "id": "waf-product-page",
+      "url": "https://www.cloudflare.com/application-services/products/waf/",
+      "pageKind": "marketing-product",
+      "title": "Cloudflare Web Application Firewall",
+      "retrievedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "productFamilies": [
+    {
+      "id": "application-security",
+      "name": "Application security",
+      "summary": "Products that protect web applications and APIs at the edge.",
+      "sourceIds": ["waf-product-page"]
+    }
+  ],
+  "products": [
+    {
+      "id": "waf",
+      "name": "   ",
+      "summary": "Filters and blocks malicious HTTP traffic before it reaches an application.",
+      "familyId": "application-security",
+      "sourceIds": ["waf-product-page"]
+    }
+  ],
+  "solutions": [],
+  "useCases": [],
+  "relationships": []
+}
