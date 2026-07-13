@@ -7,7 +7,7 @@
  */
 import { CrawlError } from '../errors.js';
 import { parseBase, requireBounded, resolveHref } from './base.js';
-import type { HtmlPage } from './html.js';
+import { cleanText, type HtmlPage } from './html.js';
 import { collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPage, ProductCard, ProductTaxonomySection } from './types.js';
 
@@ -41,7 +41,7 @@ export function parseProductsOverview(page: HtmlPage, meta: PageMeta): ProductsO
   const families: ProductTaxonomySection[] = figureElements.map((figureElement) => {
     const figure = page(figureElement);
     const heading = requireBounded(
-      figure.find('figcaption').first().text(),
+      cleanText(figure.find('figcaption').first()),
       FIELD_CAPS.name,
       'text for figcaption (family name)',
       url,
@@ -57,14 +57,14 @@ export function parseProductsOverview(page: HtmlPage, meta: PageMeta): ProductsO
       const card = page(cardElement);
       const strong = card.find('strong').first();
       const name = requireBounded(
-        strong.text(),
+        cleanText(strong),
         FIELD_CAPS.name,
         `strong (product name) inside ${PRODUCT_CARD_SELECTOR}`,
         url,
       );
       // Absent or blank tagline p → null, never an error: see the TSDoc
       // asymmetry note above (live evidence: ddos-for-web).
-      const tagline = collapseWhitespace(strong.parent().next('p').text());
+      const tagline = cleanText(strong.parent().next('p'));
       const href = card.attr('href');
       if (href === undefined || collapseWhitespace(href).length === 0) {
         throw new CrawlError(`[parse ${url}] missing required ${PRODUCT_CARD_SELECTOR}@href`, {

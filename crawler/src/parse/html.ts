@@ -48,13 +48,28 @@ export function requireAttr(
   return collapseWhitespace(value);
 }
 
+/** One selection out of an {@link HtmlPage} query. */
+export type HtmlSelection = ReturnType<HtmlPage>;
+
+/**
+ * Collapsed text of a selection with embedded script/style content removed.
+ * Live pages inline framework loaders inside SSR'd copy nodes (found in the
+ * wild on the solutions overview by the issue #5 data audit), and a plain
+ * `.text()` would concatenate that JavaScript into extracted summaries.
+ */
+export function cleanText(selection: HtmlSelection): string {
+  const cloned = selection.clone();
+  cloned.find('script, style').remove();
+  return collapseWhitespace(cloned.text());
+}
+
 /**
  * Required-text variant of {@link requireAttr}: first match wins, collapsed;
  * blank (including no match) throws a CrawlError at stage 'parse' naming the
  * selector.
  */
 export function requireText(page: HtmlPage, selector: string, url: string): string {
-  const text = collapseWhitespace(page(selector).first().text());
+  const text = cleanText(page(selector).first());
   if (text.length === 0) {
     throw new CrawlError(`[parse ${url}] missing required text for ${selector}`, {
       stage: 'parse',
@@ -80,6 +95,6 @@ export function optionalAttr(
 
 /** Optional text: collapsed first-match text, or undefined when blank. */
 export function optionalText(page: HtmlPage, selector: string): string | undefined {
-  const text = collapseWhitespace(page(selector).first().text());
+  const text = cleanText(page(selector).first());
   return text.length === 0 ? undefined : text;
 }

@@ -8,7 +8,7 @@
  */
 import { CrawlError } from '../errors.js';
 import { parseBase, requireBounded, resolveHref } from './base.js';
-import type { HtmlPage } from './html.js';
+import { cleanText, type HtmlPage } from './html.js';
 import { collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPage, RawEntityCard } from './types.js';
 
@@ -44,12 +44,12 @@ export function parseDeveloperDocs(page: HtmlPage, meta: PageMeta): DeveloperDoc
       continue;
     }
     const name = requireBounded(
-      nameSpan.text(),
+      cleanText(nameSpan),
       FIELD_CAPS.name,
       `span (entry name) inside ${ENTRY_CARD_SELECTOR}`,
       url,
     );
-    const description = collapseWhitespace(descriptionP.text());
+    const description = cleanText(descriptionP);
     if (description.length === 0) {
       throw new CrawlError(
         `[parse ${url}] missing required description p inside ${ENTRY_CARD_SELECTOR}`,
