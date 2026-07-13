@@ -1,0 +1,54 @@
+<section class="catalog-overview" aria-labelledby="overview-heading">
+  <h1 id="overview-heading">Cloudflare 제품 카탈로그</h1>
+
+  @if (catalog(); as catalog) {
+  <p class="summary-line">
+    <span lang="en">Product family</span> {{ catalog.productFamilies.length }} ·
+    <span lang="en">Product</span> {{ catalog.products.length }} ·
+    <span lang="en">Solution</span> {{ catalog.solutions.length }} · <span lang="en">Use case</span>
+    {{ catalog.useCases.length }} · 출처 {{ catalog.sources.length }}곳 · 생성 시각 {{
+    catalog.generatedAt | date: 'medium' }}
+  </p>
+  } @for (group of groups(); track group.family.id) {
+  <section
+    class="family"
+    [id]="'family-' + group.family.id"
+    [attr.aria-labelledby]="'family-heading-' + group.family.id"
+  >
+    <h2 [id]="'family-heading-' + group.family.id">
+      {{ group.family.name }}
+      <span class="count">product {{ group.products.length }}개</span>
+    </h2>
+    <p class="family-summary">{{ group.family.summary }}</p>
+    @if (group.products.length > 0) {
+    <ul class="link-list">
+      @for (product of group.products; track product.id) {
+      <li>
+        <a [routerLink]="['/products', product.id]">{{ product.name }}</a>
+      </li>
+      }
+    </ul>
+    } @else {
+    <p class="empty-note">이 family의 product가 아직 수집되지 않았습니다.</p>
+    }
+  </section>
+  }
+
+  <section class="solutions" aria-labelledby="solutions-heading">
+    <h2 id="solutions-heading">
+      <span lang="en">Solution</span>
+      <span class="count">{{ solutions().length }}개</span>
+    </h2>
+    @if (solutions().length > 0) {
+    <ul class="link-list">
+      @for (solution of solutions(); track solution.id) {
+      <li>
+        <a [routerLink]="['/solutions', solution.id]">{{ solution.name }}</a>
+      </li>
+      }
+    </ul>
+    } @else {
+    <p class="empty-note">Solution이 아직 수집되지 않았습니다.</p>
+    }
+  </section>
+</section>

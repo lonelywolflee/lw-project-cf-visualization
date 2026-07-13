@@ -1,7 +1,10 @@
+@let state = store.state(); @if (state.kind === 'success') {
+<router-outlet />
+} @else {
 <section class="catalog-shell" aria-labelledby="catalog-heading">
   <h1 id="catalog-heading">Cloudflare 제품 카탈로그</h1>
 
-  @let state = store.state(); @switch (state.kind) { @case ('loading') {
+  @switch (state.kind) { @case ('loading') {
   <p class="state state-loading" role="status" aria-live="polite">
     카탈로그 데이터를 불러오는 중입니다…
   </p>
@@ -29,35 +32,6 @@
   <p class="state state-empty" role="status">
     카탈로그가 비어 있습니다. <code>pnpm crawl</code>을 실행해 제품 데이터를 수집해 주세요.
   </p>
-  } @case ('success') {
-  <section class="summary" aria-labelledby="summary-heading">
-    <h2 id="summary-heading">카탈로그 요약</h2>
-    <dl class="summary-counts">
-      <div>
-        <dt lang="en">Product family</dt>
-        <dd>{{ state.catalog.productFamilies.length }}</dd>
-      </div>
-      <div>
-        <dt lang="en">Product</dt>
-        <dd>{{ state.catalog.products.length }}</dd>
-      </div>
-      <div>
-        <dt lang="en">Solution</dt>
-        <dd>{{ state.catalog.solutions.length }}</dd>
-      </div>
-      <div>
-        <dt lang="en">Use case</dt>
-        <dd>{{ state.catalog.useCases.length }}</dd>
-      </div>
-      <div>
-        <dt lang="en">Relationship</dt>
-        <dd>{{ state.catalog.relationships.length }}</dd>
-      </div>
-    </dl>
-    <p class="summary-meta">
-      출처 {{ state.catalog.sources.length }}곳 · 생성 시각 {{ state.catalog.generatedAt | date:
-      'medium' }}
-    </p>
-  </section>
   } }
 </section>
+}

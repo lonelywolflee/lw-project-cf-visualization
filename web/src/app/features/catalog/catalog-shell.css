@@ -28,26 +28,6 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.summary-counts {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  margin: 1rem 0;
-}
-
-.summary-counts dt {
-  font-weight: 600;
-}
-
-.summary-counts dd {
-  font-size: 1.75rem;
-  margin: 0;
-}
-
-.summary-meta {
-  color: #57606a;
-}
-
 .issue-list li {
   overflow-wrap: anywhere;
 }
