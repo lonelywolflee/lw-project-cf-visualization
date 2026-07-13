@@ -7,7 +7,9 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 > 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
 > 완료되어 아래 command를 실행할 수 있습니다. `pnpm crawl`이 공식 source 수집, schema
 > validation, `web/public/data/catalog.json` 갱신까지 수행합니다. 시각화 기능은 후속
-> issue에서 구현하며, 그 전까지 web은 Angular 기본 화면을 보여줍니다.
+> issue에서 구현하며, 현재 web은 `catalog.json`을 schema validation과 함께 불러와
+> loading·오류·빈 데이터 상태와 catalog 요약(entity 수, 생성 시각, 출처 수)을 보여주는
+> catalog shell을 제공합니다.
 
 ## 목표
 
