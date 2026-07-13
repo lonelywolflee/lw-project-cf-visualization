@@ -188,6 +188,16 @@ describe('assembleCatalog', () => {
           sourceIds: ['www-product-cdn', 'www-products-overview'],
         },
         {
+          // The tagline-less live-anomaly card: no claim states a summary,
+          // so the provenance-true product template fills the schema-required
+          // field (mirroring the family summary template).
+          id: 'ddos-for-web',
+          name: 'DDoS for Web',
+          summary: 'Cloudflare product "DDoS for Web" as listed on the official products overview.',
+          familyId: 'sase-zero-trust',
+          sourceIds: ['www-products-overview'],
+        },
+        {
           id: 'pages',
           name: 'Cloudflare Pages',
           summary: 'Build & deploy frontend sites',
@@ -304,6 +314,37 @@ describe('assembleCatalog', () => {
     const first = assembleCatalog(fixtureFragments(), { generatedAt: GENERATED_AT });
     const second = assembleCatalog(fixtureFragments(), { generatedAt: GENERATED_AT });
     expect(JSON.stringify(second)).toBe(JSON.stringify(first));
+  });
+
+  it('falls back to the product summary template when no claim states a summary', () => {
+    const fragments: readonly CatalogFragment[] = [
+      makeFragment(
+        makeSource('hand-a', 'https://www.cloudflare.com/products/', 'marketing-overview', 'A'),
+        {
+          familyClaims: [{ id: 'security', name: 'Security', sourceId: 'hand-a' }],
+          productClaims: [
+            {
+              key: '/products/ddos-for-web',
+              id: 'ddos-for-web',
+              name: 'DDoS for Web',
+              summary: null,
+              familyId: 'security',
+              sourceId: 'hand-a',
+            },
+          ],
+        },
+      ),
+    ];
+    const catalog = assembleCatalog(fragments, { generatedAt: GENERATED_AT });
+    expect(catalog.products).toEqual([
+      {
+        id: 'ddos-for-web',
+        name: 'DDoS for Web',
+        summary: 'Cloudflare product "DDoS for Web" as listed on the official products overview.',
+        familyId: 'security',
+        sourceIds: ['hand-a'],
+      },
+    ]);
   });
 
   it('errors at stage normalize when a product page is missing from the products overview', () => {

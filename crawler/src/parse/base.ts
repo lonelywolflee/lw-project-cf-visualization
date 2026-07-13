@@ -8,8 +8,8 @@
  */
 import { CrawlError } from '../errors.js';
 import { pathKeyOf } from '../ids.js';
-import { requireAttr, requireText, type HtmlPage } from './html.js';
-import { boundedField, collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
+import { cleanText, requireAttr, requireText, type HtmlPage } from './html.js';
+import { boundedField, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPageBase, ParsedPageKind, RawEntityCard } from './types.js';
 
 /**
@@ -107,9 +107,9 @@ export function extractUseCaseCards(
     const itemPath = path.slice(0, lastDot);
     const slots = groups.get(itemPath) ?? {};
     if (field === 'title') {
-      slots.titleText = collapseWhitespace(page(element).text());
+      slots.titleText = cleanText(page(element));
     } else {
-      slots.descriptionText = collapseWhitespace(page(element).text());
+      slots.descriptionText = cleanText(page(element));
     }
     groups.set(itemPath, slots);
   }

@@ -17,6 +17,7 @@
  * Error hygiene (AGENTS §6): errors carry stage, URL, status codes, and hop
  * counts — never response bodies or HTML.
  */
+import type { SourceConfig } from './config.js';
 import { CrawlError } from './errors.js';
 
 /** Product token this crawler announces in robots.txt group matching. */
@@ -400,4 +401,21 @@ export class HttpClient {
     }
     return turn;
   }
+}
+
+/**
+ * Builds the crawl {@link HttpClient} from a VALIDATED config only:
+ * {@link SourceConfig} is unobtainable except through schema validation, so
+ * the crawling-safety envelope (approved-host allowlist, hard-capped fetch
+ * knobs) is enforced by the type. Everything else stays at the class
+ * defaults (maxRedirects 5, real fetch, real sleep).
+ */
+export function httpClientFromConfig(config: SourceConfig): HttpClient {
+  return new HttpClient({
+    userAgent: CRAWLER_USER_AGENT,
+    timeoutMs: config.fetch.timeoutMs,
+    maxRetries: config.fetch.maxRetries,
+    minRequestIntervalMs: config.fetch.minRequestIntervalMs,
+    allowedHosts: config.allowedHosts,
+  });
 }

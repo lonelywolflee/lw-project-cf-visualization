@@ -31,6 +31,10 @@ function captureError(run: () => unknown): unknown {
 
 describe('parseDeveloperDocs', () => {
   it('parses the valid fixture into the full expected page (hrefs resolved absolute)', () => {
+    // The fixture carries three nav-chrome decoy anchors inside main (no
+    // span, no p; one external github.com href) mirroring the live
+    // site-header links — they must be skipped, so the entry set below stays
+    // exactly the three genuine cards.
     const page = parseHtml(fixture('developer-docs-directory.html'));
     expect(parseDeveloperDocs(page, META)).toEqual({
       sourceId: 'developers-docs-directory',
@@ -58,6 +62,15 @@ describe('parseDeveloperDocs', () => {
         },
       ],
     });
+  });
+
+  it('skips nav-chrome anchors silently: the decoys mint no entries', () => {
+    const page = parseHtml(fixture('developer-docs-directory.html'));
+    const parsed = parseDeveloperDocs(page, META);
+    expect(parsed.entries).toHaveLength(3);
+    expect(parsed.entries.map((entry) => entry.href)).not.toContain(
+      'https://github.com/cloudflare',
+    );
   });
 
   it('errors at stage parse naming the name span when an entry has no name', () => {

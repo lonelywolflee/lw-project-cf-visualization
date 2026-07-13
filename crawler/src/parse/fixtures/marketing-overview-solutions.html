@@ -33,7 +33,17 @@
               data-cms-type="text"
             >
               <astro-island ssr await-children
-                ><span>Build intelligent applications with AI at the edge</span
+                ><script>
+                  (() => {
+                    var e = async (t) => {
+                      await (
+                        await t()
+                      )();
+                    };
+                    self.Astro = e;
+                  })();
+                </script>
+                <span>Build intelligent applications with AI at the edge</span
                 ><!--astro:end--></astro-island
               >
             </p>

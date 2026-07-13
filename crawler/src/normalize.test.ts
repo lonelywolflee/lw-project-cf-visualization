@@ -89,6 +89,16 @@ describe('normalizePage', () => {
           sourceId: 'www-products-overview',
         },
         {
+          // The tagline-less live-anomaly card claims summary null: the
+          // overview states no display copy for it.
+          key: '/products/ddos-for-web',
+          id: 'ddos-for-web',
+          name: 'DDoS for Web',
+          summary: null,
+          familyId: 'sase-zero-trust',
+          sourceId: 'www-products-overview',
+        },
+        {
           key: '/products/cdn',
           id: 'cdn',
           name: 'CDN',
@@ -291,6 +301,30 @@ describe('normalizePage', () => {
         { slug: null, sourceId: 'developers-docs-directory' },
       ],
     });
+  });
+
+  it('yields slug null for a card-shaped docs entry on an external host', () => {
+    const page: ParsedPage = {
+      kind: 'developer-docs',
+      sourceId: 'developers-docs-directory',
+      canonicalUrl: 'https://developers.cloudflare.com/directory/',
+      title: 'Docs directory | Cloudflare Docs',
+      description: 'Explore the different areas of our documentation site.',
+      retrievedAt: RETRIEVED_AT,
+      entries: [
+        {
+          name: 'Open Source',
+          summary: 'Cloudflare projects on GitHub.',
+          // Single path segment, but NOT developers.cloudflare.com: external
+          // cards must never enrich product provenance.
+          href: 'https://github.com/cloudflare',
+        },
+      ],
+    };
+    const fragment = normalizePage(page, 'developer-docs');
+    expect(fragment.docsEntryClaims).toEqual([
+      { slug: null, sourceId: 'developers-docs-directory' },
+    ]);
   });
 
   it('errors at stage normalize on a relative docs entry href', () => {

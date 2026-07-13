@@ -35,7 +35,17 @@
             data-cms-path="pages.sase.useCases.items.0.description"
             data-cms-type="text"
             ><astro-island ssr await-children
-              ><span>Move beyond AI blocking to securing AI adoption at scale.</span
+              ><script>
+                (() => {
+                  var e = async (t) => {
+                    await (
+                      await t()
+                    )();
+                  };
+                  self.Astro = e;
+                })();
+              </script>
+              <span>Move beyond AI blocking to securing AI adoption at scale.</span
               ><!--astro:end--></astro-island
             ></span
           >

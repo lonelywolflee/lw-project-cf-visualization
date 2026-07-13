@@ -1,3 +1,6 @@
 # Prettier 3 already honors .gitignore by default; list only
 # committed-but-generated files here.
 pnpm-lock.yaml
+# Crawler output: serializeCatalog owns these bytes (deterministic diffs);
+# prettier must not reformat them.
+web/public/data/

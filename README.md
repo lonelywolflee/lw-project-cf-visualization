@@ -5,9 +5,9 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 생성된 JSON을 읽어 제품과 관계를 보여줍니다.
 
 > 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
-> 완료되어 아래 command를 실행할 수 있습니다. 데이터 수집과 시각화 기능은 후속 issue에서
-> 구현합니다. 그 전까지 crawler는 승인된 source 설정(`crawler/config/sources.json`)을 검증해
-> 요약만 출력하고(network 요청 없음), web은 Angular 기본 화면을 보여줍니다.
+> 완료되어 아래 command를 실행할 수 있습니다. `pnpm crawl`이 공식 source 수집, schema
+> validation, `web/public/data/catalog.json` 갱신까지 수행합니다. 시각화 기능은 후속
+> issue에서 구현하며, 그 전까지 web은 Angular 기본 화면을 보여줍니다.
 
 ## 목표
 
@@ -30,7 +30,7 @@ Cloudflare official sources
   fetch -> normalize -> validate
            |
            v
-   web/public/data/*.json
+   web/public/data/catalog.json
            |
            v
        pnpm dev
@@ -89,6 +89,9 @@ TypeScript type, validator를 제공하며 data 구조의 single source of truth
 corepack enable
 pnpm install
 
+# 공식 source 수집과 web data 갱신 (network 사용)
+pnpm crawl
+
 # 갱신된 data를 시각화 (Angular dev server)
 pnpm dev
 
@@ -98,10 +101,9 @@ pnpm test
 pnpm build
 ```
 
-`pnpm crawl` command는 수집 pipeline이 완성되는 issue에서 root에 추가됩니다. 현재
-`pnpm --filter @cf-viz/crawler run crawl`은 `crawler/config/sources.json`을 검증하고 수집
-대상 요약을 출력하며, network 요청은 보내지 않습니다. Crawler가 완성되면 일반적인 사용
-순서는 `pnpm crawl` 후 `pnpm dev`입니다.
+`pnpm crawl`은 승인된 source를 수집하고 전체 결과가 schema validation을 통과한 경우에만
+`web/public/data/catalog.json`을 원자적으로 교체합니다. 수집이나 검증이 실패하면 기존 data
+file은 변경되지 않습니다. 일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다.
 
 ## 공식 Source
 

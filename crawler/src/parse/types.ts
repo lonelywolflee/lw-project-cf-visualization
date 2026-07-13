@@ -31,12 +31,28 @@ export interface RawEntityCard {
   readonly href: string | null;
 }
 
-/** A heading-grouped run of entity cards (e.g. one product-family figure). */
-export interface RawTaxonomySection {
-  /** Collapsed group heading (e.g. the family name from a figcaption). */
+/**
+ * One product card on the products overview. Unlike {@link RawEntityCard},
+ * the tagline is nullable: the live overview ships genuine product cards
+ * whose tagline paragraph is empty (observed 2026-07-13 on
+ * /products/ddos-for-web/), while the strong name and the href stay required
+ * — a card missing either is still structure drift.
+ */
+export interface ProductCard {
+  /** Collapsed official name (bounded to the catalog name cap upstream). */
+  readonly name: string;
+  /** Collapsed, deterministically trimmed tagline, or null when the card states none. */
+  readonly tagline: string | null;
+  /** Absolute URL for the card (product identity — always required). */
+  readonly href: string;
+}
+
+/** A heading-grouped run of product cards (one products-overview family figure). */
+export interface ProductTaxonomySection {
+  /** Collapsed family name from the figcaption. */
   readonly heading: string;
-  /** Cards inside the group; parsers require at least one. */
-  readonly items: readonly RawEntityCard[];
+  /** Product cards inside the family; the parser requires at least one. */
+  readonly items: readonly ProductCard[];
 }
 
 /** Per-fetch identity handed to every parser (all fields from FetchResult). */
@@ -73,7 +89,7 @@ export type ParsedPage =
   | (ParsedPageBase & {
       readonly kind: 'products-overview';
       /** One section per family figure; heading = family name. */
-      readonly families: readonly RawTaxonomySection[];
+      readonly families: readonly ProductTaxonomySection[];
     })
   | (ParsedPageBase & {
       readonly kind: 'solutions-overview';

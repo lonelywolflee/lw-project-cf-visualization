@@ -8,7 +8,7 @@
  */
 import { CrawlError } from '../errors.js';
 import { parseBase, requireBounded, resolveHref } from './base.js';
-import type { HtmlPage } from './html.js';
+import { cleanText, type HtmlPage } from './html.js';
 import { collapseWhitespace, FIELD_CAPS, trimSummary } from '../text.js';
 import type { PageMeta, ParsedPage, RawEntityCard } from './types.js';
 
@@ -40,14 +40,12 @@ export function parseSolutionsOverview(page: HtmlPage, meta: PageMeta): Solution
   const solutions: RawEntityCard[] = titleElements.map((titleElement) => {
     const titleParagraph = page(titleElement);
     const name = requireBounded(
-      titleParagraph.find('strong').first().text(),
+      cleanText(titleParagraph.find('strong').first()),
       FIELD_CAPS.name,
       `strong (solution name) inside ${CARD_TITLE_SELECTOR}`,
       url,
     );
-    const description = collapseWhitespace(
-      titleParagraph.nextAll(CARD_DESCRIPTION_SELECTOR).first().text(),
-    );
+    const description = cleanText(titleParagraph.nextAll(CARD_DESCRIPTION_SELECTOR).first());
     if (description.length === 0) {
       throw new CrawlError(
         `[parse ${url}] missing required text for ${CARD_DESCRIPTION_SELECTOR}`,
