@@ -223,6 +223,42 @@ describe('HttpClient with a fake fetch (no network)', () => {
     expect(fakeFetch).toHaveBeenCalledTimes(3);
   });
 
+  it('retries a mid-body failure and succeeds on the next attempt', async () => {
+    const stallingBody = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.error(new DOMException('body stall', 'TimeoutError'));
+      },
+    });
+    const fakeFetch = vi
+      .fn<FetchLike>()
+      .mockResolvedValueOnce(new Response(stallingBody, { status: 200 }))
+      .mockResolvedValueOnce(htmlResponse());
+    const { client, delays } = makeClient(fakeFetch, { maxRetries: 1 });
+
+    const result = await client.fetchPage(pageRequest('https://www.cloudflare.com/'));
+
+    expect(result.bodyText).toBe('<html>ok</html>');
+    expect(delays).toEqual([1000]);
+    expect(fakeFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('rejects a redirect to a non-default port on an allowlisted host', async () => {
+    const fakeFetch = vi.fn<FetchLike>(() =>
+      Promise.resolve(
+        new Response(null, {
+          status: 301,
+          headers: { location: 'https://www.cloudflare.com:8443/x' },
+        }),
+      ),
+    );
+    const { client } = makeClient(fakeFetch);
+
+    await expect(client.fetchPage(pageRequest('https://www.cloudflare.com/'))).rejects.toThrow(
+      /non-default port/,
+    );
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+  });
+
   it('returns a 404 as a FetchResult without retrying', async () => {
     const fakeFetch = vi.fn<FetchLike>(() =>
       Promise.resolve(new Response('missing', { status: 404 })),

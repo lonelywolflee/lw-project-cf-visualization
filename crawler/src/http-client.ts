@@ -137,6 +137,18 @@ function defaultSleep(ms: number): Promise<void> {
   });
 }
 
+/**
+ * Drains an abandoned hop body to return the socket to the keep-alive
+ * pool. A failed drain only affects socket reuse, never the hop outcome.
+ */
+async function drainBody(response: Response): Promise<void> {
+  try {
+    await response.body?.cancel();
+  } catch {
+    // Ignored: the hop was already decided without its body.
+  }
+}
+
 export class HttpClient {
   private readonly userAgent: string;
   private readonly timeoutMs: number;
@@ -240,8 +252,7 @@ export class HttpClient {
       }
 
       if (REDIRECT_STATUSES.has(response.status)) {
-        // Drain the hop's body to return the socket to the keep-alive pool.
-        await response.body?.cancel();
+        await drainBody(response);
         const location = response.headers.get('location');
         if (location === null) {
           throw new CrawlError(
@@ -274,11 +285,11 @@ export class HttpClient {
       }
 
       if (response.status === 429 || response.status >= 500) {
-        await response.body?.cancel();
+        await drainBody(response);
         throw new RetryableFailure(`HTTP ${String(response.status)}`, current.href);
       }
 
-      const bodyText = await response.text();
+      const bodyText = await this.readBodyText(response, current);
       return {
         sourceId: request.sourceId,
         requestedUrl: request.url,
@@ -292,6 +303,31 @@ export class HttpClient {
     }
   }
 
+  /**
+   * Reads the final response body under the same failure classification as
+   * the request itself: a stall or reset during the body stream is retried,
+   * anything else becomes a stage-tagged CrawlError.
+   */
+  private async readBodyText(response: Response, url: URL): Promise<string> {
+    try {
+      return await response.text();
+    } catch (error) {
+      const failure = classifyFetchFailure(error);
+      if (failure.kind === 'other') {
+        throw new CrawlError(`[fetch ${url.href}] body read failed`, {
+          stage: 'fetch',
+          url: url.href,
+          cause: error,
+        });
+      }
+      const reason =
+        failure.kind === 'timeout'
+          ? `body read timed out after ${String(this.timeoutMs)}ms`
+          : `network failure during body read${failure.code === undefined ? '' : ` (${failure.code})`}`;
+      throw new RetryableFailure(reason, url.href, error);
+    }
+  }
+
   private parseRequestedUrl(url: string): URL {
     try {
       return new URL(url);
@@ -302,14 +338,22 @@ export class HttpClient {
 
   /**
    * Enforces the safety envelope for a hop BEFORE it is contacted: https
-   * only (plain http is tolerated solely for 127.0.0.1 loopback so the
-   * offline test suite can run a local server) and hostname membership in
-   * the allowlist.
+   * only, no non-default port, and hostname membership in the allowlist.
+   * 127.0.0.1 is exempt from the protocol and port rules solely so the
+   * offline test suite can run a local ephemeral-port server; the allowlist
+   * membership check still applies, and validated configs can only contain
+   * the approved Cloudflare hostnames.
    */
   private assertAllowedUrl(url: URL): void {
-    const isLoopbackHttp = url.protocol === 'http:' && url.hostname === '127.0.0.1';
-    if (url.protocol !== 'https:' && !isLoopbackHttp) {
+    const isLoopback = url.hostname === '127.0.0.1';
+    if (url.protocol !== 'https:' && !(url.protocol === 'http:' && isLoopback)) {
       throw new CrawlError(`[fetch ${url.href}] protocol '${url.protocol}' is not https`, {
+        stage: 'fetch',
+        url: url.href,
+      });
+    }
+    if (url.port !== '' && !isLoopback) {
+      throw new CrawlError(`[fetch ${url.href}] non-default port '${url.port}' is not allowed`, {
         stage: 'fetch',
         url: url.href,
       });
