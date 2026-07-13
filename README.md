@@ -48,7 +48,7 @@ file을 변경하지 않습니다.
 ├── web/                         # Angular 정적 visualization web
 │   └── public/data/             # Crawler가 생성하는 JSON data
 ├── crawler/                     # 수집을 시작하는 Node.js TypeScript script
-│   └── config/                  # 수집 대상과 허용 source 설정
+│   └── config/                  # 수집 대상과 허용 source 설정 (crawler 구현 issue에서 추가)
 └── packages/                    # 공통 library, schema, TypeScript type
     └── catalog/                 # Crawler와 web이 공유하는 data contract
 ```
