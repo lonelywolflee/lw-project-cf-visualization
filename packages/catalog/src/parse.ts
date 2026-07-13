@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { CatalogValidationError, formatIssuePath, type CatalogIssue } from './errors.js';
+import { collectIntegrityIssues } from './integrity.js';
 import { catalogSchema, type Catalog } from './schema.js';
 
 /** Discriminated result of {@link safeParseCatalog}. */
@@ -32,13 +33,19 @@ function toShapeIssues(error: z.ZodError): readonly CatalogIssue[] {
 /**
  * Validates an unknown value as a catalog document without throwing.
  *
- * Shape issues are reported with code `invalid-shape`; cross-entity
- * referential integrity is layered on top of this shape validation.
+ * If shape validation fails, only `invalid-shape` issues are returned and
+ * integrity checks are skipped (they need well-formed collections). If the
+ * shape passes, ALL referential-integrity issues are collected so a whole
+ * batch can be fixed in one run.
  */
 export function safeParseCatalog(input: unknown): CatalogParseResult {
   const shape = catalogSchema.safeParse(input);
   if (!shape.success) {
     return { success: false, issues: toShapeIssues(shape.error) };
+  }
+  const integrityIssues = collectIntegrityIssues(shape.data);
+  if (integrityIssues.length > 0) {
+    return { success: false, issues: integrityIssues };
   }
   return { success: true, data: shape.data };
 }
