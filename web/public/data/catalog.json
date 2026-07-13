@@ -1,0 +1,1068 @@
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-07-13T20:14:18.334Z",
+  "sources": [
+    {
+      "id": "developers-docs-directory",
+      "url": "https://developers.cloudflare.com/directory/",
+      "pageKind": "developer-docs",
+      "title": "Docs directory | Cloudflare Docs",
+      "retrievedAt": "2026-07-13T20:14:25.427Z"
+    },
+    {
+      "id": "www-product-cdn",
+      "url": "https://www.cloudflare.com/products/cdn/",
+      "pageKind": "marketing-product",
+      "title": "Cloudflare CDN - Global Content Delivery Network",
+      "retrievedAt": "2026-07-13T20:14:23.196Z"
+    },
+    {
+      "id": "www-product-workers",
+      "url": "https://www.cloudflare.com/products/workers/",
+      "pageKind": "marketing-product",
+      "title": "Cloudflare Workers - Global Serverless Functions Platform",
+      "retrievedAt": "2026-07-13T20:14:24.067Z"
+    },
+    {
+      "id": "www-products-overview",
+      "url": "https://www.cloudflare.com/products/",
+      "pageKind": "marketing-overview",
+      "title": "Products | Cloudflare",
+      "retrievedAt": "2026-07-13T20:14:21.518Z"
+    },
+    {
+      "id": "www-solution-sase",
+      "url": "https://www.cloudflare.com/sase/",
+      "pageKind": "marketing-solution",
+      "title": "Cloudflare One | The agile SASE platform | Cloudflare",
+      "retrievedAt": "2026-07-13T20:14:24.920Z"
+    },
+    {
+      "id": "www-solutions-overview",
+      "url": "https://www.cloudflare.com/solutions/",
+      "pageKind": "marketing-overview",
+      "title": "Solutions | Cloudflare",
+      "retrievedAt": "2026-07-13T20:14:22.013Z"
+    }
+  ],
+  "productFamilies": [
+    {
+      "id": "ai",
+      "name": "AI",
+      "summary": "Cloudflare product family \"AI\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "compute",
+      "name": "Compute",
+      "summary": "Cloudflare product family \"Compute\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "media",
+      "name": "Media",
+      "summary": "Cloudflare product family \"Media\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "network",
+      "name": "Network",
+      "summary": "Cloudflare product family \"Network\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "sase-zero-trust",
+      "name": "SASE / Zero Trust",
+      "summary": "Cloudflare product family \"SASE / Zero Trust\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "summary": "Cloudflare product family \"Security\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "summary": "Cloudflare product family \"Storage\" as grouped on the official products overview.",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "access",
+      "name": "Access",
+      "summary": "Zero trust access to private resources",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "advanced-certificate-manager",
+      "name": "Advanced Certificate Manager",
+      "summary": "Certificate Lifecycle Management",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "agents",
+      "name": "Agents",
+      "summary": "Build stateful AI agents",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ai-gateway",
+      "name": "AI Gateway",
+      "summary": "AI observability",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ai-search",
+      "name": "AI Search",
+      "summary": "Instant retrieval",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ai-security-for-apps",
+      "name": "AI Security for Apps",
+      "summary": "Protect your AI-powered applications with advanced security features",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics",
+      "summary": "Web Performance & Security",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "api-shield",
+      "name": "API Shield",
+      "summary": "API Security & Monitoring",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "argo-smart-routing",
+      "name": "Argo Smart Routing",
+      "summary": "Accelerate Web Apps",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "artifacts",
+      "name": "Artifacts",
+      "summary": "Git-native versioned storage",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "bot-management",
+      "name": "Bot Management",
+      "summary": "Block bad bots",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "browser-isolation",
+      "name": "Browser Isolation",
+      "summary": "Secure web browsing",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "browser-rendering",
+      "name": "Browser Run",
+      "summary": "Automated browsers",
+      "familyId": "compute",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "cache-reserve",
+      "name": "Cache Reserve",
+      "summary": "Persistent caching for static content",
+      "familyId": "storage",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "casb",
+      "name": "CASB",
+      "summary": "SaaS and cloud posture",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "cdn",
+      "name": "CDN",
+      "summary": "Make your site faster and stop paying for bandwidth. CDN caches content in 330+ cities worldwide with zero-configuration setup and predictable pricing.",
+      "familyId": "network",
+      "sourceIds": [
+        "www-product-cdn",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "china-network",
+      "name": "China Network",
+      "summary": "High-Performance Web Solutions in China",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "client-side-security",
+      "name": "Client-Side Security",
+      "summary": "Client-Side Protection",
+      "familyId": "security",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "containers",
+      "name": "Containers",
+      "summary": "Any language, anywhere",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "custom-domain-protection",
+      "name": "Custom Domain Protection",
+      "summary": "Registrar Security",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "d1",
+      "name": "D1",
+      "summary": "Serverless SQL",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "data-platform",
+      "name": "Data Platform",
+      "summary": "Ingest, Catalog & Query",
+      "familyId": "storage",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ddos",
+      "name": "DDoS Protection",
+      "summary": "Mitigation Solutions",
+      "familyId": "security",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ddos-for-web",
+      "name": "DDoS for Web",
+      "summary": "Cloudflare product \"DDoS for Web\" as listed on the official products overview.",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "dlp",
+      "name": "Data Loss Prevention",
+      "summary": "Protect sensitive data",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "dns",
+      "name": "DNS",
+      "summary": "Fast DNS",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "durable-objects",
+      "name": "Durable Objects",
+      "summary": "Stateful compute",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "email-routing",
+      "name": "Email Routing",
+      "summary": "Manage custom email addresses with ease",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "email-security",
+      "name": "Email Security",
+      "summary": "Phishing protection",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "email-service",
+      "name": "Email Service",
+      "summary": "Send and receive email",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "gateway",
+      "name": "Gateway",
+      "summary": "Web filtering",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "hyperdrive",
+      "name": "Hyperdrive",
+      "summary": "Global databases",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "images",
+      "name": "Images",
+      "summary": "Image optimization",
+      "familyId": "media",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "keyless-ssl",
+      "name": "Keyless SSL",
+      "summary": "Secure SSL Control",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "kv",
+      "name": "KV",
+      "summary": "Ultra-fast key-value storage",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "load-balancing",
+      "name": "Load Balancing",
+      "summary": "Zero downtime",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "log-explorer",
+      "name": "Log Explorer",
+      "summary": "Observability and Forensics",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "magic-transit",
+      "name": "Magic Transit",
+      "summary": "DDoS Protection for Networks",
+      "familyId": "security",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "mesh",
+      "name": "Mesh",
+      "summary": "Agents private network",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "network-firewall",
+      "name": "Network Firewall",
+      "summary": "Cloud-native network firewall for enterprise WAN",
+      "familyId": "security",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "network-flow",
+      "name": "Network Flow",
+      "summary": "Network Traffic Visibility",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "network-interconnect",
+      "name": "Network Interconnect",
+      "summary": "Direct physical or partner-delivered interconnections",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "page-shield",
+      "name": "Page Shield",
+      "summary": "Client-Side Protection",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "pages",
+      "name": "Cloudflare Pages",
+      "summary": "Build & deploy frontend sites",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "queues",
+      "name": "Queues",
+      "summary": "Message processing",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "r2",
+      "name": "R2",
+      "summary": "Egress-free storage",
+      "familyId": "storage",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "rate-limiting",
+      "name": "Rate Limiting",
+      "summary": "Abuse prevention",
+      "familyId": "security",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "rdp",
+      "name": "RDP",
+      "summary": "Remote Desktop Protection",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "realtime",
+      "name": "RealtimeKit",
+      "summary": "Live comms",
+      "familyId": "media",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "sandboxes",
+      "name": "Sandboxes",
+      "summary": "Secure code execution",
+      "familyId": "compute",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "secure-web-gateway",
+      "name": "Secure Web Gateway",
+      "summary": "DNS filtering & Secure Browsing",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "spectrum",
+      "name": "Spectrum",
+      "summary": "DDoS protection for TCP & UDP applications",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "spectrum-for-minecraft",
+      "name": "Spectrum for Minecraft",
+      "summary": "Minecraft Server Protection",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "ssl",
+      "name": "SSL",
+      "summary": "Secure Your Site with SSL",
+      "familyId": "security",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "stream",
+      "name": "Stream",
+      "summary": "Video streaming",
+      "familyId": "media",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "turn-sfu",
+      "name": "TURN / SFU",
+      "summary": "Real-time infra",
+      "familyId": "network",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "turnstile",
+      "name": "Turnstile",
+      "summary": "A CAPTCHA Replacement Solution",
+      "familyId": "security",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "vectorize",
+      "name": "Vectorize",
+      "summary": "Vector database",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "waf",
+      "name": "WAF",
+      "summary": "Web Application Firewall",
+      "familyId": "security",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "waiting-room",
+      "name": "Waiting Room",
+      "summary": "Traffic Management",
+      "familyId": "network",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "wan",
+      "name": "WAN",
+      "summary": "Cloud-delivered networking",
+      "familyId": "sase-zero-trust",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "web3",
+      "name": "Web3",
+      "summary": "Web3 Infrastructure",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "workers",
+      "name": "Workers",
+      "summary": "Deploy serverless functions globally in seconds. No cold starts, 330+ cities, infinite concurrency, and pay only for CPU time. Support for JavaScript, TypeScript, Python, and Rust.",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-product-workers",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "workers-ai",
+      "name": "Workers AI",
+      "summary": "Edge AI models",
+      "familyId": "ai",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "workers-for-platforms",
+      "name": "Workers for Platforms",
+      "summary": "Programmable Platform Solutions",
+      "familyId": "compute",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "workers-observability",
+      "name": "Workers Observability",
+      "summary": "First-party observability for Workers",
+      "familyId": "compute",
+      "sourceIds": [
+        "www-products-overview"
+      ]
+    },
+    {
+      "id": "workflows",
+      "name": "Workflows",
+      "summary": "Process orchestration",
+      "familyId": "compute",
+      "sourceIds": [
+        "developers-docs-directory",
+        "www-products-overview"
+      ]
+    }
+  ],
+  "solutions": [
+    {
+      "id": "ai",
+      "name": "AI",
+      "summary": "(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event(\"astro:load\"));})();Build intelligent applications with AI at the edge",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "ai-security",
+      "name": "AI Security",
+      "summary": "Secure and control AI adoption without slowing innovation.",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "financial-services",
+      "name": "Financial Services",
+      "summary": "Secure digital infrastructure for modern financial services.",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "frontends",
+      "name": "Frontends",
+      "summary": "Deploy frontend applications globally in seconds",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "healthcare",
+      "name": "Healthcare",
+      "summary": "Secure and Accelerate Healthcare Delivery",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "network",
+      "name": "Network",
+      "summary": "Global network services for performance and reliability",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "platforms",
+      "name": "Platforms",
+      "summary": "Build platforms on Cloudflare's infrastructure",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "public-sector",
+      "name": "Public Sector",
+      "summary": "Enhance cyber resilience, accelerate performance, and advance AI innovation.",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "retail",
+      "name": "Retail",
+      "summary": "Build secure, high-performance retail experiences with Cloudflare’s unified cloud platform.",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "sase",
+      "name": "Cloudflare One",
+      "summary": "Connect and protect your workforce, AI agents, and infrastructure with Cloudflare One — the unified SASE platform built for safe AI adoption and zero trust access.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "sase-for-airlines",
+      "name": "SASE for Airlines",
+      "summary": "SASE for Airlines",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "summary": "Protect your applications from threats",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    },
+    {
+      "id": "workflows",
+      "name": "Workflows",
+      "summary": "Orchestrate complex multi-step processes",
+      "sourceIds": [
+        "www-solutions-overview"
+      ]
+    }
+  ],
+  "useCases": [
+    {
+      "id": "api-response-caching",
+      "name": "API Response Caching",
+      "summary": "Caching anonymous API GET responses.",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "id": "bandwidth-cost-reduction",
+      "name": "Bandwidth Cost Reduction",
+      "summary": "Slashing the bandwidth bill for those pushing massive amounts of data worldwide.",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "id": "block-email-phishing",
+      "name": "Block email phishing",
+      "summary": "AI-powered email security stops phishing, impersonation, malware, and BEC before threats reach inboxes. Deploy instantly with flexible MX and API methods, and extend security across collaboration apps.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "build-scalable-apis",
+      "name": "Build scalable APIs",
+      "summary": "Handle billions of requests with automatic scaling and global deployment. No load balancers, no capacity planning, no regional configuration.",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "id": "coffee-shop-networking",
+      "name": "Coffee shop networking",
+      "summary": "Treat anywhere like a coffee shop. Minimize appliances and MPLS, unify access policies across remote and local users, and consolidate infrastructure with a simpler stack.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "deploy-complete-web-applications",
+      "name": "Deploy complete web applications",
+      "summary": "Ship React, Vue, or Next.js apps integrated backend logic, databases, and storage. Full-stack development without infrastructure management.",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "id": "dynamic-content-optimization",
+      "name": "Dynamic Content Optimization",
+      "summary": "Features like instant purging, API-driven control, and granular Cache Rules give developers powerful tools without the legacy complexity.",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "id": "modernize-remote-access",
+      "name": "Modernize remote access",
+      "summary": "Stop relying on clunky, insecure VPNs. Provide identity-first, quantum-safe access to internal apps. Accelerate onboarding, speed up M&A integration, and stop ransomware with granular zero trust rules.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "protect-web-browsing",
+      "name": "Protect web browsing",
+      "summary": "Implement DNS and HTTP filtering to protect remote users and branch offices from malware, phishing, and malicious websites. Enforce acceptable use policies and get instant results.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "run-business-logic-and-background-jobs",
+      "name": "Run business logic and background jobs",
+      "summary": "Handle webhooks, process data, and run scheduled tasks with built-in Queues, Workflows, and Cron Triggers. Reliable automation without server babysitting.",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "id": "run-serverless-functions-at-the-edge",
+      "name": "Run serverless functions at the edge",
+      "summary": "Handle authentication, rate limiting, routing, caching logic near your users. Reduce latency and reduce load on your server by offloading processing to Workers.",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "id": "safely-adopt-ai",
+      "name": "Safely adopt AI",
+      "summary": "Move beyond AI blocking to securing AI adoption at scale. Govern AI agent connections, control shadow AI, and analyze prompt content to block sensitive data from leaking into public models.",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "id": "static-asset-acceleration",
+      "name": "Static Asset Acceleration",
+      "summary": "Accelerating the delivery of static assets like images, CSS, and JavaScript to improve site speed and Core Web Vitals.",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "product-use-case",
+      "fromId": "cdn",
+      "toId": "api-response-caching",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "cdn",
+      "toId": "bandwidth-cost-reduction",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "cdn",
+      "toId": "dynamic-content-optimization",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "cdn",
+      "toId": "static-asset-acceleration",
+      "sourceIds": [
+        "www-product-cdn"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "workers",
+      "toId": "build-scalable-apis",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "workers",
+      "toId": "deploy-complete-web-applications",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "workers",
+      "toId": "run-business-logic-and-background-jobs",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "type": "product-use-case",
+      "fromId": "workers",
+      "toId": "run-serverless-functions-at-the-edge",
+      "sourceIds": [
+        "www-product-workers"
+      ]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "sase",
+      "toId": "block-email-phishing",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "sase",
+      "toId": "coffee-shop-networking",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "sase",
+      "toId": "modernize-remote-access",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "sase",
+      "toId": "protect-web-browsing",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    },
+    {
+      "type": "solution-use-case",
+      "fromId": "sase",
+      "toId": "safely-adopt-ai",
+      "sourceIds": [
+        "www-solution-sase"
+      ]
+    }
+  ]
+}
