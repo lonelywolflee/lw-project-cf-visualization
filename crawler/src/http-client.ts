@@ -29,6 +29,7 @@ export const CRAWLER_USER_AGENT =
 /** Injectable fetch boundary. Narrower than `typeof fetch` but satisfied by it. */
 export type FetchLike = (input: string | URL, init?: RequestInit) => Promise<Response>;
 
+/** Construction options for {@link HttpClient}. */
 export interface HttpClientOptions {
   readonly userAgent: string;
   readonly timeoutMs: number;
@@ -45,6 +46,7 @@ export interface HttpClientOptions {
   readonly sleepImpl?: (ms: number) => Promise<void>;
 }
 
+/** One page-fetch request handed to {@link HttpClient.fetchPage}. */
 export interface FetchPageRequest {
   readonly sourceId: string;
   readonly url: string;
@@ -55,6 +57,7 @@ export interface FetchPageRequest {
   readonly guardUrl?: (url: URL) => void;
 }
 
+/** Outcome of one successful page fetch; the body stays in memory only. */
 export interface FetchResult {
   readonly sourceId: string;
   readonly requestedUrl: string;
@@ -149,6 +152,7 @@ async function drainBody(response: Response): Promise<void> {
   }
 }
 
+/** Safe crawler HTTP client enforcing the crawling-safety envelope per hop. */
 export class HttpClient {
   private readonly userAgent: string;
   private readonly timeoutMs: number;
