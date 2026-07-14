@@ -1,0 +1,121 @@
+<section class="calc-page" aria-labelledby="calc-heading">
+  <header class="calc-head">
+    <h1 id="calc-heading">요금 계산기</h1>
+    <p class="calc-sub">
+      제품을 고르고 예상 사용량을 입력하면 티어별 월 비용을 추정합니다. 계산은 큐레이션된 공식 단가
+      기반이며 조합은 자유입니다.
+    </p>
+    <p class="calc-disclaimer" role="note">
+      이 금액은 공식 요금 문서의 단가로 계산한 <strong>추정치</strong>이며 실제 청구서와 다를 수
+      있습니다. 부분 단위는 비례 계산하고 각 항목을 센트 단위로 반올림합니다.
+    </p>
+  </header>
+
+  <h2 class="sec-title">제품 선택</h2>
+  <div class="picker" role="group" aria-label="계산할 제품 선택">
+    @for (product of pricedProducts(); track product.id) {
+    <button
+      type="button"
+      class="chip"
+      [class.selected]="isSelected(product.id)"
+      [attr.aria-pressed]="isSelected(product.id)"
+      (click)="toggleProduct(product.id)"
+    >
+      {{ product.name }}
+    </button>
+    }
+  </div>
+  <p class="picker-note">
+    요금이 큐레이션된 제품 {{ pricedProducts().length }}개만 계산할 수 있습니다. 나머지 {{
+    unpricedCount() }}개는 공식 요금 문서가 아직 큐레이션되지 않아 목록에 없습니다.
+  </p>
+
+  @if (cards().length === 0) {
+  <p class="empty-state" role="status">
+    위에서 제품을 선택하면 사용량 입력과 티어별 추정이 여기에 나타납니다.
+  </p>
+  } @else {
+  <div class="cards">
+    @for (card of cards(); track card.product.id) {
+    <article class="product-card">
+      <header class="card-head">
+        <h3 class="card-name">{{ card.product.name }}</h3>
+        <a
+          class="card-src"
+          [href]="card.product.pricing.sourceUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          >공식 요금 문서 (새 창)</a
+        >
+        <span class="card-verified"
+          >확인일 {{ card.product.pricing.verifiedAt | date: 'mediumDate' }}</span
+        >
+      </header>
+
+      @if (card.product.metrics.length > 0) {
+      <div class="usage-inputs">
+        @for (metric of card.product.metrics; track metric.metric) {
+        <label class="usage-field">
+          <span class="usage-label">{{ metric.labelKo }} / 월</span>
+          <input
+            type="number"
+            min="0"
+            [id]="'u-' + card.product.id + '-' + metric.metric"
+            [value]="usageValue(card, metric.metric)"
+            (input)="onUsage(card.product.id, metric.metric, $event)"
+          />
+        </label>
+        }
+      </div>
+      }
+
+      <fieldset class="tiers">
+        <legend class="tiers-legend">티어 선택 — 합계에 반영됩니다</legend>
+        @for (tier of card.tiers; track tier.tierId) {
+        <label class="tier-row" [class.selected]="card.selectedTierId === tier.tierId">
+          <input
+            type="radio"
+            [name]="'tier-' + card.product.id"
+            [value]="tier.tierId"
+            [checked]="card.selectedTierId === tier.tierId"
+            (change)="setTier(card.product.id, tier.tierId)"
+          />
+          <span class="tier-main">
+            <span class="tier-name">{{ tier.tierName }}</span>
+            <span class="tier-total">
+              @if (tier.total === null) { 문의 } @else { ${{ tier.total | number: '1.2-2' }}/월 }
+            </span>
+          </span>
+          <span class="tier-detail">
+            @if (tier.base !== null && tier.base > 0) {
+            <span class="tier-line">기본 ${{ tier.base | number: '1.2-2' }}</span>
+            } @for (line of tier.meterCosts; track line.metric) { @if (line.billable > 0) {
+            <span class="tier-line">
+              {{ line.labelKo }} 초과 {{ line.billable | number }} → ${{ line.cost | number: '1.2-2'
+              }}
+            </span>
+            } } @if (tier.uncovered.length > 0) {
+            <span class="tier-warning">
+              이 티어는 {{ tier.uncovered.join(', ') }} 초과분을 판매하지 않습니다 — 한도를
+              확인하세요
+            </span>
+            }
+          </span>
+        </label>
+        }
+      </fieldset>
+    </article>
+    }
+  </div>
+
+  <div class="combined" aria-live="polite">
+    <span class="combined-label">선택 티어 합계 (월, USD)</span>
+    <span class="combined-total">${{ combined().total | number: '1.2-2' }}</span>
+    @if (combined().excluded.length > 0) {
+    <span class="combined-note">
+      문의 기반 티어({{ combined().excluded.join(', ') }})는 합계에서 제외됩니다
+    </span>
+    }
+  </div>
+  }
+</section>

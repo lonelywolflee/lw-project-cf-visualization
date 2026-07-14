@@ -112,9 +112,19 @@
       <p class="s-count">
         구성 제품 {{ members.length }}개 — 그래프 노드나 칩을 선택하면 제품 상세가 열립니다.
       </p>
-      }
-      <p class="s-cost-note">구성 제품의 조합 요금 계산은 요금 계산기(예정)에서 제공됩니다.</p>
-      }
+      } @if (pricedMemberIds().length > 0) {
+      <a
+        class="s-cost-link"
+        routerLink="/calculator"
+        [queryParams]="{ products: pricedMemberIds().join(',') }"
+      >
+        이 구성을 요금 계산기로 계산하기 →
+      </a>
+      } @else {
+      <p class="s-cost-note">
+        구성 제품에 큐레이션된 요금이 아직 없어 요금 계산기에서 계산할 수 없습니다.
+      </p>
+      } }
     </aside>
   </div>
   } @else {
