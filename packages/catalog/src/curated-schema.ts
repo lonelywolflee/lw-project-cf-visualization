@@ -23,6 +23,9 @@ export type CuratedLane = (typeof CURATED_LANES)[number];
 
 /**
  * Layers per lane, in request-traversal order (top of the map first).
+ * `observability` is the one off-path layer: monitoring products observe
+ * the other layers instead of sitting on the request path, so it renders
+ * as a side band rather than a traversal step.
  *
  * Layer slugs are globally unique across lanes so a layer value alone
  * identifies one map row; the placement schema still validates the pair.
@@ -34,6 +37,7 @@ export const CURATED_LANE_LAYERS = {
     'application-security',
     'application-performance',
     'compute-platform',
+    'observability',
   ],
   'zero-trust': ['access-control', 'data-protection', 'network-services'],
 } as const satisfies Record<CuratedLane, readonly string[]>;
