@@ -5,6 +5,7 @@ import { safeParseCuratedData, type CuratedData } from './index.js';
 function buildValidCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
     products: [
       {
         productId: 'waf',
@@ -86,6 +87,7 @@ describe('curatedDataSchema', () => {
   it('accepts empty collections (curation grows incrementally)', () => {
     const result = safeParseCuratedData({
       schemaVersion: '1',
+      learningNotes: [],
       products: [],
       compositions: [],
       pricing: [],
@@ -258,6 +260,44 @@ describe('curatedDataSchema', () => {
         ],
       },
       'pricing[0].tiers[0].meters[0].overage.perUnits',
+    );
+  });
+
+  it('accepts a learning note with and without the optional fields', () => {
+    const data = buildValidCuratedData();
+    const note = {
+      productId: 'waf',
+      whyKo: '공격 패턴은 요청 단계에서 잡는 게 싸다.',
+      misconceptionKo: '방화벽이라 네트워크 장비라고 오해한다.',
+      customerQuestionKo: '"AWS WAF 이미 쓰는데요?"',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expect(safeParseCuratedData({ ...data, learningNotes: [note] }).success).toBe(true);
+    expect(
+      safeParseCuratedData({
+        ...data,
+        learningNotes: [
+          { ...note, analogyKo: '공항 검색대.', seNoteKo: '룰셋 구조.', aeNoteKo: '딜 여는 법.' },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects a learning note with a blank required field or an unknown key', () => {
+    const data = buildValidCuratedData();
+    const note = {
+      productId: 'waf',
+      whyKo: ' ',
+      misconceptionKo: '오해.',
+      customerQuestionKo: '질문?',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expectShapeIssue({ ...data, learningNotes: [note] }, 'learningNotes[0].whyKo');
+    expectShapeIssue(
+      { ...data, learningNotes: [{ ...note, whyKo: '이유.', extra: true }] },
+      'learningNotes[0].extra',
     );
   });
 

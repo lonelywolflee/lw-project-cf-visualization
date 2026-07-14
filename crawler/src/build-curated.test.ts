@@ -57,6 +57,7 @@ const VALID_CATALOG = {
 const VALID_CURATED_SOURCE = {
   schemaVersion: '1',
   // Key order is deliberately non-canonical: the artifact must not mirror it.
+  learningNotes: [],
   products: [
     {
       verifiedAt: '2026-07-14T00:00:00Z',
@@ -127,6 +128,7 @@ describe('build-curated CLI', () => {
     const parsed: unknown = JSON.parse(artifact);
     expect(parsed).toEqual({
       schemaVersion: '1',
+      learningNotes: [],
       products: [
         {
           productId: 'waf',

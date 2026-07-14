@@ -148,10 +148,29 @@ const curatedPricingSchema = z.strictObject({
 });
 
 /**
+ * Learner-facing note for one product, written quote-first: each field
+ * leans on cited official wording, and `sourceUrl`/`verifiedAt` attribute
+ * the page the note was checked against. The three required fields are
+ * the learning card's core (왜 존재하나 / 흔한 오해 / 대표 고객 질문);
+ * the optional fields add an analogy and role-specific footnotes.
+ */
+const learningNoteSchema = z.strictObject({
+  productId: idSlugSchema,
+  whyKo: nonBlankString(400),
+  misconceptionKo: nonBlankString(400),
+  customerQuestionKo: nonBlankString(400),
+  analogyKo: nonBlankString(400).optional(),
+  seNoteKo: nonBlankString(400).optional(),
+  aeNoteKo: nonBlankString(400).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
  * Runtime schema for the curated dataset — knowledge that official pages do
  * not carry in structured form (map placements, beginner-friendly Korean
- * role lines, solution compositions, tier pricing). Every entry cites the
- * official page it was verified against and when.
+ * role lines, solution compositions, tier pricing, learning notes). Every
+ * entry cites the official page it was verified against and when.
  *
  * Prefer {@link parseCuratedData} / {@link safeParseCuratedData}; catalog
  * cross-references are validated separately by
@@ -162,6 +181,7 @@ export const curatedDataSchema = z.strictObject({
   products: z.array(curatedProductSchema),
   compositions: z.array(curatedCompositionSchema),
   pricing: z.array(curatedPricingSchema),
+  learningNotes: z.array(learningNoteSchema),
 });
 
 /** A fully validated curated dataset document. */
@@ -187,3 +207,6 @@ export type IncludedLimit = NonNullable<PricingTier['limits']>[number];
 
 /** Calculator-consumable usage dimension of a tier. */
 export type UsageMeter = NonNullable<PricingTier['meters']>[number];
+
+/** Quote-first learner note for one product. */
+export type LearningNote = CuratedData['learningNotes'][number];

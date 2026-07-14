@@ -63,6 +63,7 @@ function buildCatalog(): Catalog {
 function buildCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
     products: [
       {
         productId: 'waf',
@@ -109,6 +110,16 @@ describe('collectCuratedReferenceIssues', () => {
         },
       ],
       pricing: [{ ...first(curated.pricing), productId: 'ghost-priced' }],
+      learningNotes: [
+        {
+          productId: 'ghost-note',
+          whyKo: '이유.',
+          misconceptionKo: '오해.',
+          customerQuestionKo: '질문?',
+          sourceUrl: 'https://www.cloudflare.com/products/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
     };
     expect(collectCuratedReferenceIssues(broken, buildCatalog())).toEqual([
       {
@@ -130,6 +141,11 @@ describe('collectCuratedReferenceIssues', () => {
         code: 'unknown-entity-reference',
         path: 'pricing[0].productId',
         message: "Unknown products id 'ghost-priced'",
+      },
+      {
+        code: 'unknown-entity-reference',
+        path: 'learningNotes[0].productId',
+        message: "Unknown products id 'ghost-note'",
       },
     ]);
   });

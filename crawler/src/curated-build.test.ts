@@ -57,6 +57,7 @@ function buildCatalog(): Catalog {
 function buildCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
     products: [
       {
         productId: 'waf',
@@ -168,6 +169,7 @@ describe('buildCuratedArtifact', () => {
           placements: [...entry.placements].reverse(),
           productId: entry.productId,
         })),
+        learningNotes: [],
         schemaVersion: '1',
       }),
     );

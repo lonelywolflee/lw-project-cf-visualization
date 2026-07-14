@@ -20,6 +20,7 @@ import {
   type CuratedPricing,
   type CuratedProduct,
   type IncludedLimit,
+  type LearningNote,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,
@@ -119,6 +120,27 @@ function normalizePricing(pricing: CuratedPricing): CuratedPricing {
   };
 }
 
+function normalizeLearningNote(note: LearningNote): LearningNote {
+  const normalized: LearningNote = {
+    productId: note.productId,
+    whyKo: note.whyKo,
+    misconceptionKo: note.misconceptionKo,
+    customerQuestionKo: note.customerQuestionKo,
+    sourceUrl: note.sourceUrl,
+    verifiedAt: note.verifiedAt,
+  };
+  if (note.analogyKo !== undefined) {
+    normalized.analogyKo = note.analogyKo;
+  }
+  if (note.seNoteKo !== undefined) {
+    normalized.seNoteKo = note.seNoteKo;
+  }
+  if (note.aeNoteKo !== undefined) {
+    normalized.aeNoteKo = note.aeNoteKo;
+  }
+  return normalized;
+}
+
 /**
  * Canonical form of a valid curated dataset: collections sorted by their
  * entry id, placements by lane/layer, composition members by id; every
@@ -136,6 +158,9 @@ export function normalizeCuratedData(curated: CuratedData): CuratedData {
     pricing: [...curated.pricing]
       .sort((a, b) => compareCodepoints(a.productId, b.productId))
       .map(normalizePricing),
+    learningNotes: [...curated.learningNotes]
+      .sort((a, b) => compareCodepoints(a.productId, b.productId))
+      .map(normalizeLearningNote),
   };
 }
 
