@@ -8,6 +8,7 @@ import type { Catalog } from '@cf-viz/catalog';
 import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
+import { curatedStoreStub } from '../../testing/curated-store-stub';
 
 const source = {
   id: 'products-overview',
@@ -86,6 +87,7 @@ describe('DiscoveryPage', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(routes, withComponentInputBinding()),
+        curatedStoreStub().provider,
         {
           provide: CatalogStore,
           useValue: {

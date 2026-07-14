@@ -6,6 +6,7 @@ import { Router, provideRouter } from '@angular/router';
 import { App } from './app';
 import { routes } from './app.routes';
 import { CATALOG_URL } from './core/catalog/catalog-store';
+import { CURATED_URL } from './core/catalog/curated-store';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -60,10 +61,10 @@ describe('App', () => {
     expect(discoveryLink?.classList.contains('active')).toBe(true);
     expect(catalogLink?.classList.contains('active')).toBe(false);
 
-    // Settle the outstanding request so verify() passes.
-    TestBed.inject(HttpTestingController)
-      .expectOne(CATALOG_URL)
-      .flush('gone', { status: 404, statusText: 'Not Found' });
+    // Settle both outstanding document requests so verify() passes.
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(CATALOG_URL).flush('gone', { status: 404, statusText: 'Not Found' });
+    http.expectOne(CURATED_URL).flush('gone', { status: 404, statusText: 'Not Found' });
   });
 
   it('lazy-loads the catalog shell on the root route with accessible landmarks', async () => {
@@ -82,10 +83,10 @@ describe('App', () => {
     expect(compiled.querySelectorAll('h1')).toHaveLength(1);
     expect(compiled.querySelector('[role="status"]')?.textContent).toContain('불러오는 중');
 
-    // Settle the outstanding request so verify() passes; the resulting
-    // fetch-error state is not under test here.
-    TestBed.inject(HttpTestingController)
-      .expectOne(CATALOG_URL)
-      .flush('gone', { status: 404, statusText: 'Not Found' });
+    // Settle both outstanding document requests so verify() passes; the
+    // resulting fetch-error state is not under test here.
+    const http = TestBed.inject(HttpTestingController);
+    http.expectOne(CATALOG_URL).flush('gone', { status: 404, statusText: 'Not Found' });
+    http.expectOne(CURATED_URL).flush('gone', { status: 404, statusText: 'Not Found' });
   });
 });

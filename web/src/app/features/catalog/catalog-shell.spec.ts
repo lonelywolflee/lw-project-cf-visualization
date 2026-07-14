@@ -7,6 +7,7 @@ import type { Catalog, CatalogIssue } from '@cf-viz/catalog';
 import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
+import { curatedStoreStub, type CuratedStoreStub } from '../../testing/curated-store-stub';
 
 const emptyCatalog: Catalog = {
   schemaVersion: '1',
@@ -91,10 +92,12 @@ function makeIssues(count: number): CatalogIssue[] {
 describe('CatalogShell', () => {
   let state: WritableSignal<CatalogState>;
   let reload: ReturnType<typeof vi.fn>;
+  let curated: CuratedStoreStub;
 
   beforeEach(() => {
     state = signal<CatalogState>({ kind: 'loading' });
     reload = vi.fn();
+    curated = curatedStoreStub();
     TestBed.configureTestingModule({
       providers: [
         provideRouter(routes),
@@ -111,6 +114,7 @@ describe('CatalogShell', () => {
             reload,
           },
         },
+        curated.provider,
       ],
     });
   });
@@ -189,6 +193,47 @@ describe('CatalogShell', () => {
       '카탈로그가 비어 있습니다',
     );
     expect(element.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it('keeps gating while the curated document is still loading', async () => {
+    const { harness, element } = await createShell();
+
+    curated.state.set({ kind: 'loading' });
+    state.set({ kind: 'success', catalog: successCatalog });
+    await harness.fixture.whenStable();
+
+    // The harness root always carries its own <router-outlet>; assert the
+    // gate markup instead of the outlet element itself.
+    expect(element.querySelector('.catalog-shell')).not.toBeNull();
+    expect(element.querySelector('app-catalog-overview')).toBeNull();
+    const status = element.querySelector('[role="status"]');
+    expect(status?.textContent).toContain('큐레이션 데이터를 불러오는 중');
+  });
+
+  it('renders the curated fetch-error alert whose retry reloads the curated store', async () => {
+    const { harness, element } = await createShell();
+
+    curated.state.set({ kind: 'fetch-error', status: 503 });
+    state.set({ kind: 'success', catalog: successCatalog });
+    await harness.fixture.whenStable();
+
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('큐레이션 데이터');
+    const button = element.querySelector('button');
+    expect(button?.textContent).toContain('다시 시도');
+    button?.click();
+    expect(curated.calls.reload).toBe(1);
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('points curated validation failures at pnpm build:curated with the issue list', async () => {
+    const { harness, element } = await createShell();
+
+    curated.state.set({ kind: 'invalid-data', issues: makeIssues(2) });
+    state.set({ kind: 'success', catalog: successCatalog });
+    await harness.fixture.whenStable();
+
+    expect(element.querySelector('[role="alert"]')?.textContent).toContain('pnpm build:curated');
+    expect(element.querySelectorAll('.issue-list li')).toHaveLength(2);
   });
 
   it('mounts the child outlet only on success, replacing the state markup', async () => {
