@@ -25,19 +25,27 @@ import { compareByNameThenId } from '../../core/catalog/catalog-selectors';
 /** Korean lane chrome; every label the lane band renders. */
 export const LANE_LABELS: Record<
   CuratedLane,
-  { readonly title: string; readonly from: string; readonly to: string; readonly short: string }
+  {
+    readonly title: string;
+    readonly from: string;
+    readonly to: string;
+    readonly short: string;
+    readonly edge: string;
+  }
 > = {
   'public-web': {
     title: '공개 웹 트래픽',
     from: '방문자',
     to: 'Origin 서버',
     short: '공개 웹',
+    edge: 'Cloudflare Edge',
   },
   'zero-trust': {
     title: 'Zero Trust — 직원·사내 트래픽',
     from: '직원',
     to: '사내 앱 · 인터넷',
     short: 'Zero Trust',
+    edge: 'Cloudflare One',
   },
 };
 
@@ -90,6 +98,8 @@ export interface MapLaneView {
   readonly title: string;
   readonly from: string;
   readonly to: string;
+  /** Title of the box the traffic passes through (Edge / Cloudflare One). */
+  readonly edge: string;
   readonly layers: readonly MapLayerView[];
 }
 
@@ -158,7 +168,14 @@ export function buildMapModel(catalog: Catalog, curated: CuratedData): MapModel 
       };
     });
     const chrome = LANE_LABELS[lane];
-    return { lane, title: chrome.title, from: chrome.from, to: chrome.to, layers };
+    return {
+      lane,
+      title: chrome.title,
+      from: chrome.from,
+      to: chrome.to,
+      edge: chrome.edge,
+      layers,
+    };
   });
 
   const unplaced = catalog.products

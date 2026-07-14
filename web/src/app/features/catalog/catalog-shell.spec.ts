@@ -205,7 +205,7 @@ describe('CatalogShell', () => {
     // The harness root always carries its own <router-outlet>; assert the
     // gate markup instead of the outlet element itself.
     expect(element.querySelector('.catalog-shell')).not.toBeNull();
-    expect(element.querySelector('app-catalog-overview')).toBeNull();
+    expect(element.querySelector('app-map-page')).toBeNull();
     const status = element.querySelector('[role="status"]');
     expect(status?.textContent).toContain('큐레이션 데이터를 불러오는 중');
   });
@@ -239,7 +239,7 @@ describe('CatalogShell', () => {
   it('mounts the child outlet only on success, replacing the state markup', async () => {
     const { harness, element } = await createShell();
 
-    expect(element.querySelector('app-catalog-overview')).toBeNull();
+    expect(element.querySelector('app-map-page')).toBeNull();
 
     state.set({ kind: 'success', catalog: successCatalog });
     await harness.fixture.whenStable();
@@ -247,9 +247,9 @@ describe('CatalogShell', () => {
     expect(element.querySelector('.catalog-shell')).toBeNull();
     const headings = element.querySelectorAll('h1');
     expect(headings).toHaveLength(1);
-    expect(headings[0]?.textContent).toContain('Cloudflare 제품 카탈로그');
-    expect(element.querySelector('#family-heading-application-security')?.textContent).toContain(
-      'Application security',
-    );
+    expect(headings[0]?.textContent).toContain('Cloudflare 제품 지도');
+    // The stub curated document is empty, so every product is explicitly
+    // waiting for curation instead of silently disappearing.
+    expect(element.querySelector('.lane-unplaced')?.textContent).toContain('큐레이션 대기');
   });
 });
