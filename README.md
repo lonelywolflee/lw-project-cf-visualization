@@ -6,9 +6,10 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 계산기로 시각화합니다.
 
 > 세 화면을 제공합니다: 탐험과 회상 두 모드로 Cloudflare를 학습하는
-> **살아있는 지도**(`/` — 안개 걷기, 출처가 달린 학습 카드, 백지 회상 시험,
-> 검증한 영역이 시간이 지나면 다시 흐려지는 간격 반복 재안개, 진도 리포트
-> 내보내기), 솔루션이 어떤 제품들로 구성되는지 보여주는
+> **살아있는 지도**(`/` — 안개 걷기, 출처가 달린 학습 카드, 고객 상황과
+> 솔루션이 지도 위 제품 경로를 밝히는 렌즈, 백지 회상 시험, 검증한 영역이
+> 시간이 지나면 다시 흐려지는 간격 반복 재안개, 진도 리포트 내보내기),
+> 솔루션이 어떤 제품들로 구성되는지 보여주는
 > **구성 그래프**(`/solutions`), 예상 사용량을 입력하면 티어별 월 비용을 추정하는
 > **요금 계산기**(`/calculator`). 모든 화면의 상태(선택·모드·영역)는 URL이라 링크로
 > 공유할 수 있으며, 무엇을 선택하든 공식 출처 링크와 확인 시각이 함께 표시됩니다.
@@ -164,7 +165,7 @@ pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
 `http://127.0.0.1:8788`에서 세 화면의 직접 진입(`/`, `/solutions`, `/calculator`)과 딥링크
-(`/?product=<id>`, `/?mode=recall&area=<layer>`, `/solutions?solution=<id>`,
+(`/?product=<id>`, `/?lens=<id>`, `/?mode=recall&area=<layer>`, `/solutions?solution=<id>`,
 `/calculator?products=<id,...>`),
 은퇴한 v1 경로의 redirect
 (`/browse`, `/discovery` → `/`, `/relationships` → `/solutions`,
