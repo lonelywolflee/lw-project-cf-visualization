@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "crawl": "tsx src/main.ts"
+    "crawl": "tsx src/main.ts",
+    "validate:data": "tsx src/validate-data.ts"
   },
   "dependencies": {
     "@cf-viz/catalog": "workspace:*",
