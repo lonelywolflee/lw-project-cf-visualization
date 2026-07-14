@@ -8,7 +8,7 @@ import type { Catalog, CuratedData } from '@cf-viz/catalog';
 import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
-import { ProgressStore } from '../../core/learning/progress-store';
+import { localToday, ProgressStore } from '../../core/learning/progress-store';
 import { curatedStoreStub } from '../../testing/curated-store-stub';
 
 const source = {
@@ -311,5 +311,49 @@ describe('LivingMapPage', () => {
     const element = harness.routeNativeElement;
     expect(element?.querySelector('.recall-session')).toBeNull();
     expect(element?.querySelectorAll('.area-card').length).toBeGreaterThan(0);
+  });
+
+  function importProgress(recallDate: string): void {
+    const ok = TestBed.inject(ProgressStore).importJson(
+      JSON.stringify({
+        schemaVersion: 1,
+        nodeStates: { waf: 'verified' },
+        recallLog: [
+          { date: recallDate, area: 'application-security', correctSlots: 1, totalSlots: 1 },
+        ],
+        sessionLog: [],
+      }),
+    );
+    expect(ok).toBe(true);
+  }
+
+  it('re-fogs a verified area past its due date: nudge, node fog, and area badge', async () => {
+    importProgress('2026-01-01'); // 기한(1일)이 한참 지난 검증 기록.
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    expect(element?.querySelector('.refog-nudge')?.textContent).toContain('안개가 다시');
+    expect(element?.textContent).toContain('재안개 1');
+    const waf = nodeByName(element, 'WAF');
+    expect(waf?.classList.contains('st-verified')).toBe(true);
+    expect(waf?.classList.contains('refog')).toBe(true);
+
+    await harness.navigateByUrl('/?mode=recall');
+    const recallElement = harness.routeNativeElement;
+    const staleCard = Array.from(recallElement?.querySelectorAll('.area-card') ?? []).find((card) =>
+      card.textContent?.includes('L7 보안'),
+    );
+    expect(staleCard?.classList.contains('stale')).toBe(true);
+    expect(staleCard?.querySelector('.stale-badge')).not.toBeNull();
+  });
+
+  it('stays quiet on the day an area was verified — no premature nudge', async () => {
+    importProgress(localToday());
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    expect(element?.querySelector('.refog-nudge')).toBeNull();
+    expect(element?.textContent).not.toContain('재안개');
+    expect(nodeByName(element, 'WAF')?.classList.contains('refog')).toBe(false);
   });
 });

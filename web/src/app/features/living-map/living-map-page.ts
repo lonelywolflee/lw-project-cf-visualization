@@ -5,7 +5,7 @@ import { CURATED_LANES, type CuratedLane, type CuratedLayer } from '@cf-viz/cata
 
 import { CatalogStore } from '../../core/catalog/catalog-store';
 import { CuratedStore } from '../../core/catalog/curated-store';
-import { ProgressStore, type NodeStatus } from '../../core/learning/progress-store';
+import { localToday, ProgressStore, type NodeStatus } from '../../core/learning/progress-store';
 import { firstParamValue } from '../../core/routing/query-params';
 import { buildMapModel, LANE_LABELS, LAYER_LABELS, type MapModel } from '../map/map-selectors';
 import {
@@ -14,6 +14,7 @@ import {
   verifiedSlots,
   type LearningCardView,
 } from './living-map-selectors';
+import { areaReviewStates } from './re-fog';
 import { buildRecallPool, scoreRecall, type RecallPool, type RecallScore } from './recall-session';
 
 /**
@@ -154,6 +155,7 @@ export class LivingMapPage {
     const json = this.progress.exportJson({
       recallRate: total === 0 ? null : this.verifiedSlotCount() / total,
       slotTotal: total,
+      staleAreas: this.staleAreas().map((area) => area.layer),
       exportedAt: new Date().toISOString(),
     });
     const blob = new Blob([json], { type: 'application/json' });
@@ -273,5 +275,64 @@ export class LivingMapPage {
       result.results.map(({ productId, correct }) => ({ productId, correct })),
       result.totalSlots,
     );
+  }
+
+  // ---------------------------------------------------------------- re-fog
+
+  /** Page-load date; a session crossing midnight just misses one nudge. */
+  private readonly todayDate = localToday();
+
+  private readonly reviewStates = computed(() =>
+    areaReviewStates(this.progress.state().recallLog, this.todayDate),
+  );
+
+  /**
+   * Areas due for review: past their re-fog date AND still holding
+   * verified nodes — an area with nothing verified has nothing to lose,
+   * so it never nags.
+   */
+  protected readonly staleAreas = computed(() => {
+    const curated = this.curatedStore.curated();
+    if (curated === undefined) return [];
+    const reviews = this.reviewStates();
+    const states = this.progress.state().nodeStates;
+    return this.areas().filter(({ layer }) => {
+      if (reviews.get(layer)?.stale !== true) return false;
+      return curated.products.some(
+        (entry) =>
+          states[entry.productId] === 'verified' &&
+          entry.placements.some((placement) => placement.layer === layer),
+      );
+    });
+  });
+
+  private readonly staleLayerSet = computed(
+    () => new Set<string>(this.staleAreas().map((area) => area.layer)),
+  );
+
+  private readonly layersByProduct = computed(() => {
+    const map = new Map<string, readonly CuratedLayer[]>();
+    const curated = this.curatedStore.curated();
+    if (curated === undefined) return map;
+    for (const entry of curated.products) {
+      map.set(
+        entry.productId,
+        entry.placements.map((placement) => placement.layer),
+      );
+    }
+    return map;
+  });
+
+  /** Verified but past due in one of its areas — rendered as re-fogged. */
+  protected isRefogged(productId: string): boolean {
+    if (this.statusOf(productId) !== 'verified') return false;
+    const layers = this.layersByProduct().get(productId);
+    if (layers === undefined) return false;
+    const stale = this.staleLayerSet();
+    return layers.some((layer) => stale.has(layer));
+  }
+
+  protected isAreaStale(layer: string): boolean {
+    return this.staleLayerSet().has(layer);
   }
 }

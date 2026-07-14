@@ -25,7 +25,7 @@
       <div class="head-tools">
         <span class="fog-count">
           밝힌 노드 {{ progress.revealedCount() }} / 67 · 검증 슬롯 {{ verifiedSlotCount() }} / {{
-          slotTotal() }}
+          slotTotal() }} @if (staleAreas().length > 0) { · 재안개 {{ staleAreas().length }} }
         </span>
         <button type="button" class="tool" (click)="exportReport()">리포트 내보내기</button>
         <label class="tool tool-import">
@@ -42,6 +42,11 @@
       아무 노드나 눌러서 시작하세요. 잠금은 없습니다 — 익힌 자리가 밝아지고, 남은 안개가 다음에 갈
       곳을 알려줍니다.
     </p>
+    @if (!isRecall() && staleAreas().length > 0) {
+    <button type="button" class="refog-nudge" (click)="setMode(true)">
+      🌫 검증했던 영역 {{ staleAreas().length }}곳에 안개가 다시 꼈습니다 — 다시 채워볼까요?
+    </button>
+    }
   </header>
 
   @if (isRecall()) {
@@ -106,9 +111,17 @@
       </p>
       <div class="area-grid">
         @for (areaOption of areas(); track areaOption.layer) {
-        <button type="button" class="area-card" (click)="startArea(areaOption.layer)">
+        <button
+          type="button"
+          class="area-card"
+          [class.stale]="isAreaStale(areaOption.layer)"
+          (click)="startArea(areaOption.layer)"
+        >
           <span class="area-lane">{{ areaOption.laneLabel }}</span>
           <span class="area-name">{{ areaOption.layerLabel }}</span>
+          @if (isAreaStale(areaOption.layer)) {
+          <span class="stale-badge">🌫 안개가 다시 꼈어요 — 다시 채워볼까요?</span>
+          }
         </button>
         }
       </div>
@@ -146,6 +159,7 @@
                   <button
                     type="button"
                     class="node st-{{ statusOf(chip.id) }}"
+                    [class.refog]="isRefogged(chip.id)"
                     [class.selected]="selectedId() === chip.id"
                     [attr.aria-pressed]="selectedId() === chip.id"
                     (click)="open(chip.id)"
@@ -168,6 +182,7 @@
                 <button
                   type="button"
                   class="node st-{{ statusOf(chip.id) }}"
+                  [class.refog]="isRefogged(chip.id)"
                   [class.selected]="selectedId() === chip.id"
                   [attr.aria-pressed]="selectedId() === chip.id"
                   (click)="open(chip.id)"

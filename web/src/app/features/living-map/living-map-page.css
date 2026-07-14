@@ -611,6 +611,41 @@
   gap: 0.6rem;
 }
 
+/* ---------- re-fog (spaced repetition) ---------- */
+.refog-nudge {
+  background: #fff;
+  border: 2px dashed var(--lm-lane2);
+  border-radius: 10px;
+  color: var(--lm-lane2);
+  cursor: pointer;
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: -0.5rem 0 1.25rem;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+}
+
+.refog-nudge:hover {
+  border-style: solid;
+}
+
+/* 검증됐지만 복습 기한이 지난 노드 — 안개가 다시 낀다. */
+.node.st-verified.refog {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.area-card.stale {
+  border-color: var(--lm-lane2);
+}
+
+.stale-badge {
+  color: var(--lm-lane2);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 /* ---------- narrow screens ---------- */
 @media (max-width: 640px) {
   .journey {
