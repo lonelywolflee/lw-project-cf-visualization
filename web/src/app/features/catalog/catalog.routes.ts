@@ -46,6 +46,12 @@ export const CATALOG_ROUTES: Routes = [
         title: '관계 보기 | Cloudflare Product & Solution Explorer',
       },
       {
+        path: 'solutions',
+        pathMatch: 'full',
+        loadComponent: () => import('../graph/graph-page').then((m) => m.GraphPage),
+        title: '솔루션 구성 | Cloudflare Product & Solution Explorer',
+      },
+      {
         path: 'products/:productId',
         loadComponent: () => import('./product-detail').then((m) => m.ProductDetail),
         title: 'Product 상세 | Cloudflare Product & Solution Explorer',

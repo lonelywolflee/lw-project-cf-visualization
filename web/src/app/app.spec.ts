@@ -40,6 +40,8 @@ describe('App', () => {
     expect(nav).not.toBeNull();
     const mapLink = nav?.querySelector<HTMLAnchorElement>('a[href="/"]');
     expect(mapLink?.textContent).toContain('지도');
+    const solutionsLink = nav?.querySelector<HTMLAnchorElement>('a[href="/solutions"]');
+    expect(solutionsLink?.textContent).toContain('솔루션');
     const catalogLink = nav?.querySelector<HTMLAnchorElement>('a[href="/browse"]');
     expect(catalogLink?.textContent).toContain('카탈로그');
     const discoveryLink = nav?.querySelector<HTMLAnchorElement>('a[href="/discovery"]');
