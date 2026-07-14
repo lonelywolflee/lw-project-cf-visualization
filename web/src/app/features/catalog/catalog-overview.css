@@ -1,0 +1,60 @@
+.catalog-overview {
+  margin: 0 auto;
+  max-width: 60rem;
+}
+
+.summary-line {
+  color: #57606a;
+}
+
+.family,
+.solutions {
+  border-top: 1px solid #d0d7de;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+}
+
+.family h2,
+.solutions h2 {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.count {
+  color: #57606a;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.family-summary {
+  color: #24292f;
+}
+
+.link-list {
+  display: grid;
+  gap: 0.25rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.link-list a {
+  border-radius: 0.25rem;
+  color: #0969da;
+  display: inline-block;
+  overflow-wrap: anywhere;
+  padding: 0.125rem 0;
+}
+
+.link-list a:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 2px;
+}
+
+.empty-note {
+  color: #57606a;
+  font-style: italic;
+}

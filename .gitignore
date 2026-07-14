@@ -141,3 +141,15 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# macOS
+.DS_Store
+
+# Angular build cache
+.angular/
+
+# Crawler atomic-write staging (cleaned automatically; insurance for crashes)
+web/public/data/.catalog.json.*.tmp
+
+# wrangler pages dev local emulator state
+.wrangler/

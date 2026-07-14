@@ -1,0 +1,13 @@
+<header class="app-header">
+  <span class="brand">Cloudflare Product &amp; Solution Explorer</span>
+  <nav aria-label="주요 메뉴">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      >카탈로그</a
+    >
+    <a routerLink="/discovery" routerLinkActive="active">검색</a>
+    <a routerLink="/relationships" routerLinkActive="active">관계</a>
+  </nav>
+</header>
+<main class="app-main">
+  <router-outlet />
+</main>

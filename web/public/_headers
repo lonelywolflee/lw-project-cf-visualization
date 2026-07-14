@@ -1,0 +1,10 @@
+# Hashed build output (outputHashing: all) never changes for a given URL.
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# The catalog is refreshed manually (pnpm crawl) at a stable URL, so the
+# browser must revalidate it on every load to pick up a redeployed dataset.
+/data/catalog.json
+  Cache-Control: public, max-age=0, must-revalidate

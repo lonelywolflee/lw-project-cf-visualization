@@ -1,0 +1,16 @@
+{
+  "allowedHosts": ["www.cloudflare.com", "developers.cloudflare.com"],
+  "fetch": {
+    "timeoutMs": 10000,
+    "maxRetries": 2,
+    "concurrency": 99,
+    "minRequestIntervalMs": 1000
+  },
+  "sources": [
+    {
+      "id": "www-products-overview",
+      "url": "https://www.cloudflare.com/products/",
+      "pageKind": "marketing-overview"
+    }
+  ]
+}

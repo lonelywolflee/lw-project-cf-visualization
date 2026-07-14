@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1",
+  "generatedAt": "2026-07-14T00:00:00Z",
+  "sources": [
+    {
+      "id": "waf-blog-post",
+      "url": "https://blog.cloudflare.com/waf/",
+      "pageKind": "marketing-product",
+      "title": "A Cloudflare blog post about the WAF",
+      "retrievedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "productFamilies": [],
+  "products": [],
+  "solutions": [],
+  "useCases": [],
+  "relationships": []
+}

@@ -1,0 +1,37 @@
+@let state = store.state(); @if (state.kind === 'success') {
+<router-outlet />
+} @else {
+<section class="catalog-shell" aria-labelledby="catalog-heading">
+  <h1 id="catalog-heading">Cloudflare 제품 카탈로그</h1>
+
+  @switch (state.kind) { @case ('loading') {
+  <p class="state state-loading" role="status" aria-live="polite">
+    카탈로그 데이터를 불러오는 중입니다…
+  </p>
+  } @case ('fetch-error') {
+  <div class="state state-error" role="alert">
+    <p>카탈로그 데이터를 불러오지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.</p>
+    <button type="button" (click)="store.reload()">다시 시도</button>
+  </div>
+  } @case ('invalid-data') {
+  <div class="state state-error" role="alert">
+    <p>
+      카탈로그 데이터가 스키마 검증을 통과하지 못했습니다.
+      <code>pnpm crawl</code>로 데이터를 다시 생성해 주세요.
+    </p>
+    <ul class="issue-list">
+      @for (issue of visibleIssues(); track $index) {
+      <li><code>{{ issue.path }}</code> — {{ issue.message }}</li>
+      }
+    </ul>
+    @if (hiddenIssueCount() > 0) {
+    <p>외 {{ hiddenIssueCount() }}건의 문제가 더 있습니다.</p>
+    }
+  </div>
+  } @case ('empty') {
+  <p class="state state-empty" role="status">
+    카탈로그가 비어 있습니다. <code>pnpm crawl</code>을 실행해 제품 데이터를 수집해 주세요.
+  </p>
+  } }
+</section>
+}
