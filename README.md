@@ -6,8 +6,8 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 
 > 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
 > 완료되어 아래 command를 실행할 수 있습니다. `pnpm crawl`이 공식 source 수집, schema
-> validation, `web/public/data/catalog.json` 갱신까지 수행합니다. 시각화 기능은 후속
-> issue에서 구현하며, 현재 web은 `catalog.json`을 schema validation과 함께 불러와
+> validation, `web/public/data/catalog.json` 갱신까지 수행합니다. web은 `catalog.json`을
+> schema validation과 함께 불러와
 > product family 계층 탐색, product·solution 상세(공식 출처 링크 포함), URL로 공유
 > 가능한 검색·필터, 출처가 표기된 관계 시각화(접근 가능한 목록 병행), loading·오류·빈
 > 데이터 상태를 제공합니다.
@@ -123,9 +123,11 @@ file은 변경되지 않습니다. 일반적인 사용 순서는 `pnpm crawl` �
 
 Target hosting은 Cloudflare Pages입니다. `pnpm build`가 만든 static output
 (`web/dist/web/browser`)을 순수 static asset으로 배포하며 server-side runtime은 필요하지
-않습니다. Route 직접 진입과 새로고침은 `web/public/_redirects`의 `/* /index.html 200`
-rewrite가 처리하고, 실제 file이 있는 asset(`/data/catalog.json`, hashed chunk)은 rewrite
-이전에 그대로 제공됩니다. Cache 정책은 `web/public/_headers`가 정의합니다. 모든 pull
+않습니다. Route 직접 진입과 새로고침은 Cloudflare Pages의 내장 SPA fallback이 처리합니다
+(`404.html`이 없으면 존재하지 않는 경로에 `index.html`을 자동 제공; 별도 `_redirects` 규칙은
+필요 없고, `/* /index.html 200` 형태는 Pages가 무한 루프로 판정해 무시합니다). 실제 file이
+있는 asset(`/data/catalog.json`, hashed chunk)은 언제나 그대로 제공됩니다. Cache 정책은
+`web/public/_headers`가 정의합니다. 모든 pull
 request는 GitHub Actions CI(`.github/workflows/ci.yml`)가 `pnpm lint`, `pnpm test`,
 `pnpm validate:data`, `pnpm build`로 검증합니다.
 
@@ -138,7 +140,7 @@ Production build와 배포는 network를 사용하지 않습니다. 배포되는
 
 ### Local 검증
 
-배포 전에 Pages와 같은 `_redirects`/`_headers` 규칙을 적용하는 local static server로
+배포 전에 Pages와 같은 SPA fallback과 `_headers` 규칙을 적용하는 local static server로
 직접 진입 route와 data 응답을 확인합니다.
 
 ```bash
@@ -146,7 +148,8 @@ pnpm build
 pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
-`http://127.0.0.1:8788`에서 `/`, `/products/<id>`, `/discovery`, `/relationships` 직접
+`http://127.0.0.1:8788`에서 `/`, `/products/<id>`, `/solutions/<id>`, `/discovery`,
+`/relationships` 직접
 진입과 `/data/catalog.json` 응답을 확인합니다. 일상적인 개발에는 `pnpm dev`를 사용하고,
 이 검증은 배포 전 확인 용도입니다.
 
