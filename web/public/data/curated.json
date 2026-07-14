@@ -820,12 +820,101 @@
   ],
   "compositions": [
     {
+      "solutionId": "ai",
+      "productIds": [
+        "agents",
+        "ai-gateway",
+        "ai-search",
+        "durable-objects",
+        "r2",
+        "sandboxes",
+        "vectorize",
+        "workers",
+        "workers-ai"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/ai/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "frontends",
+      "productIds": [
+        "d1",
+        "kv",
+        "r2",
+        "workers"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/frontends/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "network",
+      "productIds": [
+        "argo-smart-routing",
+        "ddos",
+        "load-balancing"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/network/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "platforms",
+      "productIds": [
+        "d1",
+        "durable-objects",
+        "kv",
+        "pages",
+        "r2",
+        "vectorize",
+        "workers",
+        "workers-for-platforms"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/platforms/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
       "solutionId": "sase",
       "productIds": [
         "access",
-        "gateway"
+        "ai-gateway",
+        "browser-isolation",
+        "casb",
+        "dlp",
+        "email-security",
+        "gateway",
+        "network-firewall",
+        "secure-web-gateway",
+        "wan"
       ],
       "sourceUrl": "https://www.cloudflare.com/sase/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "security",
+      "productIds": [
+        "api-shield",
+        "bot-management",
+        "ddos",
+        "page-shield",
+        "rate-limiting",
+        "ssl",
+        "turnstile",
+        "waf"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/security/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "workflows",
+      "productIds": [
+        "d1",
+        "durable-objects",
+        "kv",
+        "queues",
+        "r2",
+        "workers",
+        "workflows"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/workflows/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ],
