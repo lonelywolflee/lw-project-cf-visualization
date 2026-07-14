@@ -19,6 +19,7 @@ import {
   type CuratedData,
   type CuratedPricing,
   type CuratedProduct,
+  type CuratedScenario,
   type IncludedLimit,
   type LearningNote,
   type PricingTier,
@@ -141,6 +142,21 @@ function normalizeLearningNote(note: LearningNote): LearningNote {
   return normalized;
 }
 
+function normalizeScenario(scenario: CuratedScenario): CuratedScenario {
+  const normalized: CuratedScenario = {
+    id: scenario.id,
+    titleKo: scenario.titleKo,
+    situationKo: scenario.situationKo,
+    productIds: [...scenario.productIds].sort(compareCodepoints),
+    sourceUrl: scenario.sourceUrl,
+    verifiedAt: scenario.verifiedAt,
+  };
+  if (scenario.talkTrackKo !== undefined) {
+    normalized.talkTrackKo = scenario.talkTrackKo;
+  }
+  return normalized;
+}
+
 /**
  * Canonical form of a valid curated dataset: collections sorted by their
  * entry id, placements by lane/layer, composition members by id; every
@@ -161,6 +177,9 @@ export function normalizeCuratedData(curated: CuratedData): CuratedData {
     learningNotes: [...curated.learningNotes]
       .sort((a, b) => compareCodepoints(a.productId, b.productId))
       .map(normalizeLearningNote),
+    scenarios: [...curated.scenarios]
+      .sort((a, b) => compareCodepoints(a.id, b.id))
+      .map(normalizeScenario),
   };
 }
 

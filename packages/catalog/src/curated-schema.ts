@@ -167,10 +167,33 @@ const learningNoteSchema = z.strictObject({
 });
 
 /**
+ * A customer-situation lens: a short narrative plus the products it lights
+ * up on the map. Solutions already act as lenses through compositions;
+ * scenarios cover situations that cut across solution boundaries (a flash
+ * sale, a VPN-replacement mandate). Grounded like every other entry:
+ * `sourceUrl` is the official page the mapping was checked against.
+ */
+const curatedScenarioSchema = z.strictObject({
+  id: idSlugSchema,
+  titleKo: nonBlankString(80),
+  situationKo: nonBlankString(400),
+  productIds: z
+    .array(idSlugSchema)
+    .min(2)
+    .refine((ids) => new Set(ids).size === ids.length, {
+      error: 'productIds must not contain duplicate ids',
+    }),
+  talkTrackKo: nonBlankString(400).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
  * Runtime schema for the curated dataset — knowledge that official pages do
  * not carry in structured form (map placements, beginner-friendly Korean
- * role lines, solution compositions, tier pricing, learning notes). Every
- * entry cites the official page it was verified against and when.
+ * role lines, solution compositions, tier pricing, learning notes,
+ * scenario lenses). Every entry cites the official page it was verified
+ * against and when.
  *
  * Prefer {@link parseCuratedData} / {@link safeParseCuratedData}; catalog
  * cross-references are validated separately by
@@ -182,6 +205,7 @@ export const curatedDataSchema = z.strictObject({
   compositions: z.array(curatedCompositionSchema),
   pricing: z.array(curatedPricingSchema),
   learningNotes: z.array(learningNoteSchema),
+  scenarios: z.array(curatedScenarioSchema),
 });
 
 /** A fully validated curated dataset document. */
@@ -210,3 +234,6 @@ export type UsageMeter = NonNullable<PricingTier['meters']>[number];
 
 /** Quote-first learner note for one product. */
 export type LearningNote = CuratedData['learningNotes'][number];
+
+/** Customer-situation lens over the map. */
+export type CuratedScenario = CuratedData['scenarios'][number];

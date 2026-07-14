@@ -64,7 +64,14 @@ const catalog: Catalog = {
       sourceIds: [source.id],
     },
   ],
-  solutions: [],
+  solutions: [
+    {
+      id: 'sase',
+      name: 'Cloudflare One',
+      summary: 'SASE platform.',
+      sourceIds: [source.id],
+    },
+  ],
   useCases: [],
   relationships: [],
 };
@@ -101,7 +108,14 @@ const curatedData: CuratedData = {
       verifiedAt: '2026-07-14T00:00:00Z',
     },
   ],
-  compositions: [],
+  compositions: [
+    {
+      solutionId: 'sase',
+      productIds: ['waf', 'cdn'],
+      sourceUrl: 'https://www.cloudflare.com/sase/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+  ],
   pricing: [
     {
       productId: 'workers',
@@ -117,6 +131,17 @@ const curatedData: CuratedData = {
       misconceptionKo: '방화벽이라 네트워크 장비라고 오해한다.',
       customerQuestionKo: '"AWS WAF 이미 쓰는데요?"',
       analogyKo: '공항 검색대와 같다.',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+  ],
+  scenarios: [
+    {
+      id: 'login-abuse',
+      titleKo: '로그인 공격 방어',
+      situationKo: '정상처럼 보이는 로그인 시도가 반복되는 상황입니다.',
+      productIds: ['waf', 'cdn'],
+      talkTrackKo: '로그인 실패율 급증 경험을 물으며 시작하세요.',
       sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
       verifiedAt: '2026-07-15T00:00:00Z',
     },
@@ -355,5 +380,65 @@ describe('LivingMapPage', () => {
     expect(element?.querySelector('.refog-nudge')).toBeNull();
     expect(element?.textContent).not.toContain('재안개');
     expect(nodeByName(element, 'WAF')?.classList.contains('refog')).toBe(false);
+  });
+
+  it('offers scenario and solution lenses in the lens bar', async () => {
+    const harness = await RouterTestingHarness.create('/');
+    const chips = Array.from(harness.routeNativeElement?.querySelectorAll('.lens-chip') ?? []).map(
+      (chip) => chip.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+
+    expect(chips[0]).toBe('렌즈 없음');
+    expect(chips).toContain('상황 로그인 공격 방어');
+    expect(chips).toContain('솔루션 Cloudflare One');
+  });
+
+  it('lights up scenario members, dims the rest, and shows the narrative panel', async () => {
+    const harness = await RouterTestingHarness.create('/?lens=login-abuse');
+    const element = harness.routeNativeElement;
+
+    const waf = nodeByName(element, 'WAF');
+    expect(waf?.classList.contains('lens-hit')).toBe(true);
+    expect(waf?.classList.contains('lens-dim')).toBe(false);
+    const newcomer = nodeByName(element, 'Newcomer'); // unplaced — still dims
+    expect(newcomer?.classList.contains('lens-dim')).toBe(true);
+    // The collapsed compute group holds no members — it dims as a whole.
+    const computeToggle = Array.from(
+      element?.querySelectorAll<HTMLButtonElement>('.family-toggle') ?? [],
+    ).find((button) => button.textContent?.includes('Compute'));
+    expect(computeToggle?.classList.contains('lens-dim')).toBe(true);
+
+    const panel = element?.querySelector('.lens-panel');
+    expect(panel?.textContent).toContain('정상처럼 보이는 로그인 시도');
+    expect(panel?.textContent).toContain('대화의 문');
+    expect(
+      panel?.querySelector(
+        'a[href="https://www.cloudflare.com/application-services/products/waf/"]',
+      ),
+    ).not.toBeNull();
+  });
+
+  it('links the composition graph from a solution lens', async () => {
+    const harness = await RouterTestingHarness.create('/?lens=sase');
+    const element = harness.routeNativeElement;
+
+    expect(nodeByName(element, 'CDN')?.classList.contains('lens-hit')).toBe(true);
+    expect(element?.querySelector('.lens-panel a[href="/solutions?solution=sase"]')).not.toBeNull();
+  });
+
+  it('keeps the lens while opening a learning card, and survives hostile ids', async () => {
+    const harness = await RouterTestingHarness.create('/?lens=login-abuse');
+    const element = harness.routeNativeElement;
+
+    nodeByName(element, 'WAF')?.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Location).path()).toBe('?product=waf&lens=login-abuse');
+    expect(element?.querySelector('.learning-card')).not.toBeNull();
+    expect(element?.querySelector('.lens-panel')).not.toBeNull();
+
+    await harness.navigateByUrl('/?lens=%3Cscript%3E');
+    const hostile = harness.routeNativeElement;
+    expect(hostile?.querySelector('.lens-panel')).toBeNull();
+    expect(nodeByName(hostile, 'WAF')?.classList.contains('lens-dim')).toBe(false);
   });
 });

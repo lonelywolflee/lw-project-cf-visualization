@@ -33,6 +33,7 @@ export {
   type CuratedLayer,
   type CuratedPricing,
   type CuratedProduct,
+  type CuratedScenario,
   type IncludedLimit,
   type LearningNote,
   type PricingTier,

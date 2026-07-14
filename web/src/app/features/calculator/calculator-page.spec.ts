@@ -56,6 +56,7 @@ const catalog: Catalog = {
 const curatedData: CuratedData = {
   schemaVersion: '1',
   learningNotes: [],
+  scenarios: [],
   products: [],
   compositions: [],
   pricing: [

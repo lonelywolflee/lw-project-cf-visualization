@@ -6,6 +6,7 @@ function buildValidCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
     learningNotes: [],
+    scenarios: [],
     products: [
       {
         productId: 'waf',
@@ -88,6 +89,7 @@ describe('curatedDataSchema', () => {
     const result = safeParseCuratedData({
       schemaVersion: '1',
       learningNotes: [],
+      scenarios: [],
       products: [],
       compositions: [],
       pricing: [],
@@ -298,6 +300,45 @@ describe('curatedDataSchema', () => {
     expectShapeIssue(
       { ...data, learningNotes: [{ ...note, whyKo: '이유.', extra: true }] },
       'learningNotes[0].extra',
+    );
+  });
+
+  it('accepts a scenario with and without the optional talk track', () => {
+    const data = buildValidCuratedData();
+    const scenario = {
+      id: 'flash-sale-surge',
+      titleKo: '이커머스 세일 폭주',
+      situationKo: '정상 트래픽이 순간 폭주하는 상황입니다.',
+      productIds: ['waiting-room', 'cdn'],
+      sourceUrl: 'https://developers.cloudflare.com/waiting-room/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expect(safeParseCuratedData({ ...data, scenarios: [scenario] }).success).toBe(true);
+    expect(
+      safeParseCuratedData({
+        ...data,
+        scenarios: [{ ...scenario, talkTrackKo: '지난 피크 이벤트 경험을 물으세요.' }],
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects a scenario with fewer than two members or duplicate members', () => {
+    const data = buildValidCuratedData();
+    const scenario = {
+      id: 'flash-sale-surge',
+      titleKo: '이커머스 세일 폭주',
+      situationKo: '정상 트래픽이 순간 폭주하는 상황입니다.',
+      productIds: ['waiting-room', 'cdn'],
+      sourceUrl: 'https://developers.cloudflare.com/waiting-room/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expectShapeIssue(
+      { ...data, scenarios: [{ ...scenario, productIds: ['waiting-room'] }] },
+      'scenarios[0].productIds',
+    );
+    expectShapeIssue(
+      { ...data, scenarios: [{ ...scenario, productIds: ['cdn', 'cdn'] }] },
+      'scenarios[0].productIds',
     );
   });
 

@@ -128,7 +128,49 @@
     </section>
     }
   </div>
-  } @else { @if (model(); as m) {
+  } @else {
+  <div class="lens-bar" role="group" aria-label="렌즈 선택">
+    <button
+      type="button"
+      class="lens-chip"
+      [class.on]="activeLens() === null"
+      (click)="setLens(null)"
+    >
+      렌즈 없음
+    </button>
+    @for (lensOption of lenses(); track lensOption.id) {
+    <button
+      type="button"
+      class="lens-chip"
+      [class.on]="activeLens()?.id === lensOption.id"
+      (click)="setLens(lensOption.id)"
+    >
+      <span class="lens-kind">{{ lensOption.kind === 'scenario' ? '상황' : '솔루션' }}</span>
+      {{ lensOption.title }}
+    </button>
+    }
+  </div>
+  @if (activeLens(); as activeLensView) {
+  <aside class="lens-panel" aria-live="polite">
+    @if (activeLensView.situationKo; as situation) {
+    <p class="lens-situation">{{ situation }}</p>
+    } @if (activeLensView.talkTrackKo; as talkTrack) {
+    <p class="lens-talk"><strong>대화의 문</strong> — {{ talkTrack }}</p>
+    }
+    <p class="lens-meta">
+      제품 {{ activeLensView.productIds.size }}개를 밝힙니다 ·
+      <a [href]="activeLensView.sourceUrl" target="_blank" rel="noopener noreferrer"
+        >원문 (새 창)</a
+      >
+      · 확인일 {{ activeLensView.verifiedAt | date: 'mediumDate' }} @if (activeLensView.kind ===
+      'solution') { ·
+      <a [routerLink]="['/solutions']" [queryParams]="{ solution: activeLensView.id }"
+        >구성 그래프로 보기</a
+      >
+      }
+    </p>
+  </aside>
+  } @if (model(); as m) {
   <div class="map-layout" [class.card-open]="card() !== null">
     <div class="lanes">
       @for (lane of m.lanes; track lane.lane) {
@@ -160,6 +202,8 @@
                     type="button"
                     class="node st-{{ statusOf(chip.id) }}"
                     [class.refog]="isRefogged(chip.id)"
+                    [class.lens-hit]="inLens(chip.id)"
+                    [class.lens-dim]="dimmedByLens(chip.id)"
                     [class.selected]="selectedId() === chip.id"
                     [attr.aria-pressed]="selectedId() === chip.id"
                     (click)="open(chip.id)"
@@ -172,17 +216,22 @@
                 <button
                   type="button"
                   class="family-toggle collapsed"
+                  [class.lens-dim]="activeLens() !== null && lensCountIn(group.products) === 0"
                   [attr.aria-expanded]="false"
                   (click)="toggleGroup(group.familyId)"
                 >
                   {{ group.familyName }} · {{ group.products.length }}개 중 안개 {{
-                  unvisitedIn(group.products) }} ▸
+                  unvisitedIn(group.products) }} @if (lensCountIn(group.products) > 0) {
+                  <span class="lens-badge">렌즈 {{ lensCountIn(group.products) }}</span>
+                  } ▸
                 </button>
                 } } } @else { @for (chip of layer.products; track chip.id) {
                 <button
                   type="button"
                   class="node st-{{ statusOf(chip.id) }}"
                   [class.refog]="isRefogged(chip.id)"
+                  [class.lens-hit]="inLens(chip.id)"
+                  [class.lens-dim]="dimmedByLens(chip.id)"
                   [class.selected]="selectedId() === chip.id"
                   [attr.aria-pressed]="selectedId() === chip.id"
                   (click)="open(chip.id)"
@@ -207,6 +256,7 @@
           <button
             type="button"
             class="node st-{{ statusOf(chip.id) }}"
+            [class.lens-dim]="dimmedByLens(chip.id)"
             [attr.aria-pressed]="selectedId() === chip.id"
             (click)="open(chip.id)"
           >

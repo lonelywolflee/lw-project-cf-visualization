@@ -3,8 +3,8 @@ import type { CatalogIssue } from './errors.js';
 import type { Catalog } from './schema.js';
 
 function collectUniqueIds(
-  collection: 'products' | 'compositions' | 'pricing' | 'learningNotes',
-  key: 'productId' | 'solutionId',
+  collection: 'products' | 'compositions' | 'pricing' | 'learningNotes' | 'scenarios',
+  key: 'productId' | 'solutionId' | 'id',
   ids: readonly string[],
   issues: CatalogIssue[],
 ): void {
@@ -53,6 +53,12 @@ export function collectCuratedIntegrityIssues(curated: CuratedData): CatalogIssu
     'learningNotes',
     'productId',
     curated.learningNotes.map((entry) => entry.productId),
+    issues,
+  );
+  collectUniqueIds(
+    'scenarios',
+    'id',
+    curated.scenarios.map((entry) => entry.id),
     issues,
   );
   return issues;
@@ -121,6 +127,27 @@ export function collectCuratedReferenceIssues(
         message: `Unknown products id '${entry.productId}'`,
       });
     }
+  });
+
+  curated.scenarios.forEach((entry, index) => {
+    // Scenario and solution lenses share one URL namespace (`?lens=`), so
+    // an id collision would make a deep link ambiguous — reject it here.
+    if (solutionIds.has(entry.id)) {
+      issues.push({
+        code: 'duplicate-id',
+        path: `scenarios[${String(index)}].id`,
+        message: `Scenario id '${entry.id}' collides with a solution id`,
+      });
+    }
+    entry.productIds.forEach((productId, productIndex) => {
+      if (!productIds.has(productId)) {
+        issues.push({
+          code: 'unknown-entity-reference',
+          path: `scenarios[${String(index)}].productIds[${String(productIndex)}]`,
+          message: `Unknown products id '${productId}'`,
+        });
+      }
+    });
   });
 
   return issues;

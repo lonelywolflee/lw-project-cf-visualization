@@ -646,6 +646,92 @@
   font-weight: 700;
 }
 
+/* ---------- lenses ---------- */
+.lens-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.8rem;
+}
+
+.lens-chip {
+  background: #fff;
+  border: 1.5px solid var(--lm-line);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.8rem;
+}
+
+.lens-chip:hover {
+  border-color: var(--lm-accent);
+}
+
+.lens-chip.on {
+  background: #333;
+  border-color: #333;
+  color: #fff;
+  font-weight: 700;
+}
+
+.lens-kind {
+  color: var(--lm-faint);
+  font-size: 0.72rem;
+  margin-right: 0.25rem;
+  text-transform: uppercase;
+}
+
+.lens-chip.on .lens-kind {
+  color: #cfd6e2;
+}
+
+.lens-panel {
+  background: #fff;
+  border: 1.5px dashed var(--lm-accent);
+  border-radius: 12px;
+  margin: 0 0 1rem;
+  padding: 0.8rem 1rem;
+}
+
+.lens-situation {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.lens-talk {
+  color: var(--lm-muted);
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+.lens-meta {
+  color: var(--lm-faint);
+  font-size: 0.82rem;
+  margin: 0.5rem 0 0;
+}
+
+.lens-meta a {
+  color: var(--lm-muted);
+}
+
+.node.lens-hit {
+  border-color: var(--lm-accent);
+  border-style: solid;
+  box-shadow: 0 0 0 3px var(--lm-accent-soft);
+}
+
+.node.lens-dim,
+.family-toggle.lens-dim {
+  opacity: 0.3;
+}
+
+.lens-badge {
+  color: var(--lm-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 /* ---------- narrow screens ---------- */
 @media (max-width: 640px) {
   .journey {

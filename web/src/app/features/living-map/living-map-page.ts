@@ -9,10 +9,12 @@ import { localToday, ProgressStore, type NodeStatus } from '../../core/learning/
 import { firstParamValue } from '../../core/routing/query-params';
 import { buildMapModel, LANE_LABELS, LAYER_LABELS, type MapModel } from '../map/map-selectors';
 import {
+  buildLensViews,
   learningCardView,
   totalSlots,
   verifiedSlots,
   type LearningCardView,
+  type LensView,
 } from './living-map-selectors';
 import { areaReviewStates } from './re-fog';
 import { buildRecallPool, scoreRecall, type RecallPool, type RecallScore } from './recall-session';
@@ -50,6 +52,8 @@ export class LivingMapPage {
   readonly mode = input<string | undefined>();
   /** Raw `?area=` value; the recall layer, validated against the lanes. */
   readonly area = input<string | undefined>();
+  /** Raw `?lens=` value; a scenario or solution id, validated below. */
+  readonly lens = input<string | undefined>();
 
   private readonly store = inject(CatalogStore);
   private readonly curatedStore = inject(CuratedStore);
@@ -137,12 +141,12 @@ export class LivingMapPage {
     this.progress.recordVisit(productId);
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { product: productId },
+      queryParams: { product: productId, ...this.lensParam() },
     });
   }
 
   protected close(): void {
-    void this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    void this.router.navigate([], { relativeTo: this.route, queryParams: this.lensParam() });
   }
 
   protected markLearned(productId: string): void {
@@ -334,5 +338,52 @@ export class LivingMapPage {
 
   protected isAreaStale(layer: string): boolean {
     return this.staleLayerSet().has(layer);
+  }
+
+  // ----------------------------------------------------------------- lenses
+
+  /** Every lens the bar offers: scenarios first, then solutions. */
+  protected readonly lenses = computed<readonly LensView[]>(() => {
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    return catalog !== undefined && curated !== undefined ? buildLensViews(catalog, curated) : [];
+  });
+
+  /** The validated active lens; hostile or unknown ids collapse to null. */
+  protected readonly activeLens = computed<LensView | null>(() => {
+    const raw = firstParamValue(this.lens());
+    if (raw === undefined || raw === '') return null;
+    return this.lenses().find((candidate) => candidate.id === raw) ?? null;
+  });
+
+  /** URL fragment that keeps the lens across product open/close. */
+  private lensParam(): Record<string, string> {
+    const lens = this.activeLens();
+    return lens === null ? {} : { lens: lens.id };
+  }
+
+  protected setLens(lensId: string | null): void {
+    const selected = this.selectedId();
+    const productParam = selected === null ? {} : { product: selected };
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: lensId === null ? productParam : { ...productParam, lens: lensId },
+    });
+  }
+
+  protected inLens(productId: string): boolean {
+    return this.activeLens()?.productIds.has(productId) ?? false;
+  }
+
+  protected dimmedByLens(productId: string): boolean {
+    const lens = this.activeLens();
+    return lens !== null && !lens.productIds.has(productId);
+  }
+
+  /** Lens members inside a collapsed family group (badge + dim decision). */
+  protected lensCountIn(products: readonly { readonly id: string }[]): number {
+    const lens = this.activeLens();
+    if (lens === null) return 0;
+    return products.filter((product) => lens.productIds.has(product.id)).length;
   }
 }

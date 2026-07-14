@@ -1596,5 +1596,50 @@
       "analogyKo": "자판기 네트워크입니다 — 본사 창고(Origin)까지 가지 않고 가장 가까운 자판기에서 바로 꺼냅니다.",
       "seNoteKo": "CPU 시간 과금(벽시계 아님)과 isolate 모델이 아키텍처 설계의 출발점입니다."
     }
+  ],
+  "scenarios": [
+    {
+      "id": "api-abuse-defense",
+      "titleKo": "API 남용 방어",
+      "situationKo": "공식 문서대로 \"수천 개의 API — 존재조차 모르는 것까지\" 가진 회사가 흔합니다. 엔드포인트를 발견하고 스키마로 검증하며, 정상처럼 보이는 남용(크리덴셜 스터핑, 무차별 대입)을 속도 제한과 봇 신호로 걸러 API를 지킵니다.",
+      "productIds": [
+        "api-shield",
+        "bot-management",
+        "rate-limiting",
+        "waf"
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/api-shield/",
+      "verifiedAt": "2026-07-15T00:00:00Z",
+      "talkTrackKo": "\"모바일 앱과 파트너 연동이 전부 API죠?\" — 웹 화면 뒤에 숨은 API 표면적을 세어 보이면 필요성이 스스로 드러납니다."
+    },
+    {
+      "id": "flash-sale-surge",
+      "titleKo": "이커머스 세일 폭주",
+      "situationKo": "티켓 오픈이나 한정판 드롭처럼 정상 트래픽이 순간 폭주하는 상황입니다. 공식 문서 표현대로 \"정상 트래픽의 폭주(surges in legitimate traffic)\"가 Origin을 압도하지 않도록 초과분을 대기실에 줄 세우고, 캐시로 흡수하고, 사재기 봇과 남용 요청을 걸러냅니다.",
+      "productIds": [
+        "bot-management",
+        "cdn",
+        "ddos-for-web",
+        "rate-limiting",
+        "waiting-room"
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/waiting-room/",
+      "verifiedAt": "2026-07-15T00:00:00Z",
+      "talkTrackKo": "\"세일 날 서버가 죽으면 매출과 신뢰를 같이 잃습니다\" — 지난 피크 이벤트의 장애나 응답 지연 경험을 물으며 시작하세요."
+    },
+    {
+      "id": "vpn-replacement",
+      "titleKo": "VPN 없는 회사 만들기",
+      "situationKo": "공식 페이지 문구가 방향을 요약합니다 — \"Stop relying on clunky, insecure VPNs.\" 신원 기반(identity-first)으로 사내 앱 접근을 열고, 나가는 트래픽은 필터링하고, 위험한 브라우징은 격리하며, 지사 연결까지 Cloudflare One 네트워크로 옮깁니다.",
+      "productIds": [
+        "access",
+        "browser-isolation",
+        "gateway",
+        "wan"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/sase/",
+      "verifiedAt": "2026-07-15T00:00:00Z",
+      "talkTrackKo": "VPN 헬프데스크 티켓 수와 접속 속도 불만이 대화의 문입니다. 공식 사례는 VPN 폐기까지 약 3개월을 내세웁니다."
+    }
   ]
 }
