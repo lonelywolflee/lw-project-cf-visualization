@@ -11,7 +11,8 @@
 - 모든 product 정보와 relationship은 공식 source를 추적할 수 있어야 한다.
 - schema validation에 실패한 결과로 기존 정상 web data를 덮어쓰지 않는다.
 - application, crawler, shared package는 모두 strict TypeScript로 작성한다.
-- 초기 구현은 단순한 세 폴더 구조를 유지하고 별도 data layer나 orchestration project를 만들지 않는다.
+- 단순한 세 폴더 구조와 hand-edited curated source(`data/curated/`)만 유지하고, 그 밖의 data
+  layer나 orchestration project를 만들지 않는다.
 
 ## 2. Repository Boundaries
 
@@ -27,7 +28,8 @@
 - 수집 대상 설정, HTTP access, parsing, normalization, validation, file update를 소유한다.
 - 수집 대상 seed와 domain allowlist는 `crawler/config`에 둔다.
 - Angular code를 import하지 않는다.
-- 최종 output은 `web/public/data` 외의 별도 top-level data 폴더에 만들지 않는다.
+- 최종 output은 `web/public/data` 외의 위치에 만들지 않는다 (`data/curated/`는 output이
+  아니라 hand-edited input이다).
 
 ### `packages/`
 
@@ -36,12 +38,22 @@
 - Angular와 crawler implementation에 의존하지 않는다.
 - 한쪽에서만 사용하는 helper를 성급하게 shared package로 이동하지 않는다.
 
+### `data/curated/`
+
+- 공식 page에 구조화되어 있지 않은 지식(map placement, 한국어 role 설명, solution 구성,
+  요금제)을 사람이 편집하는 source of truth다.
+- 모든 entry는 검증에 사용한 공식 `sourceUrl`과 `verifiedAt`을 필수로 가진다 — 큐레이션도
+  근거 없는 서술을 허용하지 않는다.
+- Web이 직접 읽지 않는다. `pnpm build:curated`가 검증 후 `web/public/data/curated.json`으로
+  정규화한다.
+
 Dependency direction은 다음과 같다.
 
 ```text
 web ---------> packages/catalog
 crawler -----> packages/catalog
 crawler -----> web/public/data  # file output only
+crawler <----- data/curated     # hand-edited curated source, file input only
 ```
 
 `web`에서 `crawler`로 향하는 code dependency는 허용하지 않는다.
@@ -57,8 +69,10 @@ Root `pnpm crawl` command는 내부적으로 다음 작업을 순서대로 완�
 5. 전체 output을 shared runtime schema로 validate한다.
 6. 모든 검증이 성공한 경우에만 `web/public/data`를 교체한다.
 
-별도의 candidate, curation, publish command를 만들지 않는다. 관계를 공식 source에서 명시적으로
-확인할 수 없으면 추론하지 말고 결과에서 제외한다.
+Crawl pipeline 안에 candidate/publish 같은 중간 단계를 만들지 않고, crawl 결과를 사람이
+수정하지 않는다. 관계를 공식 source에서 명시적으로 확인할 수 없으면 추론하지 말고 crawl
+결과에서 제외한다 — 그런 지식이 필요하면 출처를 명시한 curated dataset(§4 Curated Dataset
+Contract)으로만 추가한다.
 
 ### Crawling Safety
 
@@ -116,6 +130,23 @@ Validator는 최소한 다음 오류를 거부한다.
 Schema와 TypeScript type을 별도로 중복 관리하지 않는다. Breaking schema change는 web과 crawler를
 같은 Issue에서 함께 갱신한다.
 
+### Curated Dataset Contract
+
+Crawl로 얻을 수 없는 지식은 두 번째 document인 `web/public/data/curated.json`이 담는다.
+위의 "기본 output은 `catalog.json` 하나" 규칙은 crawl 산출물에 관한 것으로, curated
+artifact는 독립적인 lifecycle을 가진 별도 document다.
+
+- Source of truth는 `data/curated/curated.json`이며 artifact는 `pnpm build:curated`만
+  생성한다. Artifact bytes는 serializer가 소유한다 — 수동 편집 금지.
+- `packages/catalog`의 curated runtime schema가 shape과 type의 single source다:
+  placements(lane/layer), `roleKo`, compositions, pricing tier(사용량 meter 포함).
+- 모든 entry는 approved hostname의 `sourceUrl`과 `verifiedAt`을 필수로 가진다. 요금 수치는
+  인용한 공식 page에서 `verifiedAt` 시점에 확인한 값만 기록한다.
+- Curated entry가 참조하는 product/solution id는 commit된 catalog에 존재해야 한다.
+  `pnpm validate:data`가 shape, cross-reference, artifact 신선도(source 재빌드 byte와
+  일치)를 함께 검증한다.
+- Catalog와 curated는 `schemaVersion`을 각자 관리한다.
+
 ## 5. Angular Architecture
 
 `web/src/app`은 feature-first 구조를 사용한다.
@@ -153,6 +184,7 @@ app/
 기본 test suite는 network에 연결하지 않아야 한다.
 
 - Catalog schema와 reference integrity unit test
+- Curated dataset의 schema, cross-reference, build 결정성과 신선도 test
 - 최소 HTML fixture를 사용하는 parser regression test
 - Normalization의 deterministic output test
 - Invalid crawl 결과가 기존 web data를 보존하는 test
