@@ -1,0 +1,346 @@
+/* Solution composition graph. Shares the map's palette so the two
+   visualizations read as one product. */
+.graph-page {
+  --g-accent: #c25607;
+  --g-accent-soft: #fdf0e5;
+  --g-line: #d9dee8;
+  --g-muted: #596272;
+  --g-faint: #8a93a5;
+  --g-canvas: #f6f7fa;
+  margin: 0 auto;
+  max-width: 1160px;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.graph-head h1 {
+  font-size: 1.7rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.35rem;
+}
+
+.graph-sub {
+  color: var(--g-muted);
+  margin: 0 0 1.5rem;
+  max-width: 62ch;
+}
+
+/* ---------- overview grid ---------- */
+.overview {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.solution-card {
+  background: #ffffff;
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  cursor: pointer;
+  display: grid;
+  gap: 0.3rem;
+  padding: 1rem;
+  text-align: left;
+}
+
+.solution-card:hover {
+  border-color: var(--g-accent);
+}
+
+.card-name {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.card-count {
+  color: var(--g-muted);
+  font-size: 0.78rem;
+}
+
+.card-uncurated {
+  color: var(--g-faint);
+  font-style: italic;
+}
+
+/* ---------- focus layout ---------- */
+.graph-layout {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+@media (max-width: 960px) {
+  .graph-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.canvas {
+  background:
+    radial-gradient(rgba(31, 35, 40, 0.07) 1px, transparent 1px) 0 0 / 20px 20px,
+    var(--g-canvas);
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.focus-bar {
+  align-items: baseline;
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.back-button {
+  background: #ffffff;
+  border: 1px solid var(--g-line);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.75rem;
+}
+
+.back-button:hover {
+  border-color: var(--g-accent);
+}
+
+.focus-name {
+  color: var(--g-faint);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.graph-svg {
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.edge {
+  stroke: #c3cbdb;
+  stroke-width: 1.5;
+}
+
+.edge-shared {
+  stroke: var(--g-accent);
+  stroke-dasharray: 5 4;
+}
+
+.gnode {
+  cursor: pointer;
+}
+
+.gnode .dot {
+  fill: #ffffff;
+  stroke: #9aa4b6;
+  stroke-width: 1.5;
+}
+
+.gnode:hover .dot {
+  stroke: var(--g-accent);
+}
+
+.gnode.selected .dot {
+  fill: var(--g-accent-soft);
+  stroke: var(--g-accent);
+  stroke-width: 2.5;
+}
+
+.shared-ring {
+  fill: none;
+  stroke: var(--g-accent);
+  stroke-dasharray: 3 3;
+  stroke-width: 1.2;
+}
+
+.gnode text {
+  fill: #1f2328;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12px;
+}
+
+.hub {
+  cursor: pointer;
+}
+
+.hub circle {
+  fill: var(--g-accent-soft);
+  stroke: var(--g-accent);
+  stroke-width: 2;
+}
+
+.hub text {
+  fill: var(--g-accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---------- accessible member chips ---------- */
+.member-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+}
+
+.chip {
+  align-items: baseline;
+  background: #ffffff;
+  border: 1px solid #c8cfdc;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.74rem;
+  gap: 0.35rem;
+  line-height: 1;
+  padding: 0.42rem 0.55rem;
+}
+
+.chip:hover {
+  border-color: var(--g-accent);
+}
+
+.chip.selected {
+  background: var(--g-accent-soft);
+  border-color: var(--g-accent);
+  color: var(--g-accent);
+  font-weight: 650;
+}
+
+.shared-badge {
+  background: var(--g-accent-soft);
+  border-radius: 4px;
+  color: var(--g-accent);
+  font-size: 0.62rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.graph-src {
+  color: var(--g-faint);
+  font-size: 0.74rem;
+  margin: 0.75rem 0 0;
+}
+
+.graph-src a {
+  color: var(--g-muted);
+}
+
+.empty-composition {
+  border: 1px dashed var(--g-line);
+  border-radius: 10px;
+  color: var(--g-muted);
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+  padding: 1.25rem;
+}
+
+.empty-composition p {
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* ---------- panel ---------- */
+.panel {
+  background: #ffffff;
+  border: 1px solid var(--g-line);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.25rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.s-eyebrow {
+  color: var(--g-faint);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+}
+
+.s-name {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem;
+}
+
+.s-summary {
+  color: var(--g-muted);
+  font-size: 0.88rem;
+  margin: 0 0 0.75rem;
+}
+
+.s-count {
+  color: var(--g-muted);
+  font-size: 0.82rem;
+  margin: 0 0 0.75rem;
+}
+
+.s-cost-note {
+  border: 1px dashed var(--g-line);
+  border-radius: 9px;
+  color: var(--g-faint);
+  font-size: 0.78rem;
+  margin: 0;
+  padding: 0.6rem 0.7rem;
+}
+
+.pivot-sec {
+  border-top: 1px solid var(--g-line);
+  color: var(--g-faint);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  margin: 0.9rem 0 0.55rem;
+  padding-top: 0.7rem;
+  text-transform: uppercase;
+}
+
+.pivot-list {
+  display: grid;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pivot-button {
+  background: var(--g-canvas);
+  border: 1px solid var(--g-line);
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  width: 100%;
+}
+
+.pivot-button:hover {
+  border-color: var(--g-accent);
+}
+
+/* Focus-switch motion stays subtle and honors reduced motion. */
+.gnode .dot,
+.shared-ring,
+.edge {
+  transition:
+    cx 0.25s ease,
+    cy 0.25s ease,
+    x1 0.25s ease,
+    y1 0.25s ease,
+    x2 0.25s ease,
+    y2 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gnode .dot,
+  .shared-ring,
+  .edge {
+    transition: none;
+  }
+}
