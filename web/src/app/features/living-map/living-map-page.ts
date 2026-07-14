@@ -1,27 +1,35 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CURATED_LANES, type CuratedLane, type CuratedLayer } from '@cf-viz/catalog';
 
 import { CatalogStore } from '../../core/catalog/catalog-store';
 import { CuratedStore } from '../../core/catalog/curated-store';
 import { ProgressStore, type NodeStatus } from '../../core/learning/progress-store';
 import { firstParamValue } from '../../core/routing/query-params';
-import { buildMapModel, type MapModel } from '../map/map-selectors';
+import { buildMapModel, LANE_LABELS, LAYER_LABELS, type MapModel } from '../map/map-selectors';
 import {
   learningCardView,
   totalSlots,
   verifiedSlots,
   type LearningCardView,
 } from './living-map-selectors';
+import { buildRecallPool, scoreRecall, type RecallPool, type RecallScore } from './recall-session';
 
 /**
  * The Living Map: one full-screen map where learning happens as modes.
- * This page owns exploration mode — free clicking with fog-of-war
- * motivation (no locks: every node is clickable from the start; nodes the
- * learner has worked on render progressively brighter) and the learning
- * card overlay. Selection is URL state (`?product=`), validated against
- * the catalog like every v2 screen. Recall mode mounts on top in the
- * recall commit of #33.
+ *
+ * Exploration (default) — free clicking with fog-of-war motivation (no
+ * locks: every node is clickable from the start; nodes the learner has
+ * worked on render progressively brighter) and the learning card overlay.
+ * Selection is URL state (`?product=`), validated against the catalog.
+ *
+ * Recall (`?mode=recall&area=<layer>`) — the same map blanked per area:
+ * pick which products belong to the chosen layer from a pool that mixes
+ * the answers with adjacent-layer decoys, limited to as many picks as the
+ * area has slots. Submitting scores the session (slot rubric), upgrades
+ * correct nodes to verified, demotes missed ones, and records the recall
+ * log entry that feeds the exported report.
  *
  * The dense compute band renders as collapsed family groups by default —
  * the design's semantic-collapse requirement: labels and unvisited counts
@@ -37,6 +45,10 @@ import {
 export class LivingMapPage {
   /** Raw `?product=` value, bound by the router; undefined when absent. */
   readonly product = input<string | undefined>();
+  /** Raw `?mode=` value; anything but 'recall' means exploration. */
+  readonly mode = input<string | undefined>();
+  /** Raw `?area=` value; the recall layer, validated against the lanes. */
+  readonly area = input<string | undefined>();
 
   private readonly store = inject(CatalogStore);
   private readonly curatedStore = inject(CuratedStore);
@@ -165,4 +177,101 @@ export class LivingMapPage {
   }
 
   protected readonly importResult = signal<'imported' | 'invalid' | null>(null);
+
+  // ---------------------------------------------------------------- recall
+
+  protected readonly isRecall = computed(() => firstParamValue(this.mode()) === 'recall');
+
+  /** Every recallable area (lane + layer) with its Korean labels. */
+  protected readonly areas = computed(() => {
+    const curated = this.curatedStore.curated();
+    if (curated === undefined) return [];
+    return CURATED_LANES.flatMap((lane) =>
+      [
+        ...new Set(
+          curated.products
+            .flatMap((entry) => entry.placements)
+            .filter((placement) => placement.lane === lane)
+            .map((placement) => placement.layer),
+        ),
+      ].map((layer) => ({
+        lane,
+        layer,
+        laneLabel: LANE_LABELS[lane].short,
+        layerLabel: LAYER_LABELS[layer],
+      })),
+    );
+  });
+
+  /** The validated recall area; unknown values collapse to null. */
+  protected readonly recallArea = computed<{ lane: CuratedLane; layer: CuratedLayer } | null>(
+    () => {
+      const raw = firstParamValue(this.area());
+      if (raw === undefined) return null;
+      const match = this.areas().find((candidate) => candidate.layer === raw);
+      return match === undefined ? null : { lane: match.lane, layer: match.layer };
+    },
+  );
+
+  protected readonly pool = computed<RecallPool | null>(() => {
+    const areaValue = this.recallArea();
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    if (areaValue === null || catalog === undefined || curated === undefined) return null;
+    return buildRecallPool(catalog, curated, areaValue.lane, areaValue.layer);
+  });
+
+  /** Picks of the in-progress session, capped at the slot count. */
+  protected readonly picked = signal<ReadonlySet<string>>(new Set());
+  protected readonly score = signal<RecallScore | null>(null);
+
+  protected layerLabelOf(layer: CuratedLayer): string {
+    return LAYER_LABELS[layer];
+  }
+
+  protected setMode(recall: boolean): void {
+    this.picked.set(new Set());
+    this.score.set(null);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: recall ? { mode: 'recall' } : {},
+    });
+  }
+
+  protected startArea(layer: string): void {
+    this.picked.set(new Set());
+    this.score.set(null);
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: 'recall', area: layer },
+    });
+  }
+
+  protected togglePick(productId: string): void {
+    if (this.score() !== null) return; // Session already submitted.
+    const pool = this.pool();
+    if (pool === null) return;
+    this.picked.update((picked) => {
+      const next = new Set(picked);
+      if (next.has(productId)) {
+        next.delete(productId);
+      } else if (next.size < pool.answers.length) {
+        next.add(productId);
+      }
+      return next;
+    });
+  }
+
+  protected submitRecall(): void {
+    const pool = this.pool();
+    const areaValue = this.recallArea();
+    if (pool === null || areaValue === null || this.score() !== null) return;
+    const result = scoreRecall(pool, this.picked());
+    this.score.set(result);
+    this.progress.recordRecall(
+      areaValue.layer,
+      result.results.map(({ productId, correct }) => ({ productId, correct })),
+      result.totalSlots,
+    );
+  }
 }

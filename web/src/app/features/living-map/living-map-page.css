@@ -471,6 +471,146 @@
   font-weight: 700;
 }
 
+/* ---------- recall mode ---------- */
+.recall {
+  margin-top: 0.5rem;
+}
+
+.recall h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.4rem;
+}
+
+.recall-sub {
+  color: var(--lm-muted);
+  font-size: 0.98rem;
+  margin: 0 0 1rem;
+  max-width: 62ch;
+}
+
+.area-grid {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+}
+
+.area-card {
+  background: #fff;
+  border: 2px dashed #9aa4b6;
+  border-radius: 12px;
+  cursor: pointer;
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+
+.area-card:hover {
+  border-color: var(--lm-accent);
+  border-style: solid;
+}
+
+.area-lane {
+  color: var(--lm-faint);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.area-name {
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.recall-session {
+  background: var(--lm-canvas);
+  border: 1px solid var(--lm-line);
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem 1.3rem;
+}
+
+.recall-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.recall-chip {
+  background: #fff;
+  border: 1.5px solid #9aa4b6;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.95rem;
+}
+
+.recall-chip:hover:not(:disabled) {
+  border-color: var(--lm-accent);
+}
+
+.recall-chip.picked {
+  background: var(--lm-accent-soft);
+  border: 2.5px solid var(--lm-accent);
+  color: var(--lm-accent);
+  font-weight: 750;
+}
+
+.recall-chip:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+.recall-submit {
+  background: #333;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+  margin-top: 1rem;
+  padding: 0.75rem 1.4rem;
+}
+
+.recall-submit:disabled {
+  background: #b6bcc8;
+  cursor: not-allowed;
+}
+
+.recall-result {
+  border-top: 1.5px dashed var(--lm-line);
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+}
+
+.result-line {
+  font-size: 1.05rem;
+  font-weight: 750;
+  margin: 0 0 0.5rem;
+}
+
+.result-list {
+  color: var(--lm-verified);
+  font-size: 0.95rem;
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+}
+
+.result-list li {
+  margin: 0.2rem 0;
+}
+
+.result-list li.missed {
+  color: var(--lm-accent);
+}
+
+.recall-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
 /* ---------- narrow screens ---------- */
 @media (max-width: 640px) {
   .journey {

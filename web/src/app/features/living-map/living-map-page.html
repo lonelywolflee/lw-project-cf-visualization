@@ -3,13 +3,21 @@
     <div class="head-row">
       <h1 id="map-heading">Cloudflare 제품 지도</h1>
       <div class="mode-toggle" role="group" aria-label="지도 모드">
-        <button type="button" class="mode on" aria-pressed="true">탐험</button>
         <button
           type="button"
           class="mode"
-          aria-pressed="false"
-          disabled
-          title="회상 모드는 곧 열립니다"
+          [class.on]="!isRecall()"
+          [attr.aria-pressed]="!isRecall()"
+          (click)="setMode(false)"
+        >
+          탐험
+        </button>
+        <button
+          type="button"
+          class="mode"
+          [class.on]="isRecall()"
+          [attr.aria-pressed]="isRecall()"
+          (click)="setMode(true)"
         >
           회상 ✏
         </button>
@@ -36,7 +44,78 @@
     </p>
   </header>
 
-  @if (model(); as m) {
+  @if (isRecall()) {
+  <div class="recall">
+    @if (pool(); as p) {
+    <section class="recall-session" aria-labelledby="recall-heading">
+      <h2 id="recall-heading">회상 — {{ layerLabelOf(p.layer) }} 영역을 채우세요</h2>
+      <p class="recall-sub">
+        이 영역에는 슬롯이 {{ p.answers.length }}개 있습니다. 아래 칩에서 이 영역에 속하는 제품만
+        고르세요 (함정이 섞여 있습니다). 남은 선택 {{ p.answers.length - picked().size }}개.
+      </p>
+      <div class="recall-chips" role="group" aria-label="후보 제품">
+        @for (chip of p.chips; track chip.id) {
+        <button
+          type="button"
+          class="recall-chip"
+          [class.picked]="picked().has(chip.id)"
+          [attr.aria-pressed]="picked().has(chip.id)"
+          [disabled]="score() !== null"
+          (click)="togglePick(chip.id)"
+        >
+          {{ chip.name }}
+        </button>
+        }
+      </div>
+
+      @if (score(); as s) {
+      <div class="recall-result" role="status">
+        <p class="result-line">
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 — 이 결과가 검증 상태와 리포트에
+          기록됐습니다.
+        </p>
+        <ul class="result-list">
+          @for (result of s.results; track result.productId) {
+          <li [class.missed]="!result.correct">
+            {{ result.name }} @if (result.correct) { ✓ 검증됨 } @else { ✗ 놓침 — 다시 흐려집니다 }
+          </li>
+          }
+        </ul>
+        <div class="recall-actions">
+          <button type="button" class="tool" (click)="setMode(true)">다른 영역 고르기</button>
+          <button type="button" class="tool" (click)="setMode(false)">탐험으로 돌아가기</button>
+        </div>
+      </div>
+      } @else {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="picked().size === 0"
+        (click)="submitRecall()"
+      >
+        제출하고 채점하기
+      </button>
+      }
+    </section>
+    } @else {
+    <section class="recall-areas" aria-labelledby="recall-heading">
+      <h2 id="recall-heading">회상 모드 — 어느 영역을 채워볼까요?</h2>
+      <p class="recall-sub">
+        영역을 고르면 그 자리가 백지가 됩니다. 정답으로 채우면 노드가 검증(✓)되고, 놓치면 다시
+        흐려집니다.
+      </p>
+      <div class="area-grid">
+        @for (areaOption of areas(); track areaOption.layer) {
+        <button type="button" class="area-card" (click)="startArea(areaOption.layer)">
+          <span class="area-lane">{{ areaOption.laneLabel }}</span>
+          <span class="area-name">{{ areaOption.layerLabel }}</span>
+        </button>
+        }
+      </div>
+    </section>
+    }
+  </div>
+  } @else { @if (model(); as m) {
   <div class="map-layout" [class.card-open]="card() !== null">
     <div class="lanes">
       @for (lane of m.lanes; track lane.lane) {
@@ -187,5 +266,5 @@
     </aside>
     }
   </div>
-  }
+  } }
 </section>

@@ -56,6 +56,13 @@ const catalog: Catalog = {
       familyId: 'security',
       sourceIds: [source.id],
     },
+    {
+      id: 'cdn',
+      name: 'CDN',
+      summary: 'Caches content worldwide.',
+      familyId: 'security',
+      sourceIds: [source.id],
+    },
   ],
   solutions: [],
   useCases: [],
@@ -84,6 +91,13 @@ const curatedData: CuratedData = {
       roleKo: 'Egress 무료 스토리지입니다.',
       placements: [{ lane: 'public-web', layer: 'compute-platform' }],
       sourceUrl: 'https://www.cloudflare.com/products/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+    {
+      productId: 'cdn',
+      roleKo: '콘텐츠를 캐싱합니다.',
+      placements: [{ lane: 'public-web', layer: 'application-performance' }],
+      sourceUrl: 'https://www.cloudflare.com/products/cdn/',
       verifiedAt: '2026-07-14T00:00:00Z',
     },
   ],
@@ -235,5 +249,67 @@ describe('LivingMapPage', () => {
     expect(TestBed.inject(ProgressStore).state().sessionLog).toHaveLength(1);
     expect(element?.textContent).toContain('리포트 내보내기');
     expect(element?.querySelector('input[type="file"]')).not.toBeNull();
+  });
+
+  it('switches to recall mode via URL state and lists the recallable areas', async () => {
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.mode') ?? [])
+      .find((button) => button.textContent?.includes('회상'))
+      ?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toBe('?mode=recall');
+    const areaNames = Array.from(element?.querySelectorAll('.area-name') ?? []).map((node) =>
+      node.textContent?.trim(),
+    );
+    expect(areaNames).toContain('L7 보안');
+    expect(areaNames).toContain('컴퓨팅');
+    expect(element?.querySelector('.lanes')).toBeNull(); // 지도 대신 회상 화면
+  });
+
+  it('runs a full recall session: pick limit, scoring, verification, and demotion', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    progress.markLearned('workers'); // 익힘 상태에서 놓치면 강등되어야 한다.
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=compute-platform');
+    const element = harness.routeNativeElement;
+
+    // The compute area has 2 slots (workers, r2); picks are capped at 2.
+    expect(element?.textContent).toContain('슬롯이 2개');
+    const chip = (name: string): HTMLButtonElement | undefined =>
+      Array.from(element?.querySelectorAll<HTMLButtonElement>('.recall-chip') ?? []).find(
+        (button) => button.textContent?.trim() === name,
+      );
+    // The decoy pool draws from adjacent layers.
+    expect(element?.querySelectorAll('.recall-chip').length).toBeGreaterThan(2);
+
+    chip('R2')?.click();
+    await harness.fixture.whenStable();
+    chip('CDN')?.click(); // 함정 픽 — 선택 한도 1자리를 낭비한다.
+    await harness.fixture.whenStable();
+    chip('Workers')?.click(); // 한도(2) 초과 → 무시되어야 한다.
+    await harness.fixture.whenStable();
+    expect(element?.querySelectorAll('.recall-chip.picked')).toHaveLength(2);
+
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(element?.querySelector('.result-line')?.textContent).toContain('정답 1 / 2');
+    expect(progress.statusOf('r2')).toBe('verified');
+    expect(progress.statusOf('workers')).toBe('visited'); // marked → 강등
+    expect(progress.state().recallLog).toHaveLength(1);
+    expect(progress.state().recallLog[0]).toMatchObject({
+      area: 'compute-platform',
+      correctSlots: 1,
+      totalSlots: 2,
+    });
+  });
+
+  it('collapses an unknown recall area back to the area list', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=%3Cscript%3E');
+    const element = harness.routeNativeElement;
+    expect(element?.querySelector('.recall-session')).toBeNull();
+    expect(element?.querySelectorAll('.area-card').length).toBeGreaterThan(0);
   });
 });
