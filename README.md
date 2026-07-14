@@ -161,10 +161,12 @@ pnpm build
 pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
-`http://127.0.0.1:8788`에서 `/`, `/products/<id>`, `/solutions/<id>`, `/discovery`,
-`/relationships` 직접
-진입과 `/data/catalog.json` 응답을 확인합니다. 일상적인 개발에는 `pnpm dev`를 사용하고,
-이 검증은 배포 전 확인 용도입니다.
+`http://127.0.0.1:8788`에서 두 화면의 직접 진입(`/`, `/solutions`)과 딥링크
+(`/?product=<id>`, `/solutions?solution=<id>`), 은퇴한 v1 경로의 redirect
+(`/browse`, `/discovery` → `/`, `/relationships` → `/solutions`,
+`/products/<id>` → `/?product=<id>`, `/solutions/<id>` → `/solutions?solution=<id>`),
+그리고 `/data/catalog.json`·`/data/curated.json` 응답을 확인합니다. 일상적인 개발에는
+`pnpm dev`를 사용하고, 이 검증은 배포 전 확인 용도입니다.
 
 ### Cloudflare Pages 설정
 
