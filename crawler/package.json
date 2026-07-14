@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "crawl": "tsx src/main.ts",
+    "build:curated": "tsx src/build-curated.ts",
     "validate:data": "tsx src/validate-data.ts"
   },
   "dependencies": {

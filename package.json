@@ -12,6 +12,7 @@
     "dev": "pnpm --filter @cf-viz/web run start",
     "build": "pnpm -r run build",
     "crawl": "pnpm --filter @cf-viz/crawler run crawl",
+    "build:curated": "pnpm --filter @cf-viz/crawler run build:curated",
     "validate:data": "pnpm --filter @cf-viz/crawler run validate:data",
     "lint": "pnpm --filter @cf-viz/catalog run build && pnpm -r run lint",
     "test": "pnpm -r run test",

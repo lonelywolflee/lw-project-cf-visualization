@@ -1,22 +1,21 @@
 import { Routes } from '@angular/router';
 
-import { CatalogOverview } from './catalog-overview';
+import { MapPage } from '../map/map-page';
 import { CatalogShell } from './catalog-shell';
 
 /**
- * Catalog feature routes, loaded lazily as one chunk via `loadChildren`.
+ * Application routes, loaded lazily as one chunk via `loadChildren`.
  *
  * {@link CatalogShell} is the layout gate: it renders the loading, error,
  * invalid-data, and empty states itself and only places a `<router-outlet>`
- * on screen once the catalog reached `success`. Children may therefore
- * assume the catalog signal is present (their `pending` branch is type
- * honesty for the instant before the gate settles).
+ * on screen once BOTH documents reached `success`. Children may therefore
+ * assume the catalog and curated signals are present.
  *
- * The overview is imported statically (it is the first paint of the default
- * route); the discovery page and the two detail pages stay behind
- * `loadComponent` chunks. Discovery lives in `features/discovery/` but mounts
- * here so it shares the shell gate — a second app-level route would either
- * bypass the gate or instantiate a second shell.
+ * The two visualizations are the whole surface: the map at `/` (product
+ * selection via `?product=`) and the composition graph at `/solutions`
+ * (`?solution=` + `?product=`). Every retired v1 route stays as a redirect
+ * so old deep links land on the equivalent view instead of a dead end —
+ * the detail pages map onto the panel selection params.
  */
 export const CATALOG_ROUTES: Routes = [
   {
@@ -26,29 +25,31 @@ export const CATALOG_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: CatalogOverview,
+        component: MapPage,
         title: 'Cloudflare Product & Solution Explorer',
       },
       {
-        path: 'discovery',
-        loadComponent: () => import('../discovery/discovery-page').then((m) => m.DiscoveryPage),
-        title: '검색과 필터 | Cloudflare Product & Solution Explorer',
+        path: 'solutions',
+        pathMatch: 'full',
+        loadComponent: () => import('../graph/graph-page').then((m) => m.GraphPage),
+        title: '솔루션 구성 | Cloudflare Product & Solution Explorer',
       },
       {
-        path: 'relationships',
-        loadComponent: () =>
-          import('../relationships/relationships-page').then((m) => m.RelationshipsPage),
-        title: '관계 보기 | Cloudflare Product & Solution Explorer',
+        path: 'calculator',
+        loadComponent: () => import('../calculator/calculator-page').then((m) => m.CalculatorPage),
+        title: '요금 계산기 | Cloudflare Product & Solution Explorer',
       },
+      // Retired v1 routes, preserved as deep-link redirects.
+      { path: 'browse', redirectTo: '' },
+      { path: 'discovery', redirectTo: '' },
+      { path: 'relationships', redirectTo: 'solutions' },
       {
         path: 'products/:productId',
-        loadComponent: () => import('./product-detail').then((m) => m.ProductDetail),
-        title: 'Product 상세 | Cloudflare Product & Solution Explorer',
+        redirectTo: ({ params }) => `/?product=${params['productId'] ?? ''}`,
       },
       {
         path: 'solutions/:solutionId',
-        loadComponent: () => import('./solution-detail').then((m) => m.SolutionDetail),
-        title: 'Solution 상세 | Cloudflare Product & Solution Explorer',
+        redirectTo: ({ params }) => `/solutions?solution=${params['solutionId'] ?? ''}`,
       },
     ],
   },

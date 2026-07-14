@@ -3,9 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "pnpm",
-    "schematicCollections": [
-      "angular-eslint"
-    ],
+    "schematicCollections": ["angular-eslint"],
     "analytics": "06e3ec44-4489-499d-a1d3-93f36372c1c6"
   },
   "newProjectRoot": "projects",
@@ -56,6 +54,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": ["@cf-viz/catalog", "zod"]
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "web:build:production"

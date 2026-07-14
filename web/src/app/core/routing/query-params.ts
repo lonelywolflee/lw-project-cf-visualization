@@ -1,6 +1,6 @@
 /**
- * Query-param plumbing shared by URL-driven feature pages (discovery,
- * relationships). Lives in core because it owns no domain: it only smooths
+ * Query-param plumbing shared by URL-driven feature pages (the map and the
+ * solution graph). Lives in core because it owns no domain: it only smooths
  * over the router's raw param shapes.
  */
 

@@ -28,25 +28,31 @@ import type { Catalog } from '@cf-viz/catalog';
 import { CrawlError } from './errors.js';
 
 /**
- * Canonical serialization: 2-space indent, key order as constructed by
- * assembleCatalog (JSON.stringify preserves string-key insertion order),
- * one trailing newline, UTF-8 without BOM (Node never emits a BOM).
+ * Canonical serialization for any committed data artifact: 2-space indent,
+ * key order as constructed by the caller (JSON.stringify preserves
+ * string-key insertion order), one trailing newline, UTF-8 without BOM
+ * (Node never emits a BOM).
  */
-export function serializeCatalog(catalog: Catalog): string {
+export function serializeJsonDocument(document: unknown): string {
   // Two distinct non-serializable behaviors, both verified on Node 24:
   // JSON.stringify THROWS TypeError for BigInt values, and RETURNS
   // undefined for undefined/function roots. Both become a stage-'write'
   // CrawlError with zero filesystem effect.
   let body: string | undefined;
   try {
-    body = JSON.stringify(catalog, null, 2);
+    body = JSON.stringify(document, null, 2);
   } catch (cause) {
-    throw new CrawlError('[write] catalog is not JSON-serializable', { stage: 'write', cause });
+    throw new CrawlError('[write] document is not JSON-serializable', { stage: 'write', cause });
   }
   if (typeof body !== 'string') {
-    throw new CrawlError('[write] catalog is not JSON-serializable', { stage: 'write' });
+    throw new CrawlError('[write] document is not JSON-serializable', { stage: 'write' });
   }
   return `${body}\n`;
+}
+
+/** Canonical catalog bytes; key order comes from assembleCatalog. */
+export function serializeCatalog(catalog: Catalog): string {
+  return serializeJsonDocument(catalog);
 }
 
 /** Staging path: dot-prefixed sibling of the target, random suffix. */
@@ -64,7 +70,16 @@ export async function writeCatalogAtomically(
   catalog: Catalog,
   targetFilePath: string,
 ): Promise<void> {
-  const body = serializeCatalog(catalog);
+  await writeFileAtomically(serializeCatalog(catalog), targetFilePath);
+}
+
+/**
+ * Atomically replace `targetFilePath` with pre-serialized `body` using the
+ * same-directory staging strategy documented above. On any failure the
+ * previous target content is untouched and the staging file is removed
+ * (best effort); throws CrawlError at stage 'write'.
+ */
+export async function writeFileAtomically(body: string, targetFilePath: string): Promise<void> {
   const stagingPath = stagingPathFor(targetFilePath);
   try {
     await mkdir(path.dirname(targetFilePath), { recursive: true });

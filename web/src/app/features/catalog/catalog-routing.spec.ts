@@ -1,12 +1,14 @@
+import { Location } from '@angular/common';
 import { computed, signal, type WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import type { Catalog } from '@cf-viz/catalog';
+import type { Catalog, CuratedData } from '@cf-viz/catalog';
 
 import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
+import { curatedStoreStub } from '../../testing/curated-store-stub';
 
 const catalog: Catalog = {
   schemaVersion: '1',
@@ -49,6 +51,25 @@ const catalog: Catalog = {
   relationships: [],
 };
 
+const curated: CuratedData = {
+  schemaVersion: '1',
+  products: [],
+  compositions: [
+    {
+      solutionId: 'sase',
+      productIds: ['waf'],
+      sourceUrl: 'https://www.cloudflare.com/sase/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+  ],
+  pricing: [],
+};
+
+/**
+ * Route-level contract of the v2 surface: the two visualization routes and
+ * one redirect per retired v1 route, so old deep links land on the
+ * equivalent view instead of a dead end.
+ */
 describe('catalog routing', () => {
   let state: WritableSignal<CatalogState>;
 
@@ -61,6 +82,7 @@ describe('catalog routing', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(routes, withComponentInputBinding()),
+        curatedStoreStub({ kind: 'success', curated }).provider,
         {
           provide: CatalogStore,
           useValue: {
@@ -74,61 +96,75 @@ describe('catalog routing', () => {
     });
   });
 
-  it('renders the overview at the root route', async () => {
-    const harness = await RouterTestingHarness.create('/');
-    const element = harness.routeNativeElement;
+  function path(): string {
+    return TestBed.inject(Location).path();
+  }
 
-    expect(element?.querySelector('h1')?.textContent).toContain('Cloudflare 제품 카탈로그');
-    expect(element?.querySelector('#family-heading-application-security')?.textContent).toContain(
-      'Application security',
+  it('renders the map at the root route', async () => {
+    const harness = await RouterTestingHarness.create('/');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      'Cloudflare 제품 지도',
     );
-    const productLink = element?.querySelector<HTMLAnchorElement>('a[href="/products/waf"]');
-    expect(productLink?.textContent).toContain('Web Application Firewall');
-    expect(element?.querySelector('a[href="/solutions/sase"]')).not.toBeNull();
   });
 
-  it('navigates from an overview product link to the bound detail page', async () => {
-    const harness = await RouterTestingHarness.create('/');
-
-    const link =
-      harness.routeNativeElement?.querySelector<HTMLAnchorElement>('a[href="/products/waf"]');
-    expect(link).not.toBeNull();
-    link?.click();
-    await harness.fixture.whenStable();
-
-    const element = harness.routeNativeElement;
-    expect(element?.querySelector('h1')?.textContent).toContain('Web Application Firewall');
-    const external = element?.querySelector<HTMLAnchorElement>('a[target="_blank"]');
-    expect(external?.rel).toBe('noopener noreferrer');
+  it('renders the composition graph at /solutions', async () => {
+    const harness = await RouterTestingHarness.create('/solutions');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      '솔루션 구성 그래프',
+    );
   });
 
-  it('binds the solution route param through withComponentInputBinding', async () => {
+  it('redirects the retired /browse route to the map', async () => {
+    const harness = await RouterTestingHarness.create('/browse');
+    expect(path()).toBe('');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      'Cloudflare 제품 지도',
+    );
+  });
+
+  it('redirects the retired /discovery route to the map', async () => {
+    await RouterTestingHarness.create('/discovery');
+    expect(path()).toBe('');
+  });
+
+  it('redirects the retired /relationships route to the graph', async () => {
+    const harness = await RouterTestingHarness.create('/relationships');
+    expect(path()).toBe('/solutions');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
+      '솔루션 구성 그래프',
+    );
+  });
+
+  it('maps a retired product detail deep link onto the map panel selection', async () => {
+    const harness = await RouterTestingHarness.create('/products/waf');
+    expect(path()).toBe('?product=waf');
+    expect(harness.routeNativeElement?.querySelector('.p-name')?.textContent).toContain(
+      'Web Application Firewall',
+    );
+  });
+
+  it('maps a retired solution detail deep link onto the graph focus', async () => {
     const harness = await RouterTestingHarness.create('/solutions/sase');
-
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('SASE');
+    expect(path()).toBe('/solutions?solution=sase');
+    expect(harness.routeNativeElement?.querySelector('.hub text')?.textContent).toContain('SASE');
   });
 
-  it('shows in-page not-found for an unknown product id without redirecting', async () => {
-    const harness = await RouterTestingHarness.create('/products/does-not-exist');
-    const element = harness.routeNativeElement;
-
-    const status = element?.querySelector('[role="status"]');
-    expect(status?.textContent).toContain('찾을 수 없습니다');
-    expect(status?.textContent).toContain('does-not-exist');
-    expect(element?.querySelector('a[href="/"]')).not.toBeNull();
+  it('sends unknown routes to the map via the wildcard', async () => {
+    await RouterTestingHarness.create('/no-such-page');
+    expect(path()).toBe('');
   });
 
-  it('gates a detail deep link behind the loading state until success', async () => {
+  it('gates a redirected deep link behind the loading state until success', async () => {
     state.set({ kind: 'loading' });
     const harness = await RouterTestingHarness.create('/products/waf');
 
     const shell = harness.fixture.nativeElement as HTMLElement;
+    expect(path()).toBe('?product=waf');
     expect(shell.textContent).toContain('불러오는 중');
-    expect(shell.querySelector('article.detail')).toBeNull();
+    expect(shell.querySelector('.map-page')).toBeNull();
 
     state.set({ kind: 'success', catalog });
     await harness.fixture.whenStable();
-
-    expect(shell.querySelector('h1')?.textContent).toContain('Web Application Firewall');
+    expect(shell.querySelector('.p-name')?.textContent).toContain('Web Application Firewall');
   });
 });
