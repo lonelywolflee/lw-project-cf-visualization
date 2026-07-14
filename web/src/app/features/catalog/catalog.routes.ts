@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { MapPage } from '../map/map-page';
+import { LivingMapPage } from '../living-map/living-map-page';
 import { CatalogShell } from './catalog-shell';
 
 /**
@@ -26,7 +26,7 @@ export const CATALOG_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: MapPage,
+        component: LivingMapPage,
         title: 'Cloudflare Product & Solution Explorer',
       },
       {

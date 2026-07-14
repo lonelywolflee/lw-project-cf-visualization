@@ -205,7 +205,7 @@ describe('CatalogShell', () => {
     // The harness root always carries its own <router-outlet>; assert the
     // gate markup instead of the outlet element itself.
     expect(element.querySelector('.catalog-shell')).not.toBeNull();
-    expect(element.querySelector('app-map-page')).toBeNull();
+    expect(element.querySelector('app-living-map-page')).toBeNull();
     const status = element.querySelector('[role="status"]');
     expect(status?.textContent).toContain('큐레이션 데이터를 불러오는 중');
   });
@@ -239,7 +239,7 @@ describe('CatalogShell', () => {
   it('mounts the child outlet only on success, replacing the state markup', async () => {
     const { harness, element } = await createShell();
 
-    expect(element.querySelector('app-map-page')).toBeNull();
+    expect(element.querySelector('app-living-map-page')).toBeNull();
 
     state.set({ kind: 'success', catalog: successCatalog });
     await harness.fixture.whenStable();

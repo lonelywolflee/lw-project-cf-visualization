@@ -1,0 +1,191 @@
+<section class="living-map" aria-labelledby="map-heading">
+  <header class="map-head">
+    <div class="head-row">
+      <h1 id="map-heading">Cloudflare 제품 지도</h1>
+      <div class="mode-toggle" role="group" aria-label="지도 모드">
+        <button type="button" class="mode on" aria-pressed="true">탐험</button>
+        <button
+          type="button"
+          class="mode"
+          aria-pressed="false"
+          disabled
+          title="회상 모드는 곧 열립니다"
+        >
+          회상 ✏
+        </button>
+      </div>
+      <div class="head-tools">
+        <span class="fog-count">
+          밝힌 노드 {{ progress.revealedCount() }} / 67 · 검증 슬롯 {{ verifiedSlotCount() }} / {{
+          slotTotal() }}
+        </span>
+        <button type="button" class="tool" (click)="exportReport()">리포트 내보내기</button>
+        <label class="tool tool-import">
+          가져오기<input type="file" accept="application/json" (change)="importReport($event)" />
+        </label>
+        @if (importResult(); as result) {
+        <span class="import-note" role="status">
+          @if (result === 'imported') { 가져왔습니다 ✓ } @else { 파일이 올바르지 않습니다 }
+        </span>
+        }
+      </div>
+    </div>
+    <p class="map-sub">
+      아무 노드나 눌러서 시작하세요. 잠금은 없습니다 — 익힌 자리가 밝아지고, 남은 안개가 다음에 갈
+      곳을 알려줍니다.
+    </p>
+  </header>
+
+  @if (model(); as m) {
+  <div class="map-layout" [class.card-open]="card() !== null">
+    <div class="lanes">
+      @for (lane of m.lanes; track lane.lane) {
+      <section class="lane lane-{{ lane.lane }}" [attr.aria-label]="lane.title">
+        <p class="lane-title">{{ lane.title }}</p>
+        <div class="journey">
+          <div class="endpoint"><span class="endpoint-name">{{ lane.from }}</span></div>
+          <div class="edge">
+            <p class="edge-title">{{ lane.edge }}</p>
+            @for (layer of lane.layers; track layer.layer) {
+            <div class="layer" [class.off-path]="layer.offPath">
+              <span class="layer-name">
+                {{ layer.label }} @if (layer.offPath) { <span class="layer-tag">경로 밖</span> }
+              </span>
+              <div class="nodes">
+                @if (layer.groups; as groups) { @for (group of groups; track group.familyId) { @if
+                (isExpanded(group.familyId)) {
+                <div class="family-group expanded">
+                  <button
+                    type="button"
+                    class="family-toggle"
+                    [attr.aria-expanded]="true"
+                    (click)="toggleGroup(group.familyId)"
+                  >
+                    {{ group.familyName }} ▾
+                  </button>
+                  @for (chip of group.products; track chip.id) {
+                  <button
+                    type="button"
+                    class="node st-{{ statusOf(chip.id) }}"
+                    [class.selected]="selectedId() === chip.id"
+                    [attr.aria-pressed]="selectedId() === chip.id"
+                    (click)="open(chip.id)"
+                  >
+                    {{ chip.name }}
+                  </button>
+                  }
+                </div>
+                } @else {
+                <button
+                  type="button"
+                  class="family-toggle collapsed"
+                  [attr.aria-expanded]="false"
+                  (click)="toggleGroup(group.familyId)"
+                >
+                  {{ group.familyName }} · {{ group.products.length }}개 중 안개 {{
+                  unvisitedIn(group.products) }} ▸
+                </button>
+                } } } @else { @for (chip of layer.products; track chip.id) {
+                <button
+                  type="button"
+                  class="node st-{{ statusOf(chip.id) }}"
+                  [class.selected]="selectedId() === chip.id"
+                  [attr.aria-pressed]="selectedId() === chip.id"
+                  (click)="open(chip.id)"
+                >
+                  {{ chip.name }}
+                </button>
+                } @empty {
+                <span class="empty-layer">배치된 제품 없음</span>
+                } }
+              </div>
+            </div>
+            }
+          </div>
+          <div class="endpoint"><span class="endpoint-name">{{ lane.to }}</span></div>
+        </div>
+      </section>
+      } @if (m.unplaced.length > 0) {
+      <section class="lane lane-unplaced" aria-label="배치 미정 제품">
+        <p class="lane-title">배치 미정 — 큐레이션 대기 {{ m.unplaced.length }}개</p>
+        <div class="nodes">
+          @for (chip of m.unplaced; track chip.id) {
+          <button
+            type="button"
+            class="node st-{{ statusOf(chip.id) }}"
+            [attr.aria-pressed]="selectedId() === chip.id"
+            (click)="open(chip.id)"
+          >
+            {{ chip.name }}
+          </button>
+          }
+        </div>
+      </section>
+      }
+    </div>
+
+    @if (card(); as c) {
+    <aside class="learning-card" aria-label="학습 카드" aria-live="polite">
+      <header class="card-head">
+        <p class="c-eyebrow">{{ c.familyName }}</p>
+        <button type="button" class="card-close" (click)="close()" aria-label="카드 닫기">✕</button>
+      </header>
+      <h2 class="p-name">{{ c.product.name }}</h2>
+      @if (c.roleKo; as role) {
+      <p class="c-role">{{ role }}</p>
+      } @if (c.note; as note) {
+      <dl class="note">
+        <dt>왜 존재하나</dt>
+        <dd>{{ note.whyKo }}</dd>
+        <dt>흔한 오해</dt>
+        <dd>{{ note.misconceptionKo }}</dd>
+        <dt>고객이 실제로 묻는 질문</dt>
+        <dd>{{ note.customerQuestionKo }}</dd>
+        @if (note.analogyKo; as analogy) {
+        <dt>비유하자면</dt>
+        <dd>{{ analogy }}</dd>
+        } @if (note.seNoteKo; as seNote) {
+        <dt>SE 각주</dt>
+        <dd>{{ seNote }}</dd>
+        } @if (note.aeNoteKo; as aeNote) {
+        <dt>AE 각주</dt>
+        <dd>{{ aeNote }}</dd>
+        }
+      </dl>
+      <p class="c-src">
+        노트 출처:
+        <a [href]="note.sourceUrl" target="_blank" rel="noopener noreferrer">원문 페이지 (새 창)</a>
+        · 확인일 {{ note.verifiedAt | date: 'mediumDate' }}
+      </p>
+      } @else {
+      <div class="fallback">
+        <span class="fallback-badge">학습 노트 준비 중</span>
+        <p class="fallback-summary" lang="en">{{ c.product.summary }}</p>
+        <p class="fallback-hint">지금은 공식 요약과 원문 링크로 학습하세요.</p>
+      </div>
+      }
+
+      <div class="deeper">
+        @for (link of c.sources; track link.url) {
+        <a [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.title }} (새 창)</a>
+        } @if (c.hasPricing) {
+        <a routerLink="/calculator" [queryParams]="{ products: c.product.id }"
+          >요금 계산기에서 보기</a
+        >
+        }
+      </div>
+
+      @if (statusOf(c.product.id) === 'verified') {
+      <p class="learned-state verified">회상으로 검증된 노드 ✓</p>
+      } @else if (statusOf(c.product.id) === 'marked') {
+      <p class="learned-state">익혔음으로 표시됨 — 회상 모드에서 검증해 보세요</p>
+      } @else {
+      <button type="button" class="learn-button" (click)="markLearned(c.product.id)">
+        익혔음 ✓ — 노드가 밝아집니다
+      </button>
+      }
+    </aside>
+    }
+  </div>
+  }
+</section>
