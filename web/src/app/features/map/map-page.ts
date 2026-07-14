@@ -1,4 +1,3 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -6,6 +5,7 @@ import { CatalogStore } from '../../core/catalog/catalog-store';
 import { CuratedStore } from '../../core/catalog/curated-store';
 import { firstParamValue } from '../../core/routing/query-params';
 import { buildMapModel, productPanel, type MapModel, type ProductPanelView } from './map-selectors';
+import { ProductPanel } from './product-panel';
 
 /**
  * The home page: visitor → Cloudflare Edge → origin as a layered map, a
@@ -22,7 +22,7 @@ import { buildMapModel, productPanel, type MapModel, type ProductPanelView } fro
  */
 @Component({
   selector: 'app-map-page',
-  imports: [DatePipe, DecimalPipe],
+  imports: [ProductPanel],
   templateUrl: './map-page.html',
   styleUrl: './map-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

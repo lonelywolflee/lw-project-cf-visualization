@@ -305,7 +305,7 @@
   border-style: dashed;
 }
 
-/* ---------- panel ---------- */
+/* ---------- panel container (inner card styles live in product-panel) ---------- */
 .panel {
   background: #ffffff;
   border: 1px solid var(--map-line);
@@ -324,136 +324,10 @@
   text-transform: uppercase;
 }
 
-.p-name {
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 1.25rem;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.5rem;
-}
-
-.p-role {
-  color: var(--map-muted);
-  font-size: 0.88rem;
-  margin: 0 0 0.75rem;
-}
-
 .p-hint {
   color: var(--map-muted);
   font-size: 0.88rem;
   margin: 0.4rem 0 0;
-}
-
-.p-placements {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  list-style: none;
-  margin: 0 0 0.25rem;
-  padding: 0;
-}
-
-.p-placements li {
-  background: var(--map-canvas);
-  border: 1px solid var(--map-line);
-  border-radius: 999px;
-  font-size: 0.72rem;
-  padding: 0.15rem 0.55rem;
-}
-
-.p-sec {
-  border-top: 1px solid var(--map-line);
-  color: var(--map-faint);
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.1em;
-  margin: 0.9rem 0 0.55rem;
-  padding-top: 0.7rem;
-  text-transform: uppercase;
-}
-
-.tier {
-  border: 1px solid var(--map-line);
-  border-radius: 9px;
-  margin: 0 0 0.5rem;
-  padding: 0.55rem 0.7rem;
-}
-
-.tier-head {
-  align-items: baseline;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: space-between;
-}
-
-.tier-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-}
-
-.tier-price {
-  color: var(--map-accent);
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.82rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.tier-note {
-  color: var(--map-faint);
-  font-size: 0.76rem;
-  margin: 0.2rem 0 0;
-}
-
-.tier-lines {
-  color: var(--map-muted);
-  font-size: 0.78rem;
-  margin: 0.35rem 0 0;
-  padding-left: 1rem;
-}
-
-.tier-lines li {
-  margin: 0.15rem 0;
-}
-
-.tier-over {
-  color: var(--map-faint);
-  display: block;
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 0.72rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.p-missing {
-  border: 1px dashed var(--map-line);
-  border-radius: 9px;
-  color: var(--map-faint);
-  font-size: 0.8rem;
-  margin: 0;
-  padding: 0.6rem 0.7rem;
-}
-
-.p-missing-inline {
-  color: var(--map-faint);
-}
-
-.p-src {
-  color: var(--map-faint);
-  font-size: 0.74rem;
-  margin: 0.25rem 0 0;
-}
-
-.p-src a,
-.p-sources a {
-  color: var(--map-muted);
-}
-
-.p-sources {
-  font-size: 0.8rem;
-  margin: 0;
-  padding-left: 1rem;
-}
-
-.p-sources li {
-  margin: 0.2rem 0;
 }
 
 /* ---------- narrow screens: journey stacks vertically ---------- */
