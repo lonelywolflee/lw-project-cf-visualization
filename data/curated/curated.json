@@ -601,6 +601,332 @@
       ],
       "sourceUrl": "https://developers.cloudflare.com/workers/platform/pricing/",
       "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "r2",
+      "tiers": [
+        {
+          "id": "standard",
+          "name": "Standard (종량)",
+          "monthlyUsd": 0,
+          "noteKo": "무료 구간을 초과한 사용량만 과금 (Standard storage 기준)",
+          "featuresKo": ["Egress(전송) 요금 없음", "S3 호환 API"],
+          "meters": [
+            {
+              "metric": "storage-gb-month",
+              "included": 10,
+              "per": "month",
+              "overage": { "usd": 0.015, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            },
+            {
+              "metric": "class-a-operations",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 4.5, "perUnits": 1000000 },
+              "labelKo": "Class A 작업(쓰기·목록)"
+            },
+            {
+              "metric": "class-b-operations",
+              "included": 10000000,
+              "per": "month",
+              "overage": { "usd": 0.36, "perUnits": 1000000 },
+              "labelKo": "Class B 작업(읽기)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/r2/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "d1",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            { "metric": "rows-read", "included": 5000000, "per": "day", "labelKo": "행 읽기" },
+            { "metric": "rows-written", "included": 100000, "per": "day", "labelKo": "행 쓰기" },
+            { "metric": "storage-gb", "included": 5, "labelKo": "저장 용량(GB, 총량)" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "rows-read",
+              "included": 25000000000,
+              "per": "month",
+              "overage": { "usd": 0.001, "perUnits": 1000000 },
+              "labelKo": "행 읽기"
+            },
+            {
+              "metric": "rows-written",
+              "included": 50000000,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 1000000 },
+              "labelKo": "행 쓰기"
+            },
+            {
+              "metric": "storage-gb-month",
+              "included": 5,
+              "per": "month",
+              "overage": { "usd": 0.75, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/d1/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "kv",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            { "metric": "keys-read", "included": 100000, "per": "day", "labelKo": "키 읽기" },
+            { "metric": "keys-written", "included": 1000, "per": "day", "labelKo": "키 쓰기" },
+            { "metric": "keys-deleted", "included": 1000, "per": "day", "labelKo": "키 삭제" },
+            { "metric": "list-requests", "included": 1000, "per": "day", "labelKo": "목록 요청" },
+            { "metric": "storage-gb", "included": 1, "labelKo": "저장 용량(GB, 총량)" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "keys-read",
+              "included": 10000000,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1000000 },
+              "labelKo": "키 읽기"
+            },
+            {
+              "metric": "keys-written",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "키 쓰기"
+            },
+            {
+              "metric": "keys-deleted",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "키 삭제"
+            },
+            {
+              "metric": "list-requests",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "목록 요청"
+            },
+            {
+              "metric": "storage-gb-month",
+              "included": 1,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/kv/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "queues",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "noteKo": "메시지 1건 전달 ≈ 3 operations (쓰기·읽기·삭제)",
+          "limits": [
+            { "metric": "operations", "included": 10000, "per": "day", "labelKo": "작업 수" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "operations",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 0.4, "perUnits": 1000000 },
+              "labelKo": "작업 수(64KB 단위)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/queues/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "durable-objects",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "noteKo": "컴퓨팅 요금만 표시 — SQLite 스토리지 단가는 D1과 동일",
+          "limits": [
+            { "metric": "requests", "included": 100000, "per": "day", "labelKo": "요청 수" },
+            {
+              "metric": "duration-gb-s",
+              "included": 13000,
+              "per": "day",
+              "labelKo": "실행 시간(GB-초)"
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "requests",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 0.15, "perUnits": 1000000 },
+              "labelKo": "요청 수"
+            },
+            {
+              "metric": "duration-gb-s",
+              "included": 400000,
+              "per": "month",
+              "overage": { "usd": 12.5, "perUnits": 1000000 },
+              "labelKo": "실행 시간(GB-초)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "images",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            {
+              "metric": "transformations",
+              "included": 5000,
+              "per": "month",
+              "labelKo": "고유 변환"
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid (종량)",
+          "monthlyUsd": 0,
+          "noteKo": "저장·전송은 Images 버킷에 보관하는 이미지에만 과금",
+          "meters": [
+            {
+              "metric": "images-stored",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 100000 },
+              "labelKo": "저장 이미지 수"
+            },
+            {
+              "metric": "images-delivered",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 100000 },
+              "labelKo": "전송 이미지 수"
+            },
+            {
+              "metric": "transformations",
+              "included": 5000,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1000 },
+              "labelKo": "고유 변환"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/images/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "stream",
+      "tiers": [
+        {
+          "id": "usage",
+          "name": "종량",
+          "monthlyUsd": 0,
+          "noteKo": "저장 분량은 선불, 전송 분량은 후불",
+          "meters": [
+            {
+              "metric": "minutes-stored",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000 },
+              "labelKo": "저장 분량(분)"
+            },
+            {
+              "metric": "minutes-delivered",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 1000 },
+              "labelKo": "전송 분량(분)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/stream/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers-ai",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [{ "metric": "neurons", "included": 10000, "per": "day", "labelKo": "Neurons" }]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 매일 10,000 Neurons 무료 구간은 별도 적용",
+          "meters": [
+            {
+              "metric": "neurons",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 0.011, "perUnits": 1000 },
+              "labelKo": "Neurons"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ]
 }
