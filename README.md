@@ -26,32 +26,35 @@ MVP는 product family 탐색, 검색과 filter, 상세 정보, 출처가 포함�
 ## 동작 방식
 
 ```text
-Cloudflare official sources
-           |
-           v
-      pnpm crawl
-  fetch -> normalize -> validate
-           |
-           v
-   web/public/data/catalog.json
-           |
-           v
-       pnpm dev
-   Angular visualization
+Cloudflare official sources          data/curated/ (hand-edited)
+            |                                  |
+       pnpm crawl                     pnpm build:curated
+ fetch -> normalize -> validate     validate -> normalize
+            |                                  |
+            v                                  v
+ web/public/data/catalog.json    web/public/data/curated.json
+            \_________________________________/
+                            |
+                        pnpm dev
+                 Angular visualization
 ```
 
-Crawler 실행 한 번으로 수집, 구조화, schema validation, web data 갱신을 완료합니다. 각 record는
-공식 source URL과 수집 시각을 포함합니다. 수집이나 validation이 실패하면 기존 정상 data
-file을 변경하지 않습니다.
+Data는 두 갈래입니다. **Crawl**은 공식 page에 있는 살아있는 사실(제품·솔루션의 존재, 설명,
+URL)을 수집하고, **curation**은 공식 page에 구조화되어 있지 않은 지식(요청 경로상의 레이어
+위치, 한국어 역할 설명, 솔루션 구성, 요금제)을 담습니다. 두 쪽 모두 모든 record가 공식
+source URL과 확인 시각을 포함하며, 수집·검증이 실패하면 기존 정상 data file을 변경하지
+않습니다.
 
 ## 프로젝트 구조
 
 ```text
 .
 ├── web/                         # Angular 정적 visualization web
-│   └── public/data/             # Crawler가 생성하는 JSON data
-├── crawler/                     # 수집을 시작하는 Node.js TypeScript script
+│   └── public/data/             # 생성된 JSON data (catalog.json, curated.json)
+├── crawler/                     # 수집·빌드 script (Node.js TypeScript)
 │   └── config/                  # 수집 대상 seed와 허용 host, fetch 정책 (sources.json)
+├── data/
+│   └── curated/                 # 손으로 편집하는 curated dataset source (출처 필수)
 └── packages/                    # 공통 library, schema, TypeScript type
     └── catalog/                 # Crawler와 web이 공유하는 data contract
 ```
@@ -95,6 +98,9 @@ pnpm install
 # 공식 source 수집과 web data 갱신 (network 사용)
 pnpm crawl
 
+# Curated source를 검증·정규화해 web artifact 갱신 (offline)
+pnpm build:curated
+
 # 갱신된 data를 시각화 (Angular dev server)
 pnpm dev
 
@@ -103,13 +109,18 @@ pnpm lint
 pnpm test
 pnpm build
 
-# Commit된 catalog data의 schema validation (offline)
+# Commit된 data(catalog + curated)의 schema·정합성 validation (offline)
 pnpm validate:data
 ```
 
 `pnpm crawl`은 승인된 source를 수집하고 전체 결과가 schema validation을 통과한 경우에만
 `web/public/data/catalog.json`을 원자적으로 교체합니다. 수집이나 검증이 실패하면 기존 data
 file은 변경되지 않습니다. 일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다.
+
+Curated data를 수정할 때는 `data/curated/curated.json`을 편집한 뒤 `pnpm build:curated`를
+실행합니다. Schema, 중복, catalog 참조 검증을 통과한 경우에만 `web/public/data/curated.json`이
+정규화된 형태로 교체되며, source만 고치고 rebuild를 잊으면 `pnpm validate:data`가
+freshness 단계에서 실패합니다.
 
 ## 공식 Source
 
@@ -126,7 +137,7 @@ Target hosting은 Cloudflare Pages입니다. `pnpm build`가 만든 static outpu
 않습니다. Route 직접 진입과 새로고침은 Cloudflare Pages의 내장 SPA fallback이 처리합니다
 (`404.html`이 없으면 존재하지 않는 경로에 `index.html`을 자동 제공; 별도 `_redirects` 규칙은
 필요 없고, `/* /index.html 200` 형태는 Pages가 무한 루프로 판정해 무시합니다). 실제 file이
-있는 asset(`/data/catalog.json`, hashed chunk)은 언제나 그대로 제공됩니다. Cache 정책은
+있는 asset(`/data/catalog.json`, `/data/curated.json`, hashed chunk)은 언제나 그대로 제공됩니다. Cache 정책은
 `web/public/_headers`가 정의합니다. 모든 pull
 request는 GitHub Actions CI(`.github/workflows/ci.yml`)가 `pnpm lint`, `pnpm test`,
 `pnpm validate:data`, `pnpm build`로 검증합니다.
@@ -134,9 +145,11 @@ request는 GitHub Actions CI(`.github/workflows/ci.yml`)가 `pnpm lint`, `pnpm t
 ### Data 갱신
 
 Production build와 배포는 network를 사용하지 않습니다. 배포되는 data는 commit된
-`web/public/data/catalog.json`이 전부이며, 갱신하려면 수동으로 `pnpm crawl`을 실행한 뒤
-변경된 `catalog.json`을 commit합니다. Commit된 data는 `pnpm validate:data`로 언제든
-다시 검증할 수 있습니다.
+`web/public/data/`의 `catalog.json`과 `curated.json`이 전부입니다. Catalog는 수동으로
+`pnpm crawl`을 실행해, curated artifact는 `data/curated/curated.json` 편집 후
+`pnpm build:curated`를 실행해 갱신하고 변경분을 commit합니다. Commit된 data는
+`pnpm validate:data`가 schema, cross-reference, artifact 신선도까지 언제든 다시
+검증할 수 있습니다.
 
 ### Local 검증
 

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1",
+  "products": [
+    {
+      "productId": "access",
+      "roleKo": "VPN 없이 신원 기반으로 사내 앱 접근을 제어하는 ZTNA입니다.",
+      "placements": [
+        {
+          "lane": "zero-trust",
+          "layer": "access-control"
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/zero-trust/products/access/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "waf",
+      "roleKo": "SQL 주입·XSS 같은 웹 공격 패턴을 요청이 Origin에 닿기 전에 차단합니다.",
+      "placements": [
+        {
+          "lane": "public-web",
+          "layer": "application-security"
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers",
+      "roleKo": "전 세계 엣지에서 실행되는 서버리스 코드로, Origin 서버 없이 앱을 구동합니다.",
+      "placements": [
+        {
+          "lane": "public-web",
+          "layer": "compute-platform"
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/products/workers/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "compositions": [
+    {
+      "solutionId": "sase",
+      "productIds": [
+        "access",
+        "gateway"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/sase/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "pricing": [
+    {
+      "productId": "workers",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            {
+              "metric": "requests",
+              "included": 100000,
+              "per": "day",
+              "labelKo": "요청 수"
+            },
+            {
+              "metric": "cpu-ms",
+              "included": 10,
+              "per": "invocation",
+              "labelKo": "CPU 시간(ms)"
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 5,
+          "noteKo": "계정 단위 최소 요금",
+          "meters": [
+            {
+              "metric": "requests",
+              "included": 10000000,
+              "per": "month",
+              "overage": {
+                "usd": 0.3,
+                "perUnits": 1000000
+              },
+              "labelKo": "요청 수"
+            },
+            {
+              "metric": "cpu-ms",
+              "included": 30000000,
+              "per": "month",
+              "overage": {
+                "usd": 0.02,
+                "perUnits": 1000000
+              },
+              "labelKo": "CPU 시간(ms)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/workers/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ]
+}

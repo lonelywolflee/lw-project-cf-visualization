@@ -29,17 +29,18 @@ export function formatIssuePath(path: readonly PropertyKey[]): string {
 }
 
 /**
- * Thrown by {@link parseCatalog}; the message embeds one `path: message`
- * line per issue so CLI output is actionable without unwrapping.
+ * Thrown by {@link parseCatalog} and {@link parseCuratedData}; the message
+ * embeds one `path: message` line per issue so CLI output is actionable
+ * without unwrapping. `subject` names the document kind in the first line.
  */
 export class CatalogValidationError extends Error {
   /** Every issue found, in document order. */
   readonly issues: readonly CatalogIssue[];
 
-  constructor(issues: readonly CatalogIssue[]) {
+  constructor(issues: readonly CatalogIssue[], subject = 'Catalog') {
     const lines = issues.map((issue) => `  ${issue.path}: ${issue.message}`);
     super(
-      [`Catalog validation failed with ${String(issues.length)} issue(s):`, ...lines].join('\n'),
+      [`${subject} validation failed with ${String(issues.length)} issue(s):`, ...lines].join('\n'),
     );
     this.name = 'CatalogValidationError';
     this.issues = issues;

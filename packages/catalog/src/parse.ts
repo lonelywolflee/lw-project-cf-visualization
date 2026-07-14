@@ -9,7 +9,13 @@ export type CatalogParseResult =
   | { readonly success: true; readonly data: Catalog }
   | { readonly success: false; readonly issues: readonly CatalogIssue[] };
 
-function toShapeIssues(error: z.ZodError): readonly CatalogIssue[] {
+/**
+ * Maps zod issues onto the shared issue contract.
+ *
+ * Package-internal (not re-exported from the index): shared by the catalog
+ * and curated parse pipelines.
+ */
+export function toShapeIssues(error: z.ZodError): readonly CatalogIssue[] {
   return error.issues.flatMap((issue): readonly CatalogIssue[] => {
     // zod reports unrecognized keys at the object root; point each issue at
     // the offending key instead so the path stays actionable.
