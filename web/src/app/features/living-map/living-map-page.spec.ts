@@ -461,4 +461,49 @@ describe('LivingMapPage', () => {
     expect(hostile?.querySelector('.lens-panel')).toBeNull();
     expect(nodeByName(hostile, 'WAF')?.classList.contains('lens-dim')).toBe(false);
   });
+
+  it('replays the journey from the first stop with the caption panel', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=replay');
+    const element = harness.routeNativeElement;
+
+    const panel = element?.querySelector('.replay-panel');
+    expect(panel?.textContent).toContain('정거장 1 / 3');
+    expect(panel?.querySelector('.replay-name')?.textContent).toContain('WAF');
+    expect(panel?.textContent).toContain('요청의 내용을 열어');
+    expect(nodeByName(element, 'WAF')?.classList.contains('replay-current')).toBe(true);
+    expect(element?.querySelector('.lens-bar')).toBeNull(); // 재생 중엔 렌즈 바 대신 자막
+  });
+
+  it('advances stops without spraying history and marks passed stations', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=replay');
+    const element = harness.routeNativeElement;
+
+    const next = Array.from(
+      element?.querySelectorAll<HTMLButtonElement>('.replay-controls .tool') ?? [],
+    ).find((button) => button.textContent?.includes('다음'));
+    next?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toBe('?mode=replay&stop=2');
+    expect(element?.querySelector('.replay-name')?.textContent).toContain('CDN');
+    expect(nodeByName(element, 'WAF')?.classList.contains('replay-passed')).toBe(true);
+  });
+
+  it('auto-expands the compute group when the journey stops inside it', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=replay&stop=3');
+    const element = harness.routeNativeElement;
+
+    // Workers hides behind the collapsed family toggle in exploration —
+    // the replay stop must surface it.
+    const workers = nodeByName(element, 'Workers');
+    expect(workers).not.toBeUndefined();
+    expect(workers?.classList.contains('replay-current')).toBe(true);
+  });
+
+  it('collapses hostile stop values to the first station', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=replay&stop=999');
+    expect(harness.routeNativeElement?.querySelector('.replay-panel')?.textContent).toContain(
+      '정거장 1 / 3',
+    );
+  });
 });

@@ -1,5 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CURATED_LANES, type CuratedLane, type CuratedLayer } from '@cf-viz/catalog';
 
@@ -54,6 +62,8 @@ export class LivingMapPage {
   readonly area = input<string | undefined>();
   /** Raw `?lens=` value; a scenario or solution id, validated below. */
   readonly lens = input<string | undefined>();
+  /** Raw `?stop=` value; the 1-based replay stop, clamped to the journey. */
+  readonly stop = input<string | undefined>();
 
   private readonly store = inject(CatalogStore);
   private readonly curatedStore = inject(CuratedStore);
@@ -66,6 +76,21 @@ export class LivingMapPage {
 
   constructor() {
     this.progress.touchSession();
+    // Replay's autoplay heartbeat: one interval for the component's life,
+    // inert unless playing. URL updates use replaceUrl, so a documentary
+    // run does not spray history entries.
+    const timer = setInterval(() => {
+      if (!this.playing()) return;
+      const next = this.stopIndex() + 1;
+      if (next > this.replayStops().length) {
+        this.playing.set(false);
+        return;
+      }
+      this.goToStop(next);
+    }, 4000);
+    inject(DestroyRef).onDestroy(() => {
+      clearInterval(timer);
+    });
   }
 
   protected readonly model = computed<MapModel | undefined>(() => {
@@ -115,7 +140,10 @@ export class LivingMapPage {
   }
 
   protected isExpanded(familyId: string): boolean {
-    return this.expandedGroups().has(familyId);
+    if (this.expandedGroups().has(familyId)) return true;
+    // Replay auto-expands the group holding the current stop — a stop the
+    // learner cannot see is not a stop.
+    return this.currentStop()?.familyId === familyId;
   }
 
   protected toggleGroup(familyId: string): void {
@@ -235,12 +263,13 @@ export class LivingMapPage {
     return LAYER_LABELS[layer];
   }
 
-  protected setMode(recall: boolean): void {
+  protected setMode(mode: 'explore' | 'recall' | 'replay'): void {
     this.picked.set(new Set());
     this.score.set(null);
+    this.playing.set(false);
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: recall ? { mode: 'recall' } : {},
+      queryParams: mode === 'explore' ? {} : { mode },
     });
   }
 
@@ -385,5 +414,78 @@ export class LivingMapPage {
     const lens = this.activeLens();
     if (lens === null) return 0;
     return products.filter((product) => lens.productIds.has(product.id)).length;
+  }
+
+  // ----------------------------------------------------------------- replay
+
+  protected readonly isReplay = computed(() => firstParamValue(this.mode()) === 'replay');
+
+  /** True when the OS asks for reduced motion — autoplay is not offered. */
+  protected readonly reducedMotion =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
+
+  protected readonly playing = signal(false);
+
+  /** The journey script joined with catalog names, in narration order. */
+  protected readonly replayStops = computed(() => {
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    if (catalog === undefined || curated === undefined) return [];
+    const productById = new Map(catalog.products.map((product) => [product.id, product]));
+    return curated.narration.flatMap((stop) => {
+      const product = productById.get(stop.productId);
+      return product === undefined
+        ? []
+        : [
+            {
+              productId: stop.productId,
+              name: product.name,
+              familyId: product.familyId,
+              captionKo: stop.captionKo,
+              sourceUrl: stop.sourceUrl,
+              verifiedAt: stop.verifiedAt,
+            },
+          ];
+    });
+  });
+
+  /** 1-based stop index; hostile or out-of-range values collapse to 1. */
+  protected readonly stopIndex = computed(() => {
+    const total = this.replayStops().length;
+    if (total === 0) return 0;
+    const raw = Number(firstParamValue(this.stop()) ?? '1');
+    return Number.isInteger(raw) && raw >= 1 && raw <= total ? raw : 1;
+  });
+
+  protected readonly currentStop = computed(() => {
+    if (!this.isReplay()) return null;
+    const index = this.stopIndex();
+    return index === 0 ? null : (this.replayStops()[index - 1] ?? null);
+  });
+
+  protected isReplayCurrent(productId: string): boolean {
+    return this.currentStop()?.productId === productId;
+  }
+
+  protected isReplayPassed(productId: string): boolean {
+    if (this.currentStop() === null) return false;
+    return this.replayStops()
+      .slice(0, this.stopIndex() - 1)
+      .some((stop) => stop.productId === productId);
+  }
+
+  protected goToStop(index: number): void {
+    if (index < 1 || index > this.replayStops().length) return;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: 'replay', stop: index },
+      replaceUrl: true,
+    });
+  }
+
+  protected togglePlay(): void {
+    this.playing.update((value) => !value);
   }
 }
