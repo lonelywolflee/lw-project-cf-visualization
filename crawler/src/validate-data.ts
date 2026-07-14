@@ -104,6 +104,7 @@ const curatedCounts = [
   `${String(build.data.products.length)} products`,
   `${String(build.data.compositions.length)} compositions`,
   `${String(build.data.pricing.length)} pricing entries`,
+  `${String(build.data.learningNotes.length)} learning notes`,
 ].join(', ');
 console.log(
   `curated.json is valid and fresh (schemaVersion ${build.data.schemaVersion}): ${curatedCounts}`,

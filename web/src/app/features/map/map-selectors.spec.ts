@@ -77,6 +77,7 @@ const catalog: Catalog = {
 
 const curated: CuratedData = {
   schemaVersion: '1',
+  learningNotes: [],
   products: [
     {
       productId: 'waf',

@@ -157,7 +157,8 @@ app/
 ├── shared/                     # Domain ownership이 없는 reusable UI
 └── features/
     ├── catalog/                # Routes와 layout gate (CatalogShell)
-    ├── map/                    # 경로·레이어 지도(홈)와 product detail panel
+    ├── living-map/             # 학습 지도(홈): 탐험·회상 모드, 학습 카드, 진도
+    ├── map/                    # 공용 지도 selector와 product detail panel
     ├── graph/                  # 솔루션 구성 focus graph
     └── calculator/             # 사용량 기반 요금 계산기
 ```

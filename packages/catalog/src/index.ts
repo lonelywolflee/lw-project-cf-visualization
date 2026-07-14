@@ -34,6 +34,7 @@ export {
   type CuratedPricing,
   type CuratedProduct,
   type IncludedLimit,
+  type LearningNote,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,

@@ -53,6 +53,7 @@ const catalog: Catalog = {
 
 const curated: CuratedData = {
   schemaVersion: '1',
+  learningNotes: [],
   products: [],
   compositions: [
     {
@@ -161,7 +162,7 @@ describe('catalog routing', () => {
     const shell = harness.fixture.nativeElement as HTMLElement;
     expect(path()).toBe('?product=waf');
     expect(shell.textContent).toContain('불러오는 중');
-    expect(shell.querySelector('.map-page')).toBeNull();
+    expect(shell.querySelector('.living-map')).toBeNull();
 
     state.set({ kind: 'success', catalog });
     await harness.fixture.whenStable();

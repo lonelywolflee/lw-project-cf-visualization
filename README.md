@@ -5,11 +5,12 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 레이어 배치·솔루션 구성·요금 data를 더해, Angular web application이 이를 지도·그래프·
 계산기로 시각화합니다.
 
-> 세 화면을 제공합니다: 방문자와 Origin 사이 요청 경로 위에 전 제품을 배치한
-> **경로·레이어 지도**(`/`), 솔루션이 어떤 제품들로 구성되는지 보여주는
+> 세 화면을 제공합니다: 탐험과 회상 두 모드로 Cloudflare를 학습하는
+> **살아있는 지도**(`/` — 안개 걷기, 출처가 달린 학습 카드, 백지 회상 시험,
+> 진도 리포트 내보내기), 솔루션이 어떤 제품들로 구성되는지 보여주는
 > **구성 그래프**(`/solutions`), 예상 사용량을 입력하면 티어별 월 비용을 추정하는
-> **요금 계산기**(`/calculator`). 모든 화면의 선택 상태는 URL이라 링크로 공유할 수
-> 있으며, 무엇을 선택하든 공식 출처 링크와 확인 시각이 함께 표시됩니다.
+> **요금 계산기**(`/calculator`). 모든 화면의 상태(선택·모드·영역)는 URL이라 링크로
+> 공유할 수 있으며, 무엇을 선택하든 공식 출처 링크와 확인 시각이 함께 표시됩니다.
 
 ## 목표
 
@@ -162,7 +163,8 @@ pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
 `http://127.0.0.1:8788`에서 세 화면의 직접 진입(`/`, `/solutions`, `/calculator`)과 딥링크
-(`/?product=<id>`, `/solutions?solution=<id>`, `/calculator?products=<id,...>`),
+(`/?product=<id>`, `/?mode=recall&area=<layer>`, `/solutions?solution=<id>`,
+`/calculator?products=<id,...>`),
 은퇴한 v1 경로의 redirect
 (`/browse`, `/discovery` → `/`, `/relationships` → `/solutions`,
 `/products/<id>` → `/?product=<id>`, `/solutions/<id>` → `/solutions?solution=<id>`),

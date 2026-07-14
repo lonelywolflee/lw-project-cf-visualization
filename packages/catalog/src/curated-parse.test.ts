@@ -20,6 +20,7 @@ function buildCuratedProduct(productId: string): CuratedData['products'][number]
 function buildValidCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
     products: [buildCuratedProduct('waf')],
     compositions: [
       {
