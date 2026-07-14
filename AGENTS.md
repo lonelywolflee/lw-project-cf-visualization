@@ -156,16 +156,19 @@ app/
 ├── core/                       # Application-wide service and configuration
 ├── shared/                     # Domain ownership이 없는 reusable UI
 └── features/
-    ├── catalog/                # Family hierarchy, list, detail
-    ├── discovery/              # Search and filter
-    └── relationships/          # Source-backed relationship view
+    ├── catalog/                # Routes와 layout gate (CatalogShell)
+    ├── map/                    # 경로·레이어 지도(홈)와 product detail panel
+    └── graph/                  # 솔루션 구성 focus graph
 ```
 
 - Standalone component와 route-level lazy loading을 기본으로 한다.
 - Component에서 직접 `fetch`하지 않고 catalog data service를 사용한다.
 - State는 가장 가까운 feature에 두고 Angular signal/service로 충분하면 global store를 추가하지 않는다.
 - `shared`를 miscellaneous helper 저장소로 사용하지 않는다.
-- Relationship visualization에는 keyboard로 접근 가능한 list/detail fallback을 제공한다.
+- 화면 상태(선택·포커스)는 query param으로 관리해 딥링크를 유지하고, URL 입력은 catalog에
+  존재하는 id인지 검증한 뒤에만 사용한다.
+- 시각화에는 keyboard로 접근 가능한 동등한 조작 경로(칩/버튼 목록)를 제공한다.
+- Route를 제거할 때는 같은 정보로 가는 redirect를 남겨 기존 딥링크를 깨지 않는다.
 - Semantic HTML, visible focus, color contrast, responsive layout을 acceptance criteria에 포함한다.
 - Nx, SSR, Angular Universal, NgRx는 구체적인 필요를 증명하는 별도 Issue 없이 도입하지 않는다.
 

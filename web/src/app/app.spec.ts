@@ -31,38 +31,32 @@ describe('App', () => {
     expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 
-  it('renders the primary navigation with map, catalog, discovery, and relationships links', async () => {
+  it('renders the primary navigation with exactly the two visualization links', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const nav = compiled.querySelector('nav[aria-label="주요 메뉴"]');
     expect(nav).not.toBeNull();
-    const mapLink = nav?.querySelector<HTMLAnchorElement>('a[href="/"]');
-    expect(mapLink?.textContent).toContain('지도');
-    const solutionsLink = nav?.querySelector<HTMLAnchorElement>('a[href="/solutions"]');
-    expect(solutionsLink?.textContent).toContain('솔루션');
-    const catalogLink = nav?.querySelector<HTMLAnchorElement>('a[href="/browse"]');
-    expect(catalogLink?.textContent).toContain('카탈로그');
-    const discoveryLink = nav?.querySelector<HTMLAnchorElement>('a[href="/discovery"]');
-    expect(discoveryLink?.textContent).toContain('검색');
-    const relationshipsLink = nav?.querySelector<HTMLAnchorElement>('a[href="/relationships"]');
-    expect(relationshipsLink?.textContent).toContain('관계');
+    const links = Array.from(nav?.querySelectorAll<HTMLAnchorElement>('a') ?? []);
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/', '/solutions']);
+    expect(links[0]?.textContent).toContain('지도');
+    expect(links[1]?.textContent).toContain('솔루션');
   });
 
-  it('marks the discovery link active on /discovery while 지도 stays exact', async () => {
+  it('marks the solutions link active on /solutions while 지도 stays exact', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
 
-    await TestBed.inject(Router).navigateByUrl('/discovery');
+    await TestBed.inject(Router).navigateByUrl('/solutions');
     // Zoneless pattern: the activated shell holds a pending catalog request,
     // so whenStable() would deadlock; TestBed.tick() renders synchronously.
     TestBed.tick();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const mapLink = compiled.querySelector<HTMLAnchorElement>('nav a[href="/"]');
-    const discoveryLink = compiled.querySelector<HTMLAnchorElement>('nav a[href="/discovery"]');
-    expect(discoveryLink?.classList.contains('active')).toBe(true);
+    const solutionsLink = compiled.querySelector<HTMLAnchorElement>('nav a[href="/solutions"]');
+    expect(solutionsLink?.classList.contains('active')).toBe(true);
     expect(mapLink?.classList.contains('active')).toBe(false);
 
     // Settle both outstanding document requests so verify() passes.
