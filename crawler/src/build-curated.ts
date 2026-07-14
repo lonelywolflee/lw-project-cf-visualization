@@ -73,6 +73,7 @@ const counts = [
   `${String(build.data.compositions.length)} compositions`,
   `${String(build.data.pricing.length)} pricing entries`,
   `${String(build.data.learningNotes.length)} learning notes`,
+  `${String(build.data.scenarios.length)} scenarios`,
 ].join(', ');
 console.log(
   `curated.json built (schemaVersion ${build.data.schemaVersion}): ${counts} → ${targetPath}`,

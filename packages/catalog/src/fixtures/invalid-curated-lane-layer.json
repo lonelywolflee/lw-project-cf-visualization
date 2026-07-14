@@ -5,11 +5,17 @@
     {
       "productId": "waf",
       "roleKo": "웹 공격 패턴을 차단합니다.",
-      "placements": [{ "lane": "zero-trust", "layer": "application-security" }],
+      "placements": [
+        {
+          "lane": "zero-trust",
+          "layer": "application-security"
+        }
+      ],
       "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ],
   "compositions": [],
-  "pricing": []
+  "pricing": [],
+  "scenarios": []
 }

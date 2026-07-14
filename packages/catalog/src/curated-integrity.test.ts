@@ -64,6 +64,7 @@ function buildCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
     learningNotes: [],
+    scenarios: [],
     products: [
       {
         productId: 'waf',
@@ -120,6 +121,18 @@ describe('collectCuratedReferenceIssues', () => {
           verifiedAt: '2026-07-15T00:00:00Z',
         },
       ],
+      scenarios: [
+        {
+          // 'sase' is a solution id in buildCatalog — the shared ?lens=
+          // namespace makes that collision a rejected reference issue.
+          id: 'sase',
+          titleKo: '충돌 시나리오',
+          situationKo: '렌즈 네임스페이스가 겹칩니다.',
+          productIds: ['waf', 'ghost-lens-member'],
+          sourceUrl: 'https://www.cloudflare.com/products/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
     };
     expect(collectCuratedReferenceIssues(broken, buildCatalog())).toEqual([
       {
@@ -146,6 +159,16 @@ describe('collectCuratedReferenceIssues', () => {
         code: 'unknown-entity-reference',
         path: 'learningNotes[0].productId',
         message: "Unknown products id 'ghost-note'",
+      },
+      {
+        code: 'duplicate-id',
+        path: 'scenarios[0].id',
+        message: "Scenario id 'sase' collides with a solution id",
+      },
+      {
+        code: 'unknown-entity-reference',
+        path: 'scenarios[0].productIds[1]',
+        message: "Unknown products id 'ghost-lens-member'",
       },
     ]);
   });

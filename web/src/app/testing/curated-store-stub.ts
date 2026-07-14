@@ -8,6 +8,7 @@ import { CuratedStore } from '../core/catalog/curated-store';
 export const EMPTY_CURATED: CuratedData = {
   schemaVersion: '1',
   learningNotes: [],
+  scenarios: [],
   products: [],
   compositions: [],
   pricing: [],

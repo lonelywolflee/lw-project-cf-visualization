@@ -5,18 +5,29 @@
     {
       "productId": "waf",
       "roleKo": "웹 공격 패턴을 차단합니다.",
-      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "placements": [
+        {
+          "lane": "public-web",
+          "layer": "application-security"
+        }
+      ],
       "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     },
     {
       "productId": "waf",
       "roleKo": "중복 항목입니다.",
-      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "placements": [
+        {
+          "lane": "public-web",
+          "layer": "application-performance"
+        }
+      ],
       "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ],
   "compositions": [],
-  "pricing": []
+  "pricing": [],
+  "scenarios": []
 }

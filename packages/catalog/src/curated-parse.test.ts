@@ -21,6 +21,7 @@ function buildValidCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
     learningNotes: [],
+    scenarios: [],
     products: [buildCuratedProduct('waf')],
     compositions: [
       {
@@ -69,13 +70,22 @@ describe('safeParseCuratedData', () => {
     expect(paths).toContain('pricing[0].tiers');
   });
 
-  it('collects every duplicate-id issue across all three collections', () => {
+  it('collects every duplicate-id issue across all collections', () => {
     const data = buildValidCuratedData();
+    const scenario = {
+      id: 'flash-sale-surge',
+      titleKo: '세일 폭주',
+      situationKo: '정상 트래픽이 순간 폭주합니다.',
+      productIds: ['waf', 'gateway'],
+      sourceUrl: 'https://www.cloudflare.com/products/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
     const result = safeParseCuratedData({
       ...data,
       products: [buildCuratedProduct('waf'), buildCuratedProduct('waf')],
       compositions: [...data.compositions, ...data.compositions],
       pricing: [...data.pricing, ...data.pricing],
+      scenarios: [scenario, scenario],
     });
     expect(result.success).toBe(false);
     if (result.success) {
@@ -96,6 +106,11 @@ describe('safeParseCuratedData', () => {
         code: 'duplicate-id',
         path: 'pricing[1].productId',
         message: "Duplicate productId 'waf' in pricing",
+      },
+      {
+        code: 'duplicate-id',
+        path: 'scenarios[1].id',
+        message: "Duplicate id 'flash-sale-surge' in scenarios",
       },
     ]);
   });

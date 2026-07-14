@@ -121,6 +121,17 @@ const curatedData: CuratedData = {
       verifiedAt: '2026-07-15T00:00:00Z',
     },
   ],
+  scenarios: [
+    {
+      id: 'login-abuse',
+      titleKo: '로그인 공격 방어',
+      situationKo: '정상처럼 보이는 로그인 시도가 반복되는 상황입니다.',
+      productIds: ['waf', 'cdn'],
+      talkTrackKo: '로그인 실패율 급증 경험을 물으며 시작하세요.',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+  ],
 };
 
 describe('LivingMapPage', () => {

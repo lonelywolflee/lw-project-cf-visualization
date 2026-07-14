@@ -42,6 +42,7 @@ function placement(lane: 'public-web', layer: string): { lane: 'public-web'; lay
 const curated = {
   schemaVersion: '1',
   learningNotes: [],
+  scenarios: [],
   products: [
     {
       productId: 'waf',
