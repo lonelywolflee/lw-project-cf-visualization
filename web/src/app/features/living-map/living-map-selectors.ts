@@ -46,6 +46,58 @@ export function learningCardView(
 }
 
 /**
+ * One selectable lens over the map. Scenarios carry their narrative;
+ * solution lenses derive from compositions (title from the catalog) and
+ * carry no narrative — the graph page remains their deep view.
+ */
+export interface LensView {
+  readonly kind: 'scenario' | 'solution';
+  readonly id: string;
+  readonly title: string;
+  readonly productIds: ReadonlySet<string>;
+  /** Scenario narrative; null for solution lenses. */
+  readonly situationKo: string | null;
+  /** Optional AE conversation opener; null when absent. */
+  readonly talkTrackKo: string | null;
+  readonly sourceUrl: string;
+  readonly verifiedAt: string;
+}
+
+/**
+ * Every lens the bar offers: scenarios first (the learning story), then
+ * solution compositions sorted by display name. Ids are unique across both
+ * kinds — the curated contract rejects scenario/solution collisions.
+ */
+export function buildLensViews(catalog: Catalog, curated: CuratedData): readonly LensView[] {
+  const solutionNameById = new Map(
+    catalog.solutions.map((solution) => [solution.id, solution.name]),
+  );
+  const scenarios = curated.scenarios.map((scenario): LensView => ({
+    kind: 'scenario',
+    id: scenario.id,
+    title: scenario.titleKo,
+    productIds: new Set(scenario.productIds),
+    situationKo: scenario.situationKo,
+    talkTrackKo: scenario.talkTrackKo ?? null,
+    sourceUrl: scenario.sourceUrl,
+    verifiedAt: scenario.verifiedAt,
+  }));
+  const solutions = curated.compositions
+    .map((composition): LensView => ({
+      kind: 'solution',
+      id: composition.solutionId,
+      title: solutionNameById.get(composition.solutionId) ?? composition.solutionId,
+      productIds: new Set(composition.productIds),
+      situationKo: null,
+      talkTrackKo: null,
+      sourceUrl: composition.sourceUrl,
+      verifiedAt: composition.verifiedAt,
+    }))
+    .sort((a, b) => (a.title < b.title ? -1 : a.title > b.title ? 1 : 0));
+  return [...scenarios, ...solutions];
+}
+
+/**
  * Slot counts for the approved recall metric: every placement is one slot
  * (multi-placement products contribute one slot per layer), so the global
  * denominator is 70 for the shipped dataset, never assumed as a constant.
