@@ -96,8 +96,12 @@ function parseState(raw: unknown): ProgressState | null {
   };
 }
 
-/** Local date as YYYY-MM-DD (the learner's clock, not UTC). */
-function today(): string {
+/**
+ * Local date as YYYY-MM-DD (the learner's clock, not UTC). Exported as the
+ * single definition of the record's date format — derived features (e.g.
+ * re-fog) must compare against the same calendar the log was written in.
+ */
+export function localToday(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
@@ -143,7 +147,7 @@ export class ProgressStore {
 
   /** Marks today as a session day (deduplicated); call on page entry. */
   touchSession(): void {
-    const day = today();
+    const day = localToday();
     this.stateSignal.update((state) =>
       state.sessionLog.includes(day) ? state : { ...state, sessionLog: [...state.sessionLog, day] },
     );
@@ -182,7 +186,7 @@ export class ProgressStore {
       return {
         ...state,
         nodeStates,
-        recallLog: [...state.recallLog, { date: today(), area, correctSlots, totalSlots }],
+        recallLog: [...state.recallLog, { date: localToday(), area, correctSlots, totalSlots }],
       };
     });
   }
