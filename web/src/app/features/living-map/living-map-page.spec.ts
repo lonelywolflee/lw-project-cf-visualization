@@ -146,6 +146,26 @@ const curatedData: CuratedData = {
       verifiedAt: '2026-07-15T00:00:00Z',
     },
   ],
+  narration: [
+    {
+      productId: 'waf',
+      captionKo: '요청의 내용을 열어 공격 패턴을 거릅니다.',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+    {
+      productId: 'cdn',
+      captionKo: '캐시 적중이면 여정은 여기서 끝납니다.',
+      sourceUrl: 'https://www.cloudflare.com/products/cdn/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+    {
+      productId: 'workers',
+      captionKo: '엣지에서 코드가 직접 응답을 만듭니다.',
+      sourceUrl: 'https://www.cloudflare.com/products/workers/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+  ],
 };
 
 describe('LivingMapPage', () => {

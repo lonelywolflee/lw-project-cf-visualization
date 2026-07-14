@@ -7,6 +7,7 @@ function buildValidCuratedData(): CuratedData {
     schemaVersion: '1',
     learningNotes: [],
     scenarios: [],
+    narration: [],
     products: [
       {
         productId: 'waf',
@@ -90,6 +91,7 @@ describe('curatedDataSchema', () => {
       schemaVersion: '1',
       learningNotes: [],
       scenarios: [],
+      narration: [],
       products: [],
       compositions: [],
       pricing: [],

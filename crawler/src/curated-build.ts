@@ -22,6 +22,7 @@ import {
   type CuratedScenario,
   type IncludedLimit,
   type LearningNote,
+  type NarrationStop,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,
@@ -157,10 +158,20 @@ function normalizeScenario(scenario: CuratedScenario): CuratedScenario {
   return normalized;
 }
 
+function normalizeNarrationStop(stop: NarrationStop): NarrationStop {
+  return {
+    productId: stop.productId,
+    captionKo: stop.captionKo,
+    sourceUrl: stop.sourceUrl,
+    verifiedAt: stop.verifiedAt,
+  };
+}
+
 /**
  * Canonical form of a valid curated dataset: collections sorted by their
  * entry id, placements by lane/layer, composition members by id; every
- * object rebuilt in schema key order. Idempotent.
+ * object rebuilt in schema key order. Narration keeps its authored order —
+ * the array order IS the journey (the pricing-tier rule). Idempotent.
  */
 export function normalizeCuratedData(curated: CuratedData): CuratedData {
   return {
@@ -180,6 +191,7 @@ export function normalizeCuratedData(curated: CuratedData): CuratedData {
     scenarios: [...curated.scenarios]
       .sort((a, b) => compareCodepoints(a.id, b.id))
       .map(normalizeScenario),
+    narration: curated.narration.map(normalizeNarrationStop),
   };
 }
 

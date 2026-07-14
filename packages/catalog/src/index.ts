@@ -36,6 +36,7 @@ export {
   type CuratedScenario,
   type IncludedLimit,
   type LearningNote,
+  type NarrationStop,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,
