@@ -59,6 +59,7 @@ const VALID_CURATED_SOURCE = {
   // Key order is deliberately non-canonical: the artifact must not mirror it.
   learningNotes: [],
   scenarios: [],
+  narration: [],
   products: [
     {
       verifiedAt: '2026-07-14T00:00:00Z',
@@ -131,6 +132,7 @@ describe('build-curated CLI', () => {
       schemaVersion: '1',
       learningNotes: [],
       scenarios: [],
+      narration: [],
       products: [
         {
           productId: 'waf',

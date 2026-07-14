@@ -79,6 +79,7 @@ const curated: CuratedData = {
   schemaVersion: '1',
   learningNotes: [],
   scenarios: [],
+  narration: [],
   products: [
     {
       productId: 'waf',

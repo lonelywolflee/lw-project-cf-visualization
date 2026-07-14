@@ -189,11 +189,24 @@ const curatedScenarioSchema = z.strictObject({
 });
 
 /**
+ * One stop of the replay documentary: what the request experiences at this
+ * product, quote-first like every learning surface. Array order in
+ * `narration` IS the journey order — authored order is meaning (the same
+ * rule pricing tiers follow), so normalization never sorts it.
+ */
+const narrationStopSchema = z.strictObject({
+  productId: idSlugSchema,
+  captionKo: nonBlankString(400),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
  * Runtime schema for the curated dataset — knowledge that official pages do
  * not carry in structured form (map placements, beginner-friendly Korean
  * role lines, solution compositions, tier pricing, learning notes,
- * scenario lenses). Every entry cites the official page it was verified
- * against and when.
+ * scenario lenses, the replay narration). Every entry cites the official
+ * page it was verified against and when.
  *
  * Prefer {@link parseCuratedData} / {@link safeParseCuratedData}; catalog
  * cross-references are validated separately by
@@ -206,6 +219,7 @@ export const curatedDataSchema = z.strictObject({
   pricing: z.array(curatedPricingSchema),
   learningNotes: z.array(learningNoteSchema),
   scenarios: z.array(curatedScenarioSchema),
+  narration: z.array(narrationStopSchema),
 });
 
 /** A fully validated curated dataset document. */
@@ -237,3 +251,6 @@ export type LearningNote = CuratedData['learningNotes'][number];
 
 /** Customer-situation lens over the map. */
 export type CuratedScenario = CuratedData['scenarios'][number];
+
+/** One journey stop of the replay documentary (array order = journey). */
+export type NarrationStop = CuratedData['narration'][number];

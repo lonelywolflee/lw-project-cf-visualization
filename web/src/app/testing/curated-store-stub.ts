@@ -9,6 +9,7 @@ export const EMPTY_CURATED: CuratedData = {
   schemaVersion: '1',
   learningNotes: [],
   scenarios: [],
+  narration: [],
   products: [],
   compositions: [],
   pricing: [],

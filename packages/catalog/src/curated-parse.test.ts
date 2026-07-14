@@ -22,6 +22,7 @@ function buildValidCuratedData(): CuratedData {
     schemaVersion: '1',
     learningNotes: [],
     scenarios: [],
+    narration: [],
     products: [buildCuratedProduct('waf')],
     compositions: [
       {

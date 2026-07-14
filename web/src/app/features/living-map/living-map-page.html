@@ -6,18 +6,27 @@
         <button
           type="button"
           class="mode"
-          [class.on]="!isRecall()"
-          [attr.aria-pressed]="!isRecall()"
-          (click)="setMode(false)"
+          [class.on]="!isRecall() && !isReplay()"
+          [attr.aria-pressed]="!isRecall() && !isReplay()"
+          (click)="setMode('explore')"
         >
           탐험
         </button>
         <button
           type="button"
           class="mode"
+          [class.on]="isReplay()"
+          [attr.aria-pressed]="isReplay()"
+          (click)="setMode('replay')"
+        >
+          재생 ▶
+        </button>
+        <button
+          type="button"
+          class="mode"
           [class.on]="isRecall()"
           [attr.aria-pressed]="isRecall()"
-          (click)="setMode(true)"
+          (click)="setMode('recall')"
         >
           회상 ✏
         </button>
@@ -43,7 +52,7 @@
       곳을 알려줍니다.
     </p>
     @if (!isRecall() && staleAreas().length > 0) {
-    <button type="button" class="refog-nudge" (click)="setMode(true)">
+    <button type="button" class="refog-nudge" (click)="setMode('recall')">
       🌫 검증했던 영역 {{ staleAreas().length }}곳에 안개가 다시 꼈습니다 — 다시 채워볼까요?
     </button>
     }
@@ -87,8 +96,8 @@
           }
         </ul>
         <div class="recall-actions">
-          <button type="button" class="tool" (click)="setMode(true)">다른 영역 고르기</button>
-          <button type="button" class="tool" (click)="setMode(false)">탐험으로 돌아가기</button>
+          <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
+          <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
         </div>
       </div>
       } @else {
@@ -128,7 +137,41 @@
     </section>
     }
   </div>
-  } @else {
+  } @else { @if (isReplay()) { @if (currentStop(); as replayStop) {
+  <section class="replay-panel" aria-live="polite">
+    <p class="replay-count">요청의 일생 — 정거장 {{ stopIndex() }} / {{ replayStops().length }}</p>
+    <h2 class="replay-name">{{ replayStop.name }}</h2>
+    <p class="replay-caption">{{ replayStop.captionKo }}</p>
+    <p class="replay-meta">
+      <a [href]="replayStop.sourceUrl" target="_blank" rel="noopener noreferrer">원문 (새 창)</a>
+      · 확인일 {{ replayStop.verifiedAt | date: 'mediumDate' }}
+    </p>
+    <div class="replay-controls">
+      <button
+        type="button"
+        class="tool"
+        [disabled]="stopIndex() <= 1"
+        (click)="goToStop(stopIndex() - 1)"
+      >
+        ← 이전
+      </button>
+      <button
+        type="button"
+        class="tool"
+        [disabled]="stopIndex() >= replayStops().length"
+        (click)="goToStop(stopIndex() + 1)"
+      >
+        다음 →
+      </button>
+      @if (!reducedMotion) {
+      <button type="button" class="tool" (click)="togglePlay()">
+        {{ playing() ? '일시정지 ⏸' : '자동 재생 ▶' }}
+      </button>
+      }
+      <button type="button" class="tool" (click)="setMode('explore')">탐험으로</button>
+    </div>
+  </section>
+  } } @else {
   <div class="lens-bar" role="group" aria-label="렌즈 선택">
     <button
       type="button"
@@ -170,7 +213,7 @@
       }
     </p>
   </aside>
-  } @if (model(); as m) {
+  } } @if (model(); as m) {
   <div class="map-layout" [class.card-open]="card() !== null">
     <div class="lanes">
       @for (lane of m.lanes; track lane.lane) {
@@ -204,6 +247,8 @@
                     [class.refog]="isRefogged(chip.id)"
                     [class.lens-hit]="inLens(chip.id)"
                     [class.lens-dim]="dimmedByLens(chip.id)"
+                    [class.replay-current]="isReplayCurrent(chip.id)"
+                    [class.replay-passed]="isReplayPassed(chip.id)"
                     [class.selected]="selectedId() === chip.id"
                     [attr.aria-pressed]="selectedId() === chip.id"
                     (click)="open(chip.id)"
@@ -232,6 +277,8 @@
                   [class.refog]="isRefogged(chip.id)"
                   [class.lens-hit]="inLens(chip.id)"
                   [class.lens-dim]="dimmedByLens(chip.id)"
+                  [class.replay-current]="isReplayCurrent(chip.id)"
+                  [class.replay-passed]="isReplayPassed(chip.id)"
                   [class.selected]="selectedId() === chip.id"
                   [attr.aria-pressed]="selectedId() === chip.id"
                   (click)="open(chip.id)"

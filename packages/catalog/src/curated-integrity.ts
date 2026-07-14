@@ -3,7 +3,7 @@ import type { CatalogIssue } from './errors.js';
 import type { Catalog } from './schema.js';
 
 function collectUniqueIds(
-  collection: 'products' | 'compositions' | 'pricing' | 'learningNotes' | 'scenarios',
+  collection: 'products' | 'compositions' | 'pricing' | 'learningNotes' | 'scenarios' | 'narration',
   key: 'productId' | 'solutionId' | 'id',
   ids: readonly string[],
   issues: CatalogIssue[],
@@ -59,6 +59,12 @@ export function collectCuratedIntegrityIssues(curated: CuratedData): CatalogIssu
     'scenarios',
     'id',
     curated.scenarios.map((entry) => entry.id),
+    issues,
+  );
+  collectUniqueIds(
+    'narration',
+    'productId',
+    curated.narration.map((entry) => entry.productId),
     issues,
   );
   return issues;
@@ -148,6 +154,16 @@ export function collectCuratedReferenceIssues(
         });
       }
     });
+  });
+
+  curated.narration.forEach((entry, index) => {
+    if (!productIds.has(entry.productId)) {
+      issues.push({
+        code: 'unknown-entity-reference',
+        path: `narration[${String(index)}].productId`,
+        message: `Unknown products id '${entry.productId}'`,
+      });
+    }
   });
 
   return issues;

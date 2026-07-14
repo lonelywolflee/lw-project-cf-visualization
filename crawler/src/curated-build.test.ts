@@ -59,6 +59,7 @@ function buildCuratedData(): CuratedData {
     schemaVersion: '1',
     learningNotes: [],
     scenarios: [],
+    narration: [],
     products: [
       {
         productId: 'waf',
@@ -171,6 +172,29 @@ describe('normalizeCuratedData', () => {
     expect(normalized.scenarios[1]?.talkTrackKo).toBe('헬프데스크 티켓 수로 시작하세요.');
   });
 
+  it('keeps narration in authored order — the array order is the journey', () => {
+    const base = buildCuratedData();
+    const normalized = normalizeCuratedData({
+      ...base,
+      narration: [
+        {
+          productId: 'waf',
+          captionKo: '요청의 내용을 엽니다.',
+          sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+        {
+          // Alphabetically before 'waf' — must still render second.
+          productId: 'gateway',
+          captionKo: '나가는 트래픽을 거릅니다.',
+          sourceUrl: 'https://www.cloudflare.com/zero-trust/products/gateway/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
+    });
+    expect(normalized.narration.map((stop) => stop.productId)).toEqual(['waf', 'gateway']);
+  });
+
   it('is idempotent', () => {
     const once = normalizeCuratedData(buildCuratedData());
     expect(normalizeCuratedData(once)).toEqual(once);
@@ -204,6 +228,7 @@ describe('buildCuratedArtifact', () => {
         })),
         learningNotes: [],
         scenarios: [],
+        narration: [],
         schemaVersion: '1',
       }),
     );

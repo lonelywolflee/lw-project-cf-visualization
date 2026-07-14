@@ -732,6 +732,64 @@
   font-weight: 700;
 }
 
+/* ---------- replay ---------- */
+.replay-panel {
+  background: #fff;
+  border: 2px solid var(--lm-lane2);
+  border-radius: 12px;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.replay-count {
+  color: var(--lm-faint);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.replay-name {
+  font-size: 1.3rem;
+  margin: 0.25rem 0 0.35rem;
+}
+
+.replay-caption {
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 70ch;
+}
+
+.replay-meta {
+  color: var(--lm-faint);
+  font-size: 0.82rem;
+  margin: 0.5rem 0 0.7rem;
+}
+
+.replay-meta a {
+  color: var(--lm-muted);
+}
+
+.replay-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.node.replay-current {
+  border-color: var(--lm-lane2);
+  border-style: solid;
+  box-shadow: 0 0 0 4px var(--lm-lane2-soft);
+  font-weight: 750;
+}
+
+.node.replay-passed {
+  border-color: var(--lm-lane2);
+  opacity: 0.75;
+}
+
 /* ---------- narrow screens ---------- */
 @media (max-width: 640px) {
   .journey {
