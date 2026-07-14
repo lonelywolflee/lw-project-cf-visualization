@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1",
+  "products": [
+    {
+      "productId": "nonexistent-product",
+      "roleKo": "카탈로그에 없는 제품을 참조합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "compositions": [
+    {
+      "solutionId": "nonexistent-solution",
+      "productIds": ["waf", "nonexistent-member"],
+      "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "pricing": [
+    {
+      "productId": "nonexistent-priced",
+      "tiers": [{ "id": "free", "name": "Free", "monthlyUsd": 0 }],
+      "sourceUrl": "https://www.cloudflare.com/plans/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ]
+}

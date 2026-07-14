@@ -67,8 +67,13 @@ export const idSlugSchema = z
     error: 'Id must be a lowercase kebab-case slug',
   });
 
-/** Non-empty text with an explicit length cap; whitespace-only is rejected. */
-const nonBlankString = (maxLength: number) =>
+/**
+ * Non-empty text with an explicit length cap; whitespace-only is rejected.
+ *
+ * Package-internal (not re-exported from the index): shared by the catalog
+ * and curated schemas so both enforce identical text rules.
+ */
+export const nonBlankString = (maxLength: number) =>
   z
     .string()
     .min(1, { abort: true })
@@ -83,14 +88,20 @@ const sourceIdList = z
     error: 'sourceIds must not contain duplicate ids',
   });
 
-/** ISO-8601 UTC instant with a mandatory trailing `Z` (offsets rejected). */
-const utcInstant = z.iso.datetime();
+/**
+ * ISO-8601 UTC instant with a mandatory trailing `Z` (offsets rejected).
+ *
+ * Package-internal (not re-exported from the index).
+ */
+export const utcInstant = z.iso.datetime();
 
 /**
  * Canonical `https` URL on an approved Cloudflare hostname, free of query,
  * fragment, port, and credentials so provenance stays deterministic.
+ *
+ * Package-internal (not re-exported from the index).
  */
-const canonicalSourceUrl = z
+export const canonicalSourceUrl = z
   .url({
     protocol: /^https$/,
     hostname: approvedHostnamePattern,
