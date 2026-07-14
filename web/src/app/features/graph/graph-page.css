@@ -290,6 +290,22 @@
   padding: 0.6rem 0.7rem;
 }
 
+.s-cost-link {
+  background: var(--g-accent-soft);
+  border: 1px solid var(--g-accent);
+  border-radius: 9px;
+  color: var(--g-accent);
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 650;
+  padding: 0.6rem 0.7rem;
+  text-decoration: none;
+}
+
+.s-cost-link:hover {
+  text-decoration: underline;
+}
+
 .pivot-sec {
   border-top: 1px solid var(--g-line);
   color: var(--g-faint);

@@ -34,6 +34,11 @@ export const CATALOG_ROUTES: Routes = [
         loadComponent: () => import('../graph/graph-page').then((m) => m.GraphPage),
         title: '솔루션 구성 | Cloudflare Product & Solution Explorer',
       },
+      {
+        path: 'calculator',
+        loadComponent: () => import('../calculator/calculator-page').then((m) => m.CalculatorPage),
+        title: '요금 계산기 | Cloudflare Product & Solution Explorer',
+      },
       // Retired v1 routes, preserved as deep-link redirects.
       { path: 'browse', redirectTo: '' },
       { path: 'discovery', redirectTo: '' },

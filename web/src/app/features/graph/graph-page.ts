@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { CatalogStore } from '../../core/catalog/catalog-store';
 import { CuratedStore } from '../../core/catalog/curated-store';
@@ -46,7 +46,7 @@ interface GraphNode {
  */
 @Component({
   selector: 'app-graph-page',
-  imports: [DatePipe, ProductPanel],
+  imports: [DatePipe, ProductPanel, RouterLink],
   templateUrl: './graph-page.html',
   styleUrl: './graph-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -129,6 +129,15 @@ export class GraphPage {
     const id = this.selectedProductId();
     if (id === null) return [];
     return this.focus()?.members?.find((member) => member.id === id)?.sharedWith ?? [];
+  });
+
+  /** Members with curated pricing — the calculator can preload these. */
+  protected readonly pricedMemberIds = computed<readonly string[]>(() => {
+    const members = this.focus()?.members;
+    const curated = this.curatedStore.curated();
+    if (members == null || curated === undefined) return [];
+    const priced = new Set(curated.pricing.map((entry) => entry.productId));
+    return members.map((member) => member.id).filter((id) => priced.has(id));
   });
 
   /**

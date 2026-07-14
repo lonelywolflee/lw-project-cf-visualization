@@ -82,7 +82,14 @@ const curatedData: CuratedData = {
       verifiedAt: '2026-07-14T00:00:00Z',
     },
   ],
-  pricing: [],
+  pricing: [
+    {
+      productId: 'ddos',
+      tiers: [{ id: 'free', name: 'Free', monthlyUsd: 0 }],
+      sourceUrl: 'https://www.cloudflare.com/plans/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+  ],
 };
 
 describe('GraphPage', () => {
@@ -173,12 +180,14 @@ describe('GraphPage', () => {
     expect(element?.querySelector('.p-name')?.textContent).toContain('DDoS Protection');
   });
 
-  it('shows the solution card in the panel while no product is selected', async () => {
+  it('shows the solution card with a calculator link preloading priced members', async () => {
     const harness = await RouterTestingHarness.create('/solutions?solution=security');
     const element = harness.routeNativeElement;
 
     expect(element?.querySelector('.s-name')?.textContent).toContain('Security');
-    expect(element?.querySelector('.s-cost-note')?.textContent).toContain('요금 계산기');
+    const costLink = element?.querySelector<HTMLAnchorElement>('.s-cost-link');
+    expect(costLink?.textContent).toContain('요금 계산기');
+    expect(costLink?.getAttribute('href')).toBe('/calculator?products=ddos');
   });
 
   it('renders the explicit empty state for a solution without a composition', async () => {
@@ -189,6 +198,8 @@ describe('GraphPage', () => {
     expect(empty?.getAttribute('role')).toBe('status');
     expect(empty?.textContent).toContain('아직 큐레이션되지 않았습니다');
     expect(element?.querySelector('.graph-svg')).toBeNull();
+    // Without priced members there is nothing to calculate — explicit note.
+    expect(element?.querySelector('.s-cost-note')?.textContent).toContain('계산할 수 없습니다');
   });
 
   it('restores focus and selection from a deep link with pressed chips', async () => {

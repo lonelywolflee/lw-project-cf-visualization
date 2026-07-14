@@ -39,9 +39,14 @@ describe('App', () => {
     const nav = compiled.querySelector('nav[aria-label="주요 메뉴"]');
     expect(nav).not.toBeNull();
     const links = Array.from(nav?.querySelectorAll<HTMLAnchorElement>('a') ?? []);
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/', '/solutions']);
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/',
+      '/solutions',
+      '/calculator',
+    ]);
     expect(links[0]?.textContent).toContain('지도');
     expect(links[1]?.textContent).toContain('솔루션');
+    expect(links[2]?.textContent).toContain('계산기');
   });
 
   it('marks the solutions link active on /solutions while 지도 stays exact', async () => {
