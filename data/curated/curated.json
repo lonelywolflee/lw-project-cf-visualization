@@ -9,10 +9,439 @@
       "verifiedAt": "2026-07-14T00:00:00Z"
     },
     {
+      "productId": "advanced-certificate-manager",
+      "roleKo": "TLS 인증서의 발급과 갱신 수명주기를 관리합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "agents",
+      "roleKo": "상태를 기억하는 AI 에이전트를 엣지에서 구축·실행합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ai-gateway",
+      "roleKo": "앱과 AI 모델 사이에서 호출을 캐싱·관측·제어하는 게이트웨이입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ai-search",
+      "roleKo": "문서를 색인해 즉시 검색과 RAG에 활용하는 AI 검색입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ai-security-for-apps",
+      "roleKo": "AI 기능이 들어간 애플리케이션을 프롬프트 공격 등 위협에서 보호합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "analytics",
+      "roleKo": "엣지가 처리한 트래픽의 성능·보안 지표를 한눈에 보여줍니다.",
+      "placements": [{ "lane": "public-web", "layer": "observability" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "api-shield",
+      "roleKo": "스키마 검증과 mTLS로 API 엔드포인트를 전용 보호합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "argo-smart-routing",
+      "roleKo": "혼잡을 피한 최적 경로로 Origin까지 트래픽을 라우팅해 앱을 가속합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "artifacts",
+      "roleKo": "Git처럼 버전이 관리되는 저장소입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "bot-management",
+      "roleKo": "봇 트래픽을 식별·점수화해 악성 봇만 골라 차단합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "browser-isolation",
+      "roleKo": "웹 브라우징을 엣지에서 격리 실행해 기기를 악성 코드로부터 보호합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "access-control" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "browser-rendering",
+      "roleKo": "스크린샷·크롤링 같은 작업용 자동화 브라우저를 엣지에서 실행합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "cache-reserve",
+      "roleKo": "R2 기반 영구 캐시 계층으로 캐시 적중률을 극대화합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "casb",
+      "roleKo": "SaaS와 클라우드의 설정 오류·데이터 노출을 스캔해 탐지합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "data-protection" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "cdn",
+      "roleKo": "전 세계 330여 개 도시에 콘텐츠를 캐싱해 Origin 부하와 지연을 함께 줄입니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "sourceUrl": "https://www.cloudflare.com/products/cdn/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "china-network",
+      "roleKo": "중국 본토 내 PoP로 중국 사용자에게 빠른 연결을 제공합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "client-side-security",
+      "roleKo": "브라우저에서 실행되는 스크립트를 감시해 클라이언트측 위협을 막습니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "containers",
+      "roleKo": "어떤 언어로 만든 코드든 컨테이너로 엣지에서 실행합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "custom-domain-protection",
+      "roleKo": "도메인 등록(registrar) 단계를 보호해 탈취와 변조를 막습니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "d1",
+      "roleKo": "엣지에서 동작하는 서버리스 SQL(SQLite) 데이터베이스입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "data-platform",
+      "roleKo": "데이터를 수집·카탈로그화·질의하는 데이터 플랫폼입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ddos",
+      "roleKo": "L3부터 L7까지 대규모 DDoS 공격을 규모 제한 없이 흡수합니다.",
+      "placements": [
+        { "lane": "public-web", "layer": "network-l3-l4" },
+        { "lane": "public-web", "layer": "application-security" }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ddos-for-web",
+      "roleKo": "웹 애플리케이션을 겨냥한 DDoS 공격을 흡수합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "dlp",
+      "roleKo": "민감 데이터(카드번호 등)의 유출을 탐지하고 차단합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "data-protection" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "dns",
+      "roleKo": "도메인 이름을 IP로 해석하는 빠른 권한 DNS — 모든 여정의 첫 관문입니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "durable-objects",
+      "roleKo": "상태를 가진 서버리스 객체로 실시간 협업·조정 로직을 구현합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "email-routing",
+      "roleKo": "커스텀 도메인 이메일 주소를 만들어 원하는 곳으로 라우팅합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "email-security",
+      "roleKo": "피싱·사기(BEC) 이메일을 받은편지함에 닿기 전에 차단합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "data-protection" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "email-service",
+      "roleKo": "애플리케이션에서 이메일을 보내고 받는 개발자용 이메일 서비스입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "gateway",
+      "roleKo": "조직의 아웃바운드 웹 트래픽을 정책에 따라 필터링합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "access-control" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "hyperdrive",
+      "roleKo": "기존 데이터베이스 연결을 가속해 엣지에서 빠르게 쓰게 합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "images",
+      "roleKo": "이미지를 저장·리사이즈·최적화해 빠르게 전송합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "keyless-ssl",
+      "roleKo": "개인 키를 고객이 보관한 채로 TLS 연결을 처리합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "kv",
+      "roleKo": "전 세계에 복제되는 초고속 key-value 저장소입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "load-balancing",
+      "roleKo": "여러 Origin으로 트래픽을 분산하고 장애를 자동으로 우회합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "log-explorer",
+      "roleKo": "엣지 로그를 저장·질의해 보안 조사(포렌식)에 활용합니다.",
+      "placements": [{ "lane": "public-web", "layer": "observability" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "magic-transit",
+      "roleKo": "데이터센터의 IP 대역 전체를 L3에서 DDoS로부터 보호합니다.",
+      "placements": [{ "lane": "public-web", "layer": "network-l3-l4" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "mesh",
+      "roleKo": "에이전트 기반으로 사이트·기기 간 프라이빗 네트워크를 만듭니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "network-services" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "network-firewall",
+      "roleKo": "장비 없이 엣지에서 적용되는 클라우드 네트워크 방화벽입니다.",
+      "placements": [
+        { "lane": "public-web", "layer": "network-l3-l4" },
+        { "lane": "zero-trust", "layer": "network-services" }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "network-flow",
+      "roleKo": "네트워크 트래픽 흐름을 모니터링해 가시성을 제공합니다.",
+      "placements": [{ "lane": "public-web", "layer": "observability" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "network-interconnect",
+      "roleKo": "데이터센터와 Cloudflare를 물리·파트너 회선으로 직접 연결합니다.",
+      "placements": [
+        { "lane": "public-web", "layer": "network-l3-l4" },
+        { "lane": "zero-trust", "layer": "network-services" }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "page-shield",
+      "roleKo": "페이지에 로드되는 서드파티 스크립트를 감시해 클라이언트측 공격을 막습니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "pages",
+      "roleKo": "Git 연동으로 프런트엔드 사이트를 빌드·배포하는 호스팅입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "queues",
+      "roleKo": "메시지를 쌓아 두고 순서대로 안정적으로 처리하는 큐입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "r2",
+      "roleKo": "Egress(전송) 요금이 없는 S3 호환 오브젝트 스토리지입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "rate-limiting",
+      "roleKo": "IP·경로별 요청 속도를 제한해 남용과 브루트포스를 막습니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "rdp",
+      "roleKo": "원격 데스크톱(RDP) 접근을 신원 기반으로 보호합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "access-control" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "realtime",
+      "roleKo": "음성·영상 통화 기능을 앱에 넣는 실시간 통신 SDK와 인프라입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "sandboxes",
+      "roleKo": "신뢰할 수 없는 코드를 격리 환경에서 안전하게 실행합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "secure-web-gateway",
+      "roleKo": "DNS 필터링으로 위험한 사이트 접속을 차단합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "access-control" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "spectrum",
+      "roleKo": "HTTP가 아닌 TCP/UDP 애플리케이션을 프록시로 보호합니다.",
+      "placements": [{ "lane": "public-web", "layer": "network-l3-l4" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "spectrum-for-minecraft",
+      "roleKo": "Minecraft 서버를 DDoS로부터 보호하는 Spectrum 특화판입니다.",
+      "placements": [{ "lane": "public-web", "layer": "network-l3-l4" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "ssl",
+      "roleKo": "사이트와 방문자 사이의 연결을 TLS로 암호화합니다.",
+      "placements": [{ "lane": "public-web", "layer": "dns-connectivity" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "stream",
+      "roleKo": "동영상 인코딩·저장·재생을 한 번에 처리하는 스트리밍입니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "turn-sfu",
+      "roleKo": "실시간 미디어를 중계하는 TURN/SFU 인프라입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "turnstile",
+      "roleKo": "퍼즐 없는 CAPTCHA 대체재로 사람과 봇을 판별합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "vectorize",
+      "roleKo": "임베딩을 저장·검색하는 벡터 데이터베이스입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
       "productId": "waf",
       "roleKo": "SQL 주입·XSS 같은 웹 공격 패턴을 요청이 Origin에 닿기 전에 차단합니다.",
       "placements": [{ "lane": "public-web", "layer": "application-security" }],
       "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "waiting-room",
+      "roleKo": "트래픽 폭주 시 가상 대기실로 방문자를 줄 세워 Origin을 보호합니다.",
+      "placements": [{ "lane": "public-web", "layer": "application-performance" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "wan",
+      "roleKo": "MPLS를 대체하는 기업 WAN을 Cloudflare 네트워크 위에서 제공합니다.",
+      "placements": [{ "lane": "zero-trust", "layer": "network-services" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "web3",
+      "roleKo": "IPFS·Ethereum 같은 분산망 콘텐츠를 HTTP로 제공하는 게이트웨이입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     },
     {
@@ -21,13 +450,116 @@
       "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
       "sourceUrl": "https://www.cloudflare.com/products/workers/",
       "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers-ai",
+      "roleKo": "전 세계 GPU에서 AI 모델 추론을 서버 관리 없이 실행합니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers-for-platforms",
+      "roleKo": "고객이 직접 코드를 올리는 SaaS를 만들 때 쓰는 멀티테넌트 Workers입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers-observability",
+      "roleKo": "Workers 실행 로그와 트레이스를 수집하는 1차 관측 도구입니다.",
+      "placements": [{ "lane": "public-web", "layer": "observability" }],
+      "sourceUrl": "https://www.cloudflare.com/products/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workflows",
+      "roleKo": "다단계 작업을 중단 없이 이어가는 내구성 있는 실행 엔진입니다.",
+      "placements": [{ "lane": "public-web", "layer": "compute-platform" }],
+      "sourceUrl": "https://developers.cloudflare.com/directory/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ],
   "compositions": [
     {
+      "solutionId": "ai",
+      "productIds": [
+        "agents",
+        "ai-gateway",
+        "ai-search",
+        "durable-objects",
+        "r2",
+        "sandboxes",
+        "vectorize",
+        "workers",
+        "workers-ai"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/ai/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "frontends",
+      "productIds": ["d1", "kv", "r2", "workers"],
+      "sourceUrl": "https://www.cloudflare.com/solutions/frontends/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "network",
+      "productIds": ["argo-smart-routing", "ddos", "load-balancing"],
+      "sourceUrl": "https://www.cloudflare.com/solutions/network/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "platforms",
+      "productIds": [
+        "d1",
+        "durable-objects",
+        "kv",
+        "pages",
+        "r2",
+        "vectorize",
+        "workers",
+        "workers-for-platforms"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/platforms/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
       "solutionId": "sase",
-      "productIds": ["access", "gateway"],
+      "productIds": [
+        "access",
+        "ai-gateway",
+        "browser-isolation",
+        "casb",
+        "dlp",
+        "email-security",
+        "gateway",
+        "network-firewall",
+        "secure-web-gateway",
+        "wan"
+      ],
       "sourceUrl": "https://www.cloudflare.com/sase/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "security",
+      "productIds": [
+        "api-shield",
+        "bot-management",
+        "ddos",
+        "page-shield",
+        "rate-limiting",
+        "ssl",
+        "turnstile",
+        "waf"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/security/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "workflows",
+      "productIds": ["d1", "durable-objects", "kv", "queues", "r2", "workers", "workflows"],
+      "sourceUrl": "https://www.cloudflare.com/solutions/workflows/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ],
@@ -68,6 +600,332 @@
         }
       ],
       "sourceUrl": "https://developers.cloudflare.com/workers/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "r2",
+      "tiers": [
+        {
+          "id": "standard",
+          "name": "Standard (종량)",
+          "monthlyUsd": 0,
+          "noteKo": "무료 구간을 초과한 사용량만 과금 (Standard storage 기준)",
+          "featuresKo": ["Egress(전송) 요금 없음", "S3 호환 API"],
+          "meters": [
+            {
+              "metric": "storage-gb-month",
+              "included": 10,
+              "per": "month",
+              "overage": { "usd": 0.015, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            },
+            {
+              "metric": "class-a-operations",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 4.5, "perUnits": 1000000 },
+              "labelKo": "Class A 작업(쓰기·목록)"
+            },
+            {
+              "metric": "class-b-operations",
+              "included": 10000000,
+              "per": "month",
+              "overage": { "usd": 0.36, "perUnits": 1000000 },
+              "labelKo": "Class B 작업(읽기)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/r2/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "d1",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            { "metric": "rows-read", "included": 5000000, "per": "day", "labelKo": "행 읽기" },
+            { "metric": "rows-written", "included": 100000, "per": "day", "labelKo": "행 쓰기" },
+            { "metric": "storage-gb", "included": 5, "labelKo": "저장 용량(GB, 총량)" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "rows-read",
+              "included": 25000000000,
+              "per": "month",
+              "overage": { "usd": 0.001, "perUnits": 1000000 },
+              "labelKo": "행 읽기"
+            },
+            {
+              "metric": "rows-written",
+              "included": 50000000,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 1000000 },
+              "labelKo": "행 쓰기"
+            },
+            {
+              "metric": "storage-gb-month",
+              "included": 5,
+              "per": "month",
+              "overage": { "usd": 0.75, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/d1/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "kv",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            { "metric": "keys-read", "included": 100000, "per": "day", "labelKo": "키 읽기" },
+            { "metric": "keys-written", "included": 1000, "per": "day", "labelKo": "키 쓰기" },
+            { "metric": "keys-deleted", "included": 1000, "per": "day", "labelKo": "키 삭제" },
+            { "metric": "list-requests", "included": 1000, "per": "day", "labelKo": "목록 요청" },
+            { "metric": "storage-gb", "included": 1, "labelKo": "저장 용량(GB, 총량)" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "keys-read",
+              "included": 10000000,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1000000 },
+              "labelKo": "키 읽기"
+            },
+            {
+              "metric": "keys-written",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "키 쓰기"
+            },
+            {
+              "metric": "keys-deleted",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "키 삭제"
+            },
+            {
+              "metric": "list-requests",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000000 },
+              "labelKo": "목록 요청"
+            },
+            {
+              "metric": "storage-gb-month",
+              "included": 1,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1 },
+              "labelKo": "저장 용량(GB-월)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/kv/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "queues",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "noteKo": "메시지 1건 전달 ≈ 3 operations (쓰기·읽기·삭제)",
+          "limits": [
+            { "metric": "operations", "included": 10000, "per": "day", "labelKo": "작업 수" }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "operations",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 0.4, "perUnits": 1000000 },
+              "labelKo": "작업 수(64KB 단위)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/queues/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "durable-objects",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "noteKo": "컴퓨팅 요금만 표시 — SQLite 스토리지 단가는 D1과 동일",
+          "limits": [
+            { "metric": "requests", "included": 100000, "per": "day", "labelKo": "요청 수" },
+            {
+              "metric": "duration-gb-s",
+              "included": 13000,
+              "per": "day",
+              "labelKo": "실행 시간(GB-초)"
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 플랜 기본 요금은 Workers에서 한 번만 계산",
+          "meters": [
+            {
+              "metric": "requests",
+              "included": 1000000,
+              "per": "month",
+              "overage": { "usd": 0.15, "perUnits": 1000000 },
+              "labelKo": "요청 수"
+            },
+            {
+              "metric": "duration-gb-s",
+              "included": 400000,
+              "per": "month",
+              "overage": { "usd": 12.5, "perUnits": 1000000 },
+              "labelKo": "실행 시간(GB-초)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "images",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [
+            {
+              "metric": "transformations",
+              "included": 5000,
+              "per": "month",
+              "labelKo": "고유 변환"
+            }
+          ]
+        },
+        {
+          "id": "paid",
+          "name": "Paid (종량)",
+          "monthlyUsd": 0,
+          "noteKo": "저장·전송은 Images 버킷에 보관하는 이미지에만 과금",
+          "meters": [
+            {
+              "metric": "images-stored",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 100000 },
+              "labelKo": "저장 이미지 수"
+            },
+            {
+              "metric": "images-delivered",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 100000 },
+              "labelKo": "전송 이미지 수"
+            },
+            {
+              "metric": "transformations",
+              "included": 5000,
+              "per": "month",
+              "overage": { "usd": 0.5, "perUnits": 1000 },
+              "labelKo": "고유 변환"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/images/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "stream",
+      "tiers": [
+        {
+          "id": "usage",
+          "name": "종량",
+          "monthlyUsd": 0,
+          "noteKo": "저장 분량은 선불, 전송 분량은 후불",
+          "meters": [
+            {
+              "metric": "minutes-stored",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 5, "perUnits": 1000 },
+              "labelKo": "저장 분량(분)"
+            },
+            {
+              "metric": "minutes-delivered",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 1, "perUnits": 1000 },
+              "labelKo": "전송 분량(분)"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/stream/pricing/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "productId": "workers-ai",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "limits": [{ "metric": "neurons", "included": 10000, "per": "day", "labelKo": "Neurons" }]
+        },
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 0,
+          "noteKo": "Workers Paid 플랜($5/월) 필요 — 매일 10,000 Neurons 무료 구간은 별도 적용",
+          "meters": [
+            {
+              "metric": "neurons",
+              "included": 0,
+              "per": "month",
+              "overage": { "usd": 0.011, "perUnits": 1000 },
+              "labelKo": "Neurons"
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://developers.cloudflare.com/workers-ai/platform/pricing/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
   ]

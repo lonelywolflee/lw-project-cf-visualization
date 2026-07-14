@@ -93,6 +93,24 @@ describe('curatedDataSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepts the off-path observability layer only in the public-web lane', () => {
+    const data = buildValidCuratedData();
+    const product = data.products[0];
+    expect(
+      safeParseCuratedData({
+        ...data,
+        products: [{ ...product, placements: [{ lane: 'public-web', layer: 'observability' }] }],
+      }).success,
+    ).toBe(true);
+    expectShapeIssue(
+      {
+        ...data,
+        products: [{ ...product, placements: [{ lane: 'zero-trust', layer: 'observability' }] }],
+      },
+      'products[0].placements[0].layer',
+    );
+  });
+
   it('rejects an unsupported schemaVersion', () => {
     expectShapeIssue({ ...buildValidCuratedData(), schemaVersion: '2' }, 'schemaVersion');
   });
