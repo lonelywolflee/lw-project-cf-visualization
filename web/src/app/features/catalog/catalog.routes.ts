@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { CatalogOverview } from './catalog-overview';
+import { MapPage } from '../map/map-page';
 import { CatalogShell } from './catalog-shell';
 
 /**
@@ -8,15 +8,15 @@ import { CatalogShell } from './catalog-shell';
  *
  * {@link CatalogShell} is the layout gate: it renders the loading, error,
  * invalid-data, and empty states itself and only places a `<router-outlet>`
- * on screen once the catalog reached `success`. Children may therefore
- * assume the catalog signal is present (their `pending` branch is type
- * honesty for the instant before the gate settles).
+ * on screen once BOTH documents reached `success`. Children may therefore
+ * assume the catalog and curated signals are present (their `pending`
+ * branch is type honesty for the instant before the gate settles).
  *
- * The overview is imported statically (it is the first paint of the default
- * route); the discovery page and the two detail pages stay behind
- * `loadComponent` chunks. Discovery lives in `features/discovery/` but mounts
- * here so it shares the shell gate — a second app-level route would either
- * bypass the gate or instantiate a second shell.
+ * The map is imported statically (it is the first paint of the default
+ * route); the browse overview, discovery, and the two detail pages stay
+ * behind `loadComponent` chunks. Feature pages from other folders mount
+ * here so they share the shell gate — a second app-level route would
+ * either bypass the gate or instantiate a second shell.
  */
 export const CATALOG_ROUTES: Routes = [
   {
@@ -26,8 +26,13 @@ export const CATALOG_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: CatalogOverview,
+        component: MapPage,
         title: 'Cloudflare Product & Solution Explorer',
+      },
+      {
+        path: 'browse',
+        loadComponent: () => import('./catalog-overview').then((m) => m.CatalogOverview),
+        title: '카탈로그 | Cloudflare Product & Solution Explorer',
       },
       {
         path: 'discovery',

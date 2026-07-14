@@ -54,6 +54,11 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "prebundle": {
+              "exclude": ["@cf-viz/catalog", "zod"]
+            }
+          },
           "configurations": {
             "production": {
               "buildTarget": "web:build:production"

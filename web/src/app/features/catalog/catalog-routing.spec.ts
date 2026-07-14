@@ -7,6 +7,7 @@ import type { Catalog } from '@cf-viz/catalog';
 import { routes } from '../../app.routes';
 import type { CatalogState } from '../../core/catalog/catalog-state';
 import { CatalogStore } from '../../core/catalog/catalog-store';
+import { curatedStoreStub } from '../../testing/curated-store-stub';
 
 const catalog: Catalog = {
   schemaVersion: '1',
@@ -61,6 +62,7 @@ describe('catalog routing', () => {
     TestBed.configureTestingModule({
       providers: [
         provideRouter(routes, withComponentInputBinding()),
+        curatedStoreStub().provider,
         {
           provide: CatalogStore,
           useValue: {
@@ -74,8 +76,15 @@ describe('catalog routing', () => {
     });
   });
 
-  it('renders the overview at the root route', async () => {
+  it('renders the map at the root route', async () => {
     const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    expect(element?.querySelector('h1')?.textContent).toContain('Cloudflare 제품 지도');
+  });
+
+  it('renders the browse overview at /browse', async () => {
+    const harness = await RouterTestingHarness.create('/browse');
     const element = harness.routeNativeElement;
 
     expect(element?.querySelector('h1')?.textContent).toContain('Cloudflare 제품 카탈로그');
@@ -88,7 +97,7 @@ describe('catalog routing', () => {
   });
 
   it('navigates from an overview product link to the bound detail page', async () => {
-    const harness = await RouterTestingHarness.create('/');
+    const harness = await RouterTestingHarness.create('/browse');
 
     const link =
       harness.routeNativeElement?.querySelector<HTMLAnchorElement>('a[href="/products/waf"]');
