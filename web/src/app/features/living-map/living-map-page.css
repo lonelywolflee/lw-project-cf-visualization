@@ -11,8 +11,9 @@
   --lm-canvas: #f6f7fa;
   --lm-verified: #1f7a43;
   margin: 0 auto;
-  max-width: 1240px;
-  padding: 1.25rem 1rem 4rem;
+  /* Wide screens get map, not margins — 67 nodes want the room. */
+  max-width: 1760px;
+  padding: 1.25rem 1.5rem 4rem;
 }
 
 .head-row {
@@ -105,7 +106,7 @@
 }
 
 .map-layout.card-open {
-  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-columns: minmax(0, 1fr) minmax(400px, 460px);
 }
 
 @media (max-width: 980px) {
@@ -368,6 +369,29 @@
   font-size: 1.02rem;
   line-height: 1.6;
   margin: 0 0 0.9rem;
+}
+
+.layer-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin: 0 0 0.6rem;
+}
+
+.pill {
+  background: var(--lm-canvas);
+  border: 1px solid var(--lm-line);
+  border-radius: 999px;
+  color: var(--lm-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+}
+
+.pill-bc {
+  background: var(--lm-accent-soft);
+  border-color: var(--lm-accent);
+  color: var(--lm-accent);
 }
 
 .pair-link {

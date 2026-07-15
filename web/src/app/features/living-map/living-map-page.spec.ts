@@ -701,6 +701,12 @@ describe('LivingMapPage', () => {
     const harness = await RouterTestingHarness.create('/?product=waf');
     const card = harness.routeNativeElement?.querySelector('.learning-card');
 
+    // Discoverability pills at the top announce what the card holds below.
+    const pills = Array.from(card?.querySelectorAll('.layer-pills .pill') ?? []).map((pill) =>
+      pill.textContent?.trim(),
+    );
+    expect(pills).toContain('SE 심화 ↓');
+    expect(pills).toContain('경쟁 비교 2 ↓');
     expect(card?.textContent).toContain('SE 심화');
     expect(card?.textContent).toContain('운영·튜닝');
     expect(card?.textContent).toContain('AE 어필');
