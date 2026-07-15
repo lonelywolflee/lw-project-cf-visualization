@@ -1608,7 +1608,7 @@
       "battlecard": [
         {
           "competitor": "DataDome",
-          "vsKo": "인터넷 트래픽 규모로 학습한 ML과 엣지 인라인(추가 지연 없음)이 강점. 봇 전문 벤더는 전담 리서치와 이커머스 특화 튜닝을 내세움 — PoC에서 오탐·미탐률을 같은 트래픽으로 직접 비교하게 하는 것이 정공법입니다.",
+          "vsKo": "인터넷 트래픽 규모로 학습한 ML과 요청 경로 네이티브 통합(별도 커넥터·모듈 배포 불필요, 서브밀리초 판정)이 강점. DataDome도 인라인 실시간 판정이므로 \"우리만 인라인\"은 금물. 봇 전문 벤더의 전담 리서치·이커머스 특화 튜닝은 인정하고, PoC에서 같은 트래픽으로 오탐·미탐률을 직접 비교하게 하는 것이 정공법입니다.",
           "grounding": "internal-reviewed"
         }
       ]
@@ -1629,7 +1629,7 @@
       "battlecard": [
         {
           "competitor": "Zscaler Isolation",
-          "vsKo": "픽셀 스트리밍이 아니라 그리기 명령 전송이라 \"로컬 같다\"는 체감 성능이 강점 — 구형 RBI에 데인 고객일수록 데모 한 번이 설득의 전부입니다.",
+          "vsKo": "픽셀 스트리밍 방식의 구형 RBI 대비, 그리기 명령 전송이라 \"로컬 같다\"는 체감 성능이 강점 — 상대 제품의 현재 렌더링 방식은 단정하지 말고, 구형 RBI에 데인 고객일수록 데모 한 번으로 판단하게 하세요.",
           "grounding": "internal-reviewed"
         }
       ]
@@ -1753,7 +1753,8 @@
       "sourceUrl": "https://developers.cloudflare.com/d1/",
       "verifiedAt": "2026-07-15T00:00:00Z",
       "se": {
-        "archKo": "읽기 복제가 전역 읽기 지연을 낮춥니다 — 쓰기는 주 위치로 향하므로 읽기 중심 워크로드에 최적입니다."
+        "archKo": "읽기 복제가 전역 읽기 지연을 낮춥니다 — 쓰기는 주 위치로 향하므로 읽기 중심 워크로드에 최적입니다.",
+        "limitsKo": "Time Travel 복원 기간은 플랜에 따라 다릅니다(유료 30일, 무료 7일)."
       },
       "ae": {
         "pitchKo": "테넌트별 DB 격리를 어떻게 하는지 물으세요 — \"수천 개 DB 무료 격리\"가 SaaS 개발팀에 꽂히는 문장입니다."
@@ -1783,7 +1784,7 @@
       "battlecard": [
         {
           "competitor": "Akamai Prolexic",
-          "vsKo": "상시 인라인(BGP 애니캐스트, 스크러빙 센터 우회 없음)과 unmetered 과금이 강점. 전용 스크러빙 계약의 커스텀 런북·전담 대응팀은 Prolexic이 내세우는 축 — 전환 시간(상시 vs 온디맨드)으로 프레임하세요.",
+          "vsKo": "아키텍처로 프레임하세요 — 지정 스크러빙 센터로의 우회 라우팅(Prolexic) vs 모든 데이터센터가 스크러빙 지점인 인라인 완화 + unmetered 과금. Prolexic도 always-on 옵션이 있으므로 \"온디맨드\"로 몰지 마세요. 커스텀 런북과 전담 대응팀은 Prolexic의 강점으로 인정하는 것이 정직합니다.",
           "grounding": "internal-reviewed"
         }
       ]
@@ -2004,7 +2005,8 @@
       "sourceUrl": "https://www.cloudflare.com/network-services/products/magic-transit/",
       "verifiedAt": "2026-07-15T00:00:00Z",
       "se": {
-        "archKo": "정화된 트래픽을 GRE 터널로 돌려받는 그림까지 그리면 아키텍처 설명이 완성됩니다."
+        "archKo": "정화된 트래픽을 GRE 터널로 돌려받는 그림까지 그리면 아키텍처 설명이 완성됩니다.",
+        "limitsKo": "용량 배수(\"역대 최대의 23배\")는 시점 민감 수치입니다 — 인용 전 최신 분기 위협 리포트와 대조하세요."
       },
       "ae": {
         "valueKo": "기존 스크러빙 계약 갱신 시점과 연간 비용을 물으세요 — 상시 인라인 전환의 TCO 비교가 견적 골격이 됩니다."
@@ -2012,7 +2014,7 @@
       "battlecard": [
         {
           "competitor": "AWS Shield Advanced",
-          "vsKo": "전 PoP 애니캐스트 흡수와 3초 내 완화, 그리고 AWS 밖(온프레미스·타 클라우드) IP 대역까지 커버하는 것이 강점. Shield는 AWS 리소스 한정 — 하이브리드 네트워크에서 자동으로 이깁니다.",
+          "vsKo": "온프레미스·타 클라우드 IP 대역이 스코프에 있으면 Shield로는 못 덮습니다(AWS 리소스 한정) — 그 조건에서 전 PoP 애니캐스트 흡수와 3초 내 완화가 차별점이 됩니다. 순수 AWS-only 워크로드라면 Shield의 통합이 자연스러움을 인정하세요.",
           "grounding": "internal-reviewed"
         }
       ]
@@ -2162,7 +2164,7 @@
       "productId": "realtime",
       "whyKo": "\"강력하고 확장 가능한 실시간 앱\"을 위한 제품군 — RealtimeKit SDK, 미디어를 라우팅하는 SFU, 방화벽을 뚫는 TURN이 한 묶음입니다.",
       "misconceptionKo": "Zoom 같은 완성 앱이 아닙니다 — 내 앱에 통화·회의를 심는 인프라와 SDK입니다. \"몇 줄의 코드\"로 붙인다는 게 공식 문구입니다.",
-      "customerQuestionKo": "\"WebRTC 인프라 운영이 부담입니다\" — SFU·TURN 운영을 통째로 넘기고 egress 과금($0.05/GB, 월 1,000GB 무료)으로 단순화하는 그림으로 답하세요.",
+      "customerQuestionKo": "\"WebRTC 인프라 운영이 부담입니다\" — SFU·TURN 운영을 통째로 넘기고 egress 과금($0.05/GB, SFU·TURN 합산 월 1,000GB 무료)으로 단순화하는 그림으로 답하세요.",
       "sourceUrl": "https://developers.cloudflare.com/realtime/",
       "verifiedAt": "2026-07-15T00:00:00Z",
       "se": {
@@ -2261,7 +2263,7 @@
       "sourceUrl": "https://developers.cloudflare.com/directory/",
       "verifiedAt": "2026-07-15T00:00:00Z",
       "se": {
-        "archKo": "SFU egress $0.05/GB에 월 1,000GB 무료(Realtime 문서 기준) — 자체 릴레이 운영비와 비교하세요."
+        "archKo": "SFU egress $0.05/GB에 무료 구간은 SFU·TURN 합산 월 1,000GB(Realtime 문서 기준) — 자체 릴레이 운영비와 비교하세요."
       }
     },
     {
@@ -2316,7 +2318,7 @@
       "battlecard": [
         {
           "competitor": "AWS WAF",
-          "vsKo": "관리형 룰 자동 갱신과 멀티클라우드·온프레미스 커버가 강점. 워크로드가 AWS 안에만 있다면 AWS WAF의 통합 과금이 단순 — 멀티클라우드와 Origin 도달 전 차단 요구에서 이깁니다.",
+          "vsKo": "살아남는 진짜 차별점은 하나입니다 — 단일 정책으로 AWS 밖(타 클라우드·온프레미스·임의 Origin)까지 한 번에 커버. 관리형 룰 자동 갱신과 엣지(Origin 도달 전) 차단은 AWS WAF(+CloudFront)도 하므로 근거로 쓰지 마세요. 워크로드가 AWS 안에만 있다면 통합 과금의 단순함은 인정하고 시작하세요.",
           "grounding": "internal-reviewed"
         }
       ]
@@ -2357,7 +2359,7 @@
       "sourceUrl": "https://developers.cloudflare.com/web3/",
       "verifiedAt": "2026-07-15T00:00:00Z",
       "se": {
-        "limitsKo": "IPFS 게이트웨이는 읽기 전용입니다 — 쓰기는 Ethereum 게이트웨이의 영역입니다."
+        "limitsKo": "IPFS 게이트웨이는 읽기 전용입니다 — 쓰기는 Ethereum 게이트웨이의 영역입니다. 참고: 공개 IPFS 게이트웨이(cloudflare-ipfs.com)는 2024년 8월 종료됐습니다 — 이 제품은 유료 게이트웨이 기준입니다."
       }
     },
     {

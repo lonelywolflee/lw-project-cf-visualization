@@ -29,6 +29,7 @@ const catalog: Catalog = {
     product('spectrum', 'Spectrum'),
     product('magic-transit', 'Magic Transit'),
     product('cdn', 'CDN'),
+    product('r2', 'R2'),
   ],
   solutions: [],
   useCases: [],
@@ -169,11 +170,28 @@ describe('suggestProducts', () => {
     expect(hits.map((chip) => chip.id)).toContain('waf');
   });
 
+  it('suggests exact short names below the gate — two-letter products stay reachable', () => {
+    // Typing the full short name (case-insensitive) is still retrieval.
+    expect(suggestProducts(catalog, 'r2', new Set()).map((chip) => chip.id)).toEqual(['r2']);
+    expect(suggestProducts(catalog, 'R2', new Set()).map((chip) => chip.id)).toEqual(['r2']);
+    // But a two-letter fragment of a longer name never opens a list.
+    expect(suggestProducts(catalog, 'ma', new Set())).toEqual([]);
+  });
+
+  it('matches word starts only — no letter fishing inside names', () => {
+    // 'age' sits inside "Management" but starts no word — must not match.
+    expect(suggestProducts(catalog, 'age', new Set())).toEqual([]);
+    // 'man' starts the word "Management" — matches.
+    expect(suggestProducts(catalog, 'man', new Set()).map((chip) => chip.id)).toContain(
+      'bot-management',
+    );
+  });
+
   it('excludes already-entered ids and respects the limit', () => {
     expect(suggestProducts(catalog, 'waf', new Set(['waf'])).map((chip) => chip.id)).not.toContain(
       'waf',
     );
     const limited = suggestProducts(catalog, 'a', new Set(), 2);
-    expect(limited).toEqual([]); // still gated by the 3-char rule
+    expect(limited).toEqual([]); // short fragment, no exact match
   });
 });

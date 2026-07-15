@@ -454,6 +454,57 @@ describe('LivingMapPage', () => {
     expect(harness.routeNativeElement?.querySelector('.verify-input')).not.toBeNull();
   });
 
+  it('demotes a sprayed verify session to practice — browsing is not recall', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=compute-platform');
+    const element = harness.routeNativeElement;
+    const input = element?.querySelector<HTMLInputElement>('.verify-input input');
+    const pick = async (query: string, name: string): Promise<void> => {
+      if (input === null || input === undefined) return;
+      input.value = query;
+      input.dispatchEvent(new Event('input'));
+      await harness.fixture.whenStable();
+      Array.from(element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [])
+        .find((button) => button.textContent?.trim() === name)
+        ?.click();
+      await harness.fixture.whenStable();
+    };
+
+    await pick('Wor', 'Workers'); // 정답 1
+    await pick('WAF', 'WAF'); // 오답 1
+    await pick('CDN', 'CDN'); // 오답 2 → 오답 > 정답 → 강등
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(element?.querySelector('.spray-warning')?.textContent).toContain('연습으로만');
+    expect(progress.statusOf('workers')).toBe('marked'); // verified 아님
+    expect(progress.state().nodeReviews['workers']).toBeUndefined();
+    expect(progress.state().recallLog[0]?.kind).toBe('practice');
+  });
+
+  it('reaches two-letter products through exact-match suggestions', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=compute-platform');
+    const element = harness.routeNativeElement;
+    const input = element?.querySelector<HTMLInputElement>('.verify-input input');
+    if (input) {
+      input.value = 'r2';
+      input.dispatchEvent(new Event('input'));
+    }
+    await harness.fixture.whenStable();
+
+    const suggestion = Array.from(
+      element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [],
+    ).find((button) => button.textContent?.trim() === 'R2');
+    expect(suggestion).not.toBeUndefined();
+    suggestion?.click();
+    await harness.fixture.whenStable();
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(progress.statusOf('r2')).toBe('verified');
+  });
+
   it('collapses an unknown recall area back to the area list', async () => {
     const harness = await RouterTestingHarness.create('/?mode=recall&area=%3Cscript%3E');
     const element = harness.routeNativeElement;

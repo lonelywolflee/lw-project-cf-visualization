@@ -49,6 +49,12 @@ export interface ProgressState {
   readonly nodeStates: Readonly<Record<string, NodeStatus>>;
   /** Absent in pre-v2 records; parsed as empty (legacy area fallback). */
   readonly nodeReviews: Readonly<Record<string, NodeReview>>;
+  /**
+   * Products whose learning card was actually opened. Distinct from
+   * nodeStates because a verify hit grants `verified` without a visit —
+   * the content-learning metric must not count those as "read".
+   */
+  readonly openedIds: readonly string[];
   readonly recallLog: readonly RecallEntry[];
   /** Distinct local dates (YYYY-MM-DD) with at least one visit. */
   readonly sessionLog: readonly string[];
@@ -60,6 +66,7 @@ const EMPTY_STATE: ProgressState = {
   schemaVersion: 1,
   nodeStates: {},
   nodeReviews: {},
+  openedIds: [],
   recallLog: [],
   sessionLog: [],
 };
@@ -100,6 +107,11 @@ function parseState(raw: unknown): ProgressState | null {
       reviews[key] = { last: review['last'], streak: review['streak'] };
     }
   }
+  const openedIds = candidate['openedIds'];
+  if (openedIds !== undefined) {
+    if (!Array.isArray(openedIds)) return null;
+    if (!(openedIds as unknown[]).every((id) => typeof id === 'string')) return null;
+  }
   const log: RecallEntry[] = [];
   for (const entry of recallLog as unknown[]) {
     if (typeof entry !== 'object' || entry === null) return null;
@@ -128,6 +140,7 @@ function parseState(raw: unknown): ProgressState | null {
     schemaVersion: 1,
     nodeStates: states,
     nodeReviews: reviews,
+    openedIds: (openedIds as string[] | undefined) ?? [],
     recallLog: log,
     sessionLog: sessionLog as string[],
   };
@@ -192,6 +205,11 @@ export class ProgressStore {
 
   /** Card opened: upgrade to at least `visited`, never downgrade. */
   recordVisit(productId: string): void {
+    this.stateSignal.update((state) =>
+      state.openedIds.includes(productId)
+        ? state
+        : { ...state, openedIds: [...state.openedIds, productId] },
+    );
     this.upgrade(productId, 'visited');
   }
 
