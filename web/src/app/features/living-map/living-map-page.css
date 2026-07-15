@@ -11,9 +11,11 @@
   --lm-canvas: #f6f7fa;
   --lm-verified: #1f7a43;
   margin: 0 auto;
-  /* Wide screens get map, not margins — 67 nodes want the room. */
-  max-width: 1760px;
-  padding: 1.25rem 1.5rem 4rem;
+  /* Wide screens get map, not margins — 67 nodes want the room. The cap
+     is a ratio, not pixels, so the margin stays proportional on any
+     monitor width instead of growing without bound. */
+  max-width: 96%;
+  padding: 1.25rem 0 4rem;
 }
 
 .head-row {
@@ -106,7 +108,10 @@
 }
 
 .map-layout.card-open {
-  grid-template-columns: minmax(0, 1fr) minmax(400px, 460px);
+  /* The card column scales with the monitor (30%) between a working
+     minimum and a reading ceiling — Korean prose past ~46rem per line
+     costs more readability than the width buys. */
+  grid-template-columns: minmax(0, 1fr) minmax(400px, min(30%, 46rem));
 }
 
 @media (max-width: 980px) {
