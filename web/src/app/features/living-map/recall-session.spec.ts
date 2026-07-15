@@ -1,6 +1,11 @@
 import type { Catalog, CuratedData } from '@cf-viz/catalog';
 
-import { buildRecallPool, scoreRecall, suggestProducts } from './recall-session';
+import {
+  buildRecallPool,
+  buildSolutionRecallPool,
+  scoreRecall,
+  suggestProducts,
+} from './recall-session';
 
 const source = {
   id: 'products-overview',
@@ -194,5 +199,99 @@ describe('suggestProducts', () => {
     );
     const limited = suggestProducts(catalog, 'a', new Set(), 2);
     expect(limited).toEqual([]); // short fragment, no exact match
+  });
+});
+
+describe('buildSolutionRecallPool', () => {
+  const solutionCatalog: Catalog = {
+    ...catalog,
+    solutions: [
+      { id: 'sase', name: 'Cloudflare One', summary: 'SASE.', sourceIds: [source.id] },
+      { id: 'security', name: 'Security', summary: 'Inbound.', sourceIds: [source.id] },
+      { id: 'retail', name: 'Retail', summary: 'Retail.', sourceIds: [source.id] },
+    ],
+  };
+  const solutionCurated = {
+    ...(curated as unknown as Record<string, unknown>),
+    compositions: [
+      {
+        solutionId: 'sase',
+        productIds: ['waf', 'cdn', 'ddos'],
+        sourceUrl: source.url,
+        verifiedAt: '2026-07-14T00:00:00Z',
+      },
+      {
+        solutionId: 'security',
+        productIds: ['waf', 'ddos'],
+        sourceUrl: source.url,
+        verifiedAt: '2026-07-14T00:00:00Z',
+      },
+      {
+        solutionId: 'retail',
+        productIds: ['cdn'],
+        sourceUrl: source.url,
+        verifiedAt: '2026-07-14T00:00:00Z',
+      },
+    ],
+    solutionNotes: [
+      {
+        solutionId: 'sase',
+        oneLinerKo: '정의.',
+        whyKo: '왜.',
+        misconceptionKo: '오해.',
+        customerQuestionKo: '질문.',
+        boundariesKo: [{ solutionId: 'security', noteKo: '방향 차이.' }],
+        sourceUrl: source.url,
+        verifiedAt: '2026-07-14T00:00:00Z',
+      },
+      {
+        solutionId: 'retail',
+        oneLinerKo: '정의.',
+        whyKo: '왜.',
+        misconceptionKo: '오해.',
+        customerQuestionKo: '질문.',
+        // One-directional storage: retail → sase. The sase session must
+        // still see this pair (mirroring), and retail ∩ security is empty
+        // so no question may exist for that pair anywhere.
+        boundariesKo: [
+          { solutionId: 'sase', noteKo: '상거래 특화.' },
+          { solutionId: 'security', noteKo: '빈 교집합 경계.' },
+        ],
+        sourceUrl: source.url,
+        verifiedAt: '2026-07-14T00:00:00Z',
+      },
+    ],
+  } as unknown as CuratedData;
+
+  it('builds ① answers from the composition and ③ from non-empty pairs, mirrored', () => {
+    const pool = buildSolutionRecallPool(solutionCatalog, solutionCurated, 'sase');
+    expect(pool?.answers.map((chip) => chip.id)).toEqual(['cdn', 'ddos', 'waf']);
+    // Own boundary (security: waf+ddos shared) plus the mirrored retail
+    // pair (cdn shared), neighbour-name order.
+    expect(
+      pool?.boundaryQuestions.map((question) => ({
+        id: question.neighbourId,
+        shared: question.answers.map((chip) => chip.id),
+      })),
+    ).toEqual([
+      { id: 'retail', shared: ['cdn'] },
+      { id: 'security', shared: ['ddos', 'waf'] },
+    ]);
+  });
+
+  it('drops empty-intersection pairs and returns null without a composition', () => {
+    // retail ↔ security is declared in a note but shares nothing — the
+    // question must not exist (an unanswerable question is not a question).
+    const pool = buildSolutionRecallPool(solutionCatalog, solutionCurated, 'security');
+    expect(pool?.boundaryQuestions.map((question) => question.neighbourId)).toEqual(['sase']);
+    expect(buildSolutionRecallPool(solutionCatalog, solutionCurated, 'ghost')).toBeNull();
+    const uncomposed: Catalog = {
+      ...solutionCatalog,
+      solutions: [
+        ...solutionCatalog.solutions,
+        { id: 'bare', name: 'Bare', summary: 'No composition.', sourceIds: [source.id] },
+      ],
+    };
+    expect(buildSolutionRecallPool(uncomposed, solutionCurated, 'bare')).toBeNull();
   });
 });

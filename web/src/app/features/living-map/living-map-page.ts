@@ -16,6 +16,8 @@ import { CuratedStore } from '../../core/catalog/curated-store';
 import {
   localToday,
   ProgressStore,
+  SOLUTION_KEY_PREFIX,
+  solutionKey,
   type NodeStatus,
   type RecallKind,
 } from '../../core/learning/progress-store';
@@ -34,11 +36,13 @@ import {
 import { areaReviewStates, nodeReviewStates } from './re-fog';
 import {
   buildRecallPool,
+  buildSolutionRecallPool,
   scoreRecall,
   suggestProducts,
   type RecallChip,
   type RecallPool,
   type RecallScore,
+  type SolutionRecallPool,
 } from './recall-session';
 
 /**
@@ -215,6 +219,9 @@ export class LivingMapPage {
       slotTotal: total,
       noteReadRate: noteIds.length === 0 ? null : openedNotes / noteIds.length,
       staleAreas: this.staleAreas().map((area) => area.layer),
+      solutionVerified: this.progress.solutionVerifiedCount(),
+      solutionTotal: this.solutionAreas().length,
+      staleSolutions: this.staleSolutions().map((solution) => solution.id),
       exportedAt: new Date().toISOString(),
     });
     const blob = new Blob([json], { type: 'application/json' });
@@ -282,6 +289,119 @@ export class LivingMapPage {
     return buildRecallPool(catalog, curated, areaValue.lane, areaValue.layer);
   });
 
+  // ------------------------------------------------- solution recall (V6-3)
+
+  /** Recallable solutions for the picker; only composed ones qualify. */
+  protected readonly solutionAreas = computed(() => {
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    if (catalog === undefined || curated === undefined) return [];
+    const composed = new Set(curated.compositions.map((entry) => entry.solutionId));
+    return catalog.solutions
+      .filter((solution) => composed.has(solution.id))
+      .map((solution) => ({ id: solution.id, name: solution.name }))
+      .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  });
+
+  /** The session pool when `?area=solution:<id>`; hostile ids → null. */
+  protected readonly solutionPool = computed<SolutionRecallPool | null>(() => {
+    const raw = firstParamValue(this.area());
+    if (raw === undefined || !raw.startsWith(SOLUTION_KEY_PREFIX)) return null;
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    if (catalog === undefined || curated === undefined) return null;
+    return buildSolutionRecallPool(catalog, curated, raw.slice(SOLUTION_KEY_PREFIX.length));
+  });
+
+  /**
+   * Which question the solution session is on: -1 = ① 구성 재현, 0..n-1 =
+   * ③ 경계 문항 index. ② (정의) is not a session step — it is the card's
+   * self-declare button, capped at marked.
+   */
+  protected readonly solutionStep = signal(-1);
+
+  /** The active boundary question, when the session is past ①. */
+  protected readonly boundaryQuestion = computed(() => {
+    const pool = this.solutionPool();
+    const step = this.solutionStep();
+    if (pool === null || step < 0) return null;
+    return pool.boundaryQuestions[step] ?? null;
+  });
+
+  protected startSolutionArea(solutionId: string): void {
+    this.resetSession();
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { mode: 'recall', area: solutionKey(solutionId) },
+    });
+  }
+
+  /**
+   * Question ① submit — the ONLY event that can verify a solution and
+   * extend its streak. Grading consumes the entered product ids without
+   * ever writing product state (the namespaced key is the whole record).
+   */
+  protected submitSolutionCompose(): void {
+    const pool = this.solutionPool();
+    if (pool === null || this.score() !== null) return;
+    const result = scoreRecall(pool, this.entered());
+    this.score.set(result);
+    const answerIds = new Set(pool.answers.map((answer) => answer.id));
+    const wrong = this.enteredChips().filter((chip) => !answerIds.has(chip.id));
+    this.wrongEntries.set(wrong);
+    const demoted = wrong.length > result.correctSlots;
+    this.demotedToPractice.set(demoted);
+    const passed = result.totalSlots > 0 && result.correctSlots / result.totalSlots >= 0.8;
+    this.progress.recordSolutionRecall(
+      pool.solutionId,
+      result.correctSlots,
+      result.totalSlots,
+      demoted ? 'practice' : 'verify',
+      demoted ? 'none' : passed ? 'verify' : 'demote',
+    );
+  }
+
+  /** Advances into (or through) the ③ boundary questions. */
+  protected startBoundaryQuestion(index: number): void {
+    const pool = this.solutionPool();
+    if (pool === null || index < 0 || index >= pool.boundaryQuestions.length) return;
+    this.resetSession();
+    this.solutionStep.set(index);
+  }
+
+  /**
+   * Question ③ submit. A perfect answer changes nothing (③ never
+   * upgrades); any miss or off-pair entry demotes the session's OWN
+   * solution — the neighbour's record belongs to the neighbour's session.
+   */
+  protected submitSolutionBoundary(): void {
+    const pool = this.solutionPool();
+    const question = this.boundaryQuestion();
+    if (pool === null || question === null || this.score() !== null) return;
+    const result = scoreRecall(question, this.entered());
+    this.score.set(result);
+    const answerIds = new Set(question.answers.map((answer) => answer.id));
+    const wrong = this.enteredChips().filter((chip) => !answerIds.has(chip.id));
+    this.wrongEntries.set(wrong);
+    const missed = wrong.length > 0 || result.correctSlots < result.totalSlots;
+    this.progress.recordSolutionRecall(
+      pool.solutionId,
+      result.correctSlots,
+      result.totalSlots,
+      'verify',
+      missed ? 'demote' : 'none',
+    );
+  }
+
+  /** Solution learning state, for the card's ② self-declare block. */
+  protected solutionStatusOf(solutionId: string): NodeStatus | 'unvisited' {
+    return this.progress.state().nodeStates[solutionKey(solutionId)] ?? 'unvisited';
+  }
+
+  protected markSolutionLearned(solutionId: string): void {
+    this.progress.markSolutionLearned(solutionId);
+  }
+
   /** Picks of the in-progress session, capped at the slot count. */
   protected readonly picked = signal<ReadonlySet<string>>(new Set());
   protected readonly score = signal<RecallScore | null>(null);
@@ -302,6 +422,7 @@ export class LivingMapPage {
     this.entered.set(new Set());
     this.wrongEntries.set([]);
     this.demotedToPractice.set(false);
+    this.solutionStep.set(-1);
   }
 
   protected setMode(mode: 'explore' | 'recall' | 'replay'): void {
@@ -530,6 +651,7 @@ export class LivingMapPage {
       params['lens'] = lens.id;
       if (lens.kind === 'solution') {
         params['solution'] = lens.id; // open the canonical card
+        this.progress.recordSolutionVisit(lens.id);
       }
     }
     const selected = this.selectedId();
@@ -562,6 +684,7 @@ export class LivingMapPage {
 
   /** Boundary-neighbour navigation: swap the card, keep the lens. */
   protected openSolutionCard(solutionId: string): void {
+    this.progress.recordSolutionVisit(solutionId);
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { ...this.lensParam(), solution: solutionId },
@@ -570,12 +693,24 @@ export class LivingMapPage {
 
   /**
    * Solution re-fog visibility (design §Recommended 4): stale solutions
-   * dim their lens chip. Reads the namespaced progress key — inert until
-   * V6-3 starts writing `solution:<id>` reviews, alive the moment it does.
+   * dim their lens chip, badge their picker row, and join the nudge count.
    */
   protected isLensStale(lensId: string): boolean {
-    return this.nodeReviews().get(`solution:${lensId}`)?.stale === true;
+    return this.nodeReviews().get(solutionKey(lensId))?.stale === true;
   }
+
+  /** Verified solutions whose review date passed — the re-fog set. */
+  protected readonly staleSolutions = computed(() => {
+    const states = this.progress.state().nodeStates;
+    return this.solutionAreas().filter(
+      ({ id }) => states[solutionKey(id)] === 'verified' && this.isLensStale(id),
+    );
+  });
+
+  /** Areas + solutions due for review; drives the header nudge. */
+  protected readonly staleTotal = computed(
+    () => this.staleAreas().length + this.staleSolutions().length,
+  );
 
   protected inLens(productId: string): boolean {
     return this.activeLens()?.productIds.has(productId) ?? false;

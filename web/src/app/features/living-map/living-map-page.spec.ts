@@ -796,6 +796,113 @@ describe('LivingMapPage', () => {
     expect(harness.routeNativeElement?.querySelector('aside[aria-label="솔루션 카드"]')).toBeNull();
   });
 
+  it('offers solutions in the recall picker and enters the namespaced session', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=recall');
+    const element = harness.routeNativeElement;
+
+    expect(element?.textContent).toContain('솔루션 — 구성을 기억으로 재현하기');
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.area-card .area-verify') ?? [])
+      .find((button) => button.closest('.area-card')?.textContent?.includes('Cloudflare One'))
+      ?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toContain('area=solution:sase');
+    expect(element?.textContent).toContain('Cloudflare One의 구성 제품을 기억으로 채우세요');
+  });
+
+  it('verifies a solution through ① without touching any product state', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=solution:sase');
+    const element = harness.routeNativeElement;
+    const input = element?.querySelector<HTMLInputElement>('.verify-input input');
+    const pick = async (query: string, name: string): Promise<void> => {
+      if (input === null || input === undefined) return;
+      input.value = query;
+      input.dispatchEvent(new Event('input'));
+      await harness.fixture.whenStable();
+      Array.from(element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [])
+        .find((button) => button.textContent?.trim() === name)
+        ?.click();
+      await harness.fixture.whenStable();
+    };
+
+    await pick('WAF', 'WAF');
+    await pick('CDN', 'CDN'); // 2/2 — ≥80%
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(element?.querySelector('.result-line')?.textContent).toContain(
+      '솔루션이 검증(✓)됐습니다',
+    );
+    expect(progress.state().nodeStates['solution:sase']).toBe('verified');
+    expect(progress.state().nodeReviews['solution:sase']).toMatchObject({ streak: 1 });
+    expect(progress.state().recallLog[0]).toMatchObject({ area: 'solution:sase', kind: 'verify' });
+    // The graded product ids never leak into product state or metrics.
+    expect(progress.statusOf('waf')).toBeUndefined();
+    expect(progress.statusOf('cdn')).toBeUndefined();
+    expect(progress.revealedCount()).toBe(0);
+    expect(element?.querySelector('.fog-count')?.textContent).toContain('솔루션 1 / 2');
+  });
+
+  it('demotes the session subject on a missed ③ boundary question', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=solution:sase');
+    const element = harness.routeNativeElement;
+    const pick = async (query: string, name: string): Promise<void> => {
+      const input = element?.querySelector<HTMLInputElement>('.verify-input input');
+      if (input === null || input === undefined) return;
+      input.value = query;
+      input.dispatchEvent(new Event('input'));
+      await harness.fixture.whenStable();
+      Array.from(element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [])
+        .find((button) => button.textContent?.trim() === name)
+        ?.click();
+      await harness.fixture.whenStable();
+    };
+
+    await pick('WAF', 'WAF');
+    await pick('CDN', 'CDN');
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+    expect(progress.state().nodeStates['solution:sase']).toBe('verified');
+
+    // sase ∩ security = { waf } — one boundary question exists.
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.tool') ?? [])
+      .find((button) => button.textContent?.includes('경계 문항 풀기'))
+      ?.click();
+    await harness.fixture.whenStable();
+    expect(element?.textContent).toContain('경계 — Cloudflare One ↔ Security');
+
+    await pick('CDN', 'CDN'); // not shared — a miss
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(element?.querySelector('.result-line')?.textContent).toContain('경계를 놓쳐');
+    expect(progress.state().nodeStates['solution:sase']).toBe('visited');
+    expect(progress.state().nodeReviews['solution:sase']).toBeUndefined();
+  });
+
+  it('records the solution visit on lens click and self-declares ② to marked', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.lens-chip') ?? [])
+      .find((chip) => chip.textContent?.includes('Cloudflare One'))
+      ?.click();
+    await harness.fixture.whenStable();
+    expect(progress.state().nodeStates['solution:sase']).toBe('visited');
+
+    element
+      ?.querySelector<HTMLButtonElement>('aside[aria-label="솔루션 카드"] .learn-button')
+      ?.click();
+    await harness.fixture.whenStable();
+    expect(progress.state().nodeStates['solution:sase']).toBe('marked');
+    expect(
+      element?.querySelector('aside[aria-label="솔루션 카드"] .learned-state')?.textContent,
+    ).toContain('익혔음으로 표시됨');
+  });
+
   it('renders the SE/AE layers and battlecards with grounding marks', async () => {
     const harness = await RouterTestingHarness.create('/?product=waf');
     const card = harness.routeNativeElement?.querySelector('.learning-card');

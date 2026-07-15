@@ -34,7 +34,8 @@
       <div class="head-tools">
         <span class="fog-count">
           밝힌 노드 {{ progress.revealedCount() }} / 67 · 검증 슬롯 {{ verifiedSlotCount() }} / {{
-          slotTotal() }} @if (staleAreas().length > 0) { · 재안개 {{ staleAreas().length }} }
+          slotTotal() }} · 솔루션 {{ progress.solutionVerifiedCount() }} / {{ solutionAreas().length
+          }} @if (staleTotal() > 0) { · 재안개 {{ staleTotal() }} }
         </span>
         <button type="button" class="tool" (click)="exportReport()">리포트 내보내기</button>
         <label class="tool tool-import">
@@ -51,9 +52,9 @@
       아무 노드나 눌러서 시작하세요. 잠금은 없습니다 — 익힌 자리가 밝아지고, 남은 안개가 다음에 갈
       곳을 알려줍니다.
     </p>
-    @if (!isRecall() && staleAreas().length > 0) {
+    @if (!isRecall() && staleTotal() > 0) {
     <button type="button" class="refog-nudge" (click)="setMode('recall')">
-      🌫 검증했던 영역 {{ staleAreas().length }}곳에 안개가 다시 꼈습니다 — 다시 채워볼까요?
+      🌫 검증했던 영역·솔루션 {{ staleTotal() }}곳에 안개가 다시 꼈습니다 — 다시 채워볼까요?
     </button>
     }
   </header>
@@ -180,6 +181,115 @@
       </button>
       } }
     </section>
+    } @else if (solutionPool(); as sp) {
+    <section class="recall-session" aria-labelledby="recall-heading">
+      @if (solutionStep() === -1) {
+      <h2 id="recall-heading">검증 — {{ sp.solutionName }}의 구성 제품을 기억으로 채우세요</h2>
+      <p class="recall-sub">
+        이 솔루션을 이루는 제품을 모두 입력하세요. 몇 개인지는 알려주지 않습니다. 80% 이상 맞혀야
+        솔루션이 검증(✓)됩니다 — 입력한 제품들의 지도 상태는 여기서 바뀌지 않습니다.
+      </p>
+      } @else if (boundaryQuestion(); as bq) {
+      <h2 id="recall-heading">경계 — {{ sp.solutionName }} ↔ {{ bq.neighbourName }}</h2>
+      <p class="recall-sub">
+        두 솔루션이 공유하는 제품을 모두 입력하세요. 경계를 놓치면 {{ sp.solutionName }}의 검증이
+        해제됩니다 — 상대 솔루션의 기록은 바뀌지 않습니다.
+      </p>
+      } @if (score() === null) {
+      <div class="verify-input">
+        <input
+          type="text"
+          [value]="query()"
+          (input)="onQueryInput($event)"
+          placeholder="제품 이름 (3글자부터 제안이 열립니다)"
+          aria-label="제품 이름 입력"
+        />
+        @if (suggestions().length > 0) {
+        <div class="suggestions" role="listbox" aria-label="제안">
+          @for (candidate of suggestions(); track candidate.id) {
+          <button type="button" class="suggestion" (click)="addEntry(candidate.id)">
+            {{ candidate.name }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+      } @if (enteredChips().length > 0) {
+      <div class="recall-chips" role="group" aria-label="입력한 제품">
+        @for (chip of enteredChips(); track chip.id) {
+        <button
+          type="button"
+          class="recall-chip picked"
+          [disabled]="score() !== null"
+          (click)="removeEntry(chip.id)"
+        >
+          {{ chip.name }} ✕
+        </button>
+        }
+      </div>
+      } @if (score(); as s) {
+      <div class="recall-result" role="status">
+        <p class="result-line">
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 — @if (solutionStep() === -1) { @if
+          (demotedToPractice()) { 아래 사유로 연습으로만 기록됐습니다. } @else if (s.totalSlots > 0
+          && s.correctSlots / s.totalSlots >= 0.8) { 솔루션이 검증(✓)됐습니다. } @else { 80%에 못
+          미쳐 솔루션 검증이 해제되고 다시 흐려집니다. } } @else { @if (s.correctSlots ===
+          s.totalSlots && wrongEntries().length === 0) { 경계가 또렷합니다 — 기록만 남습니다. }
+          @else { 경계를 놓쳐 이 솔루션의 검증이 해제됩니다. } }
+        </p>
+        @if (demotedToPractice()) {
+        <p class="spray-warning">
+          정답 밖 답({{ wrongEntries().length }}개)이 정답({{ s.correctSlots }}개)보다 많습니다 —
+          카탈로그 훑기는 회상이 아니라서 이 세션은 검증(✓) 없이 연습으로만 기록됐습니다.
+        </p>
+        }
+        <ul class="result-list">
+          @for (result of s.results; track result.productId) {
+          <li [class.missed]="!result.correct">
+            {{ result.name }} @if (result.correct) { ✓ } @else { ✗ 놓침 }
+          </li>
+          }
+        </ul>
+        @if (wrongEntries().length > 0 && !demotedToPractice()) {
+        <p class="wrong-entries">
+          정답 밖 입력: @for (chip of wrongEntries(); track chip.id) { {{ chip.name }} } — 솔루션
+          카드에서 구성과 경계를 다시 확인하세요.
+        </p>
+        }
+        <div class="recall-actions">
+          @if (solutionStep() === -1 && sp.boundaryQuestions.length > 0) {
+          <button type="button" class="tool" (click)="startBoundaryQuestion(0)">
+            경계 문항 풀기 ({{ sp.boundaryQuestions.length }}개) →
+          </button>
+          } @else if (solutionStep() >= 0 && solutionStep() + 1 < sp.boundaryQuestions.length) {
+          <button type="button" class="tool" (click)="startBoundaryQuestion(solutionStep() + 1)">
+            다음 경계 문항 →
+          </button>
+          }
+          <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
+          <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
+        </div>
+      </div>
+      } @else { @if (solutionStep() === -1) {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitSolutionCompose()"
+      >
+        제출하고 채점하기
+      </button>
+      } @else {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitSolutionBoundary()"
+      >
+        제출하고 채점하기
+      </button>
+      } }
+    </section>
     } @else {
     <section class="recall-areas" aria-labelledby="recall-heading">
       <h2 id="recall-heading">회상 모드 — 어느 영역을 채워볼까요?</h2>
@@ -210,6 +320,31 @@
               (click)="startArea(areaOption.layer, 'practice')"
             >
               칩 연습
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      <h3 class="solutions-head">솔루션 — 구성을 기억으로 재현하기</h3>
+      <p class="recall-sub">
+        솔루션의 구성 제품을 직접 채우고, 이웃과 공유하는 제품(경계)까지 답합니다. 여기서의 채점은
+        솔루션에만 기록됩니다 — 제품 노드의 상태는 바뀌지 않습니다.
+      </p>
+      <div class="area-grid">
+        @for (solutionOption of solutionAreas(); track solutionOption.id) {
+        <div class="area-card" [class.stale]="isLensStale(solutionOption.id)">
+          <span class="area-lane">솔루션</span>
+          <span class="area-name">{{ solutionOption.name }}</span>
+          @if (isLensStale(solutionOption.id)) {
+          <span class="stale-badge">🌫 안개가 다시 꼈어요 — 다시 채워볼까요?</span>
+          }
+          <div class="area-actions">
+            <button
+              type="button"
+              class="area-verify"
+              (click)="startSolutionArea(solutionOption.id)"
+            >
+              직접 채우기 ✍
             </button>
           </div>
         </div>
@@ -603,6 +738,14 @@
         </div>
         }
       </div>
+      } @if (solutionStatusOf(sc.id) === 'verified') {
+      <p class="learned-state verified">구성 재현으로 검증된 솔루션 ✓</p>
+      } @else if (solutionStatusOf(sc.id) === 'marked') {
+      <p class="learned-state">익혔음으로 표시됨 — 회상 모드에서 구성 재현으로 검증해 보세요</p>
+      } @else {
+      <button type="button" class="learn-button" (click)="markSolutionLearned(sc.id)">
+        정의를 기억으로 말해본 뒤 — 익혔음 ✓
+      </button>
       }
     </aside>
     }
