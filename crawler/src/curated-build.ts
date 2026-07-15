@@ -158,15 +158,12 @@ function normalizeLearningNote(note: LearningNote): LearningNote {
   if (note.battlecard !== undefined) {
     normalized.battlecard = [...note.battlecard]
       .sort((a, b) => compareCodepoints(a.competitor, b.competitor))
-      .map((card) => {
-        const normalizedCard: NoteBattlecard = {
-          competitor: card.competitor,
-          vsKo: card.vsKo,
-          grounding: card.grounding,
-        };
-        if (card.sourceUrl !== undefined) normalizedCard.sourceUrl = card.sourceUrl;
-        return normalizedCard;
-      });
+      .map((card): NoteBattlecard => ({
+        competitor: card.competitor,
+        vsKo: card.vsKo,
+        grounding: card.grounding,
+        sourceUrl: card.sourceUrl,
+      }));
   }
   return normalized;
 }

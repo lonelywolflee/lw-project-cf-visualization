@@ -1612,15 +1612,7 @@
             "a": "늘리는 게 아니라 VPN 콘솔을 없애는 쪽입니다 — 앱 단위 정책 한 곳으로 통제가 모이고, 접속 티켓이 줄어드는 것이 보안팀의 체감 이득입니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Zscaler ZPA",
-          "vsKo": "네트워크 규모가 받쳐 주는 성능과 무료 50석이라는 낮은 진입 장벽이 우리 강점. ZPA는 엔터프라이즈 레퍼런스와 레거시 앱 커넥터 생태계가 두터움 — 시간 단위로 끝나는 배포 속도와 총비용으로 프레임하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/access/"
-        }
-      ]
+      }
     },
     {
       "productId": "advanced-certificate-manager",
@@ -1720,15 +1712,7 @@
             "a": "그럼 디스커버리를 하루만 돌려 보시죠 — 문서에 없는 엔드포인트가 몇 개 나오는지가 답입니다. 0이면 저희가 물러나고, 아니면 그 목록이 시작점입니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Salt Security",
-          "vsKo": "엣지 인라인(별도 센서·미러링 없음)과 WAF·봇 신호 통합이 강점. API 전문 벤더는 오프라인 행위 분석의 깊이를 내세움 — 트래픽이 이미 Cloudflare를 지난다면 총비용과 배포 속도에서 이깁니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://developers.cloudflare.com/api-shield/"
-        }
-      ]
+      }
     },
     {
       "productId": "argo-smart-routing",
@@ -1774,15 +1758,7 @@
             "a": "잘됐습니다 — 같은 트래픽으로 나란히 비교하시죠. 저희는 별도 모듈 없이 기존 경로에서 켜니 PoC 비용이 낮고, 오탐·미탐 숫자로만 결정하시면 됩니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "DataDome",
-          "vsKo": "인터넷 트래픽 규모로 학습한 ML과 요청 경로 네이티브 통합(별도 커넥터·모듈 배포 불필요, 서브밀리초 판정)이 강점. DataDome도 인라인 실시간 판정이므로 \"우리만 인라인\"은 금물. 봇 전문 벤더의 전담 리서치·이커머스 특화 튜닝은 인정하고, PoC에서 같은 트래픽으로 오탐·미탐률을 직접 비교하게 하는 것이 정공법입니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/application-services/products/bot-management/"
-        }
-      ]
+      }
     },
     {
       "productId": "browser-isolation",
@@ -1803,15 +1779,7 @@
             "a": "그 기억은 픽셀 스트리밍 세대의 것입니다 — 저희는 그리기 명령만 내려보내 로컬처럼 느껴집니다. 데모 10분이면 판단이 끝납니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Zscaler Isolation",
-          "vsKo": "픽셀 스트리밍 방식의 구형 RBI 대비, 그리기 명령 전송이라 \"로컬 같다\"는 체감 성능이 강점 — 상대 제품의 현재 렌더링 방식은 단정하지 말고, 구형 RBI에 데인 고객일수록 데모 한 번으로 판단하게 하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/browser-isolation/"
-        }
-      ]
+      }
     },
     {
       "productId": "browser-rendering",
@@ -1866,19 +1834,11 @@
       "ae": {
         "objections": [
           {
-            "q": "Akamai에서 옮기면 마이그레이션 리스크가 크지 않나요?",
+            "q": "기존 CDN에서 옮기면 마이그레이션 리스크가 크지 않나요?",
             "a": "전체 전환이 아니라 도메인 단위 병행이 표준입니다 — 트래픽 일부를 먼저 태워 몇 주간 성능·오탐을 비교하고, 숫자가 이기면 넓힙니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Akamai",
-          "vsKo": "엣지 통합(같은 PoP에서 보안·컴퓨트)과 셀프서브 속도가 강점. 초대형 미디어 커스텀과 전담 프로페셔널 서비스 조직은 Akamai가 두터움 — \"비교 회피\" 대신 통합 vs 전담 서비스 프레임으로 정면 대응하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/application-services/products/cdn/"
-        }
-      ]
+      }
     },
     {
       "productId": "china-network",
@@ -1979,15 +1939,7 @@
             "a": "0원입니다 — unmetered가 계약 문구입니다. 공격 규모에 따라 청구가 커지는 스크러빙 종량제와의 구조적 차이가 바로 이것입니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Akamai Prolexic",
-          "vsKo": "아키텍처로 프레임하세요 — 지정 스크러빙 센터로의 우회 라우팅(Prolexic) vs 모든 데이터센터가 스크러빙 지점인 인라인 완화 + unmetered 과금. Prolexic도 always-on 옵션이 있으므로 \"온디맨드\"로 몰지 마세요. 커스텀 런북과 전담 대응팀은 Prolexic의 강점으로 인정하는 것이 정직합니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/application-services/products/ddos-for-web/"
-        }
-      ]
+      }
     },
     {
       "productId": "ddos-for-web",
@@ -2078,15 +2030,7 @@
             "a": "MX 변경 없는 API 모드로 몇 주 나란히 돌려 보시죠 — 기존 필터를 통과한 위협을 저희가 몇 건 잡는지, 그 숫자가 그대로 비즈니스 케이스가 됩니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Proofpoint",
-          "vsKo": "어플라이언스 없이 API 또는 인라인으로 붙는 가벼운 도입과 Zero Trust 스위트 묶음이 우리 강점. Proofpoint는 아카이빙·DLP까지 이메일 스위트의 폭이 넓음 — 승부처는 도입 마찰입니다. \"MX 레코드 변경 없이 파일럿부터 돌려 보시죠\"가 먹히는 지점입니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/email-security/"
-        }
-      ]
+      }
     },
     {
       "productId": "email-service",
@@ -2110,22 +2054,8 @@
         "archKo": "DNS 필터(리졸버)와 HTTP 검사(프록시)의 두 층입니다 — 어디까지 검사할지(TLS 복호화 동의)가 도입 설계의 첫 결정입니다."
       },
       "ae": {
-        "pitchKo": "\"최근 1년 사이 직원이 피싱 링크를 클릭한 사고가 있었나요?\"로 여는 것이 가장 빠릅니다. 사고 이야기가 나오는 순간 대화는 제품 소개가 아니라 사고 복기가 되고, 그 클릭이 빠져나가던 길목이 바로 Gateway가 설 자리라는 그림으로 자연스럽게 이어집니다.",
-        "objections": [
-          {
-            "q": "Zscaler로 이미 표준화했어요.",
-            "a": "표준화 비용을 존중합니다. 갱신 시점에 트래픽 왕복 수와 콘솔 수를 세어 보시죠 — SWG·ZTNA·DLP가 한 네트워크에서 도는 구조가 지연과 운영에서 이기는지 숫자로 확인하시면 됩니다."
-          }
-        ]
-      },
-      "battlecard": [
-        {
-          "competitor": "Zscaler ZIA",
-          "vsKo": "SWG+ZTNA+DLP가 한 네트워크·한 콘솔인 통합이 강점. ZIA는 오래 쌓인 정책 템플릿과 운영 관행이 강점 — 콘솔 수와 트래픽 왕복 수를 세어 보이면 통합 논거가 삽니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/sase/"
-        }
-      ]
+        "pitchKo": "\"최근 1년 사이 직원이 피싱 링크를 클릭한 사고가 있었나요?\"로 여는 것이 가장 빠릅니다. 사고 이야기가 나오는 순간 대화는 제품 소개가 아니라 사고 복기가 되고, 그 클릭이 빠져나가던 길목이 바로 Gateway가 설 자리라는 그림으로 자연스럽게 이어집니다."
+      }
     },
     {
       "productId": "hyperdrive",
@@ -2234,22 +2164,8 @@
         "limitsKo": "용량 배수(\"역대 최대의 23배\")는 시점 민감 수치입니다 — 인용 전 최신 분기 위협 리포트와 대조하세요."
       },
       "ae": {
-        "valueKo": "\"지금 쓰는 스크러빙 서비스는 계약이 언제 끝나고, 1년에 얼마를 내고 계세요?\" — 이 두 답만 받으면 상시 인라인 전환의 TCO 비교표가 그려지고, 그게 곧 견적의 골격입니다. 갱신 시점이 영업 타이밍입니다.",
-        "objections": [
-          {
-            "q": "Shield Advanced 계약이 이미 있어요.",
-            "a": "AWS 리소스는 그대로 Shield에 두세요. 문제는 온프레미스와 타 클라우드 대역입니다 — 그 IP들은 Shield 스코프 밖이고, 거기가 저희 자리입니다."
-          }
-        ]
-      },
-      "battlecard": [
-        {
-          "competitor": "AWS Shield Advanced",
-          "vsKo": "온프레미스·타 클라우드 IP 대역이 스코프에 있으면 Shield로는 못 덮습니다(AWS 리소스 한정) — 그 조건에서 전 PoP 애니캐스트 흡수와 3초 내 완화가 차별점이 됩니다. 순수 AWS-only 워크로드라면 Shield의 통합이 자연스러움을 인정하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/network-services/products/magic-transit/"
-        }
-      ]
+        "valueKo": "\"지금 쓰는 스크러빙 서비스는 계약이 언제 끝나고, 1년에 얼마를 내고 계세요?\" — 이 두 답만 받으면 상시 인라인 전환의 TCO 비교표가 그려지고, 그게 곧 견적의 골격입니다. 갱신 시점이 영업 타이밍입니다."
+      }
     },
     {
       "productId": "mesh",
@@ -2365,15 +2281,7 @@
             "a": "한 번에 옮기지 않습니다 — 요청될 때 점진 복사(Sippy)로 무중단 이전하고, 옮겨진 객체부터 egress 0의 이득을 봅니다. 반출이 잦은 버킷부터 시작하시죠."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "AWS S3",
-          "vsKo": "egress 무료가 구조적 강점 — 꺼내 쓰는 빈도가 높을수록 격차가 커집니다. 스토리지 클래스·이벤트·생태계 폭은 S3가 넓음 — 청구서의 egress 줄을 같이 보는 것에서 시작하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/developer-platform/products/r2/"
-        }
-      ]
+      }
     },
     {
       "productId": "rate-limiting",
@@ -2453,15 +2361,7 @@
             "a": "비교 기준은 흡수 용량과 운영입니다 — 전 세계 엣지 용량으로 받아내고, 웹과 같은 콘솔에서 운영합니다. 포트만 알려주시면 PoC는 하루면 됩니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "직접 노출(방화벽만)",
-          "vsKo": "방화벽만 두고 서비스를 직접 노출하면 Origin IP와 포트가 그대로 표적이 됩니다. L4 프록시로 앞을 가리면 Origin IP·포트가 숨고 unmetered DDoS 방어가 씌워집니다 — 게임·SSH·메일처럼 웹이 아닌 서비스에 \"웹 수준의 방어\"를 입히는 유일한 축입니다.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/application-services/products/cloudflare-spectrum/"
-        }
-      ]
+      }
     },
     {
       "productId": "spectrum-for-minecraft",
@@ -2571,23 +2471,11 @@
         "pitchKo": "고객이 가장 자주 꺼내는 우려는 오탐입니다 — 정상 결제가 막히는 장면을 떠올리고 있죠. \"처음부터 차단하지 않습니다. 로그 모드로 지켜보다가 오탐이 없는 걸 눈으로 확인한 뒤에 차단 모드로 올립니다\"라고 먼저 말하세요. 이 한마디에 보안팀보다 서비스 운영팀이 먼저 고개를 끄덕입니다.",
         "objections": [
           {
-            "q": "이미 AWS WAF를 쓰고 있어요.",
-            "a": "AWS 안 워크로드는 그대로 두셔도 됩니다. 문제는 그 밖입니다 — 타 클라우드·온프레미스 Origin까지 정책을 하나로 가져가려면 WAF가 클라우드 경계를 넘어야 하고, 그게 저희가 이기는 지점입니다."
-          },
-          {
             "q": "오탐으로 정상 고객이 막히면 누가 책임지죠?",
             "a": "그래서 도입 순서가 로그 모드부터입니다 — 차단 없이 며칠 지켜보고, 룰 ID 단위로 예외를 좁혀 건 다음 차단으로 올립니다. 첫 주에 막히는 정상 트래픽 0이 목표입니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "AWS WAF",
-          "vsKo": "살아남는 진짜 차별점은 하나입니다 — 단일 정책으로 AWS 밖(타 클라우드·온프레미스·임의 Origin)까지 한 번에 커버. 관리형 룰 자동 갱신과 엣지(Origin 도달 전) 차단은 AWS WAF(+CloudFront)도 하므로 근거로 쓰지 마세요. 워크로드가 AWS 안에만 있다면 통합 과금의 단순함은 인정하고 시작하세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/"
-        }
-      ]
+      }
     },
     {
       "productId": "waiting-room",
@@ -2631,7 +2519,7 @@
     {
       "productId": "workers",
       "whyKo": "\"전 세계 330개 이상 도시에서 cold start 없이 서버리스 함수를 몇 초 만에 배포\" — 공식 요약이 존재 이유를 그대로 말합니다. 서울에서 온 요청을 미국 Origin까지 왕복시키는 대신, 사용자에게 가장 가까운 엣지에서 코드가 응답을 만들어 바로 돌려보냅니다.",
-      "misconceptionKo": "\"AWS Lambda 같은 리전 함수\"로 오해하기 쉽습니다 — 리전 선택이 없는 전역 실행이고, V8 isolate 기반이라 cold start가 사실상 없습니다(밀리초 미만이지 물리적 0은 아닙니다).",
+      "misconceptionKo": "\"리전을 고르는 서버리스 함수\"로 오해하기 쉽습니다 — 리전 선택이 없는 전역 실행이고, V8 isolate 기반이라 cold start가 사실상 없습니다(밀리초 미만이지 물리적 0은 아닙니다).",
       "customerQuestionKo": "\"기존 Node 서버를 그대로 옮길 수 있나요?\" — 실행 모델이 다르므로(HTTP 핸들러 중심) 이식 범위를 먼저 가르는 것이 정직한 답입니다.",
       "sourceUrl": "https://www.cloudflare.com/products/workers/",
       "verifiedAt": "2026-07-15T00:00:00Z",
@@ -2648,15 +2536,7 @@
             "a": "배치와 VPC 내부 작업은 Lambda가 맞습니다. 사용자 요청 경로만 보세요 — 리전 선택 없이 사용자 옆에서 돌고 cold start가 사실상 없다는 것이 응답 시간에 그대로 찍힙니다."
           }
         ]
-      },
-      "battlecard": [
-        {
-          "competitor": "AWS Lambda",
-          "vsKo": "리전 없음·cold start 사실상 0·사용자 근접 실행이 강점. VPC 내부 자원 직접 접근, 긴 실행 시간, 무거운 런타임은 Lambda가 유리 — \"요청 경로의 코드는 Workers, 배치는 Lambda\"로 나눠 이기세요.",
-          "grounding": "internal-reviewed",
-          "sourceUrl": "https://www.cloudflare.com/products/workers/"
-        }
-      ]
+      }
     },
     {
       "productId": "workers-ai",
