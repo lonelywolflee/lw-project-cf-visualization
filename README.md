@@ -105,7 +105,7 @@ TypeScript type, validator를 제공하며 data 구조의 single source of truth
 
 - Angular CLI와 standalone Angular component (zoneless)
 - strict TypeScript
-- Node.js LTS (`.nvmrc` 기준 24)
+- Node.js LTS (`.nvmrc`에 정확한 version 고정 — root `engines.node`와 함께 이동)
 - `pnpm` workspace
 - Vitest unit test와 ESLint, Prettier
 - Cloudflare Pages static hosting
@@ -252,9 +252,14 @@ Dashboard에서 git integration으로 GitHub repository를 연결하고 다음 �
 | Environment variables  | 없음 (secret 불필요)                           |
 
 Pages build system(v2)은 root `package.json`의 `packageManager` field로 pnpm version을,
-`.nvmrc`로 Node.js version을 결정합니다. `main`이 production을 추적하고 다른 branch
-push는 preview deployment로 배포됩니다. Build command의 `pnpm build`는 workspace 의존
-순서를 따르므로 공유 contract가 먼저 빌드됩니다 — Pages에 추가 설정은 필요 없습니다.
+`.nvmrc`로 Node.js version을 결정합니다. `.nvmrc`에는 **정확한 version을 고정**합니다
+(예: `24.18.0`) — major만 적으면(`24`) Pages의 asdf가 build image에 내장된 낡은 24.x로
+해석할 수 있고, 그 version이 root `engines.node` 하한에 못 미치면 `engineStrict`가
+자동 install 단계를 실패시킵니다(v0.1.0 첫 배포가 정확히 이렇게 실패했습니다:
+image가 v24.13.1을 골랐고 하한은 24.15.0). `engines.node` 하한을 올릴 때는 `.nvmrc`도
+함께 올립니다. `main`이 production을 추적하고 다른 branch push는 preview deployment로
+배포됩니다. Build command의 `pnpm build`는 workspace 의존 순서를 따르므로 공유
+contract가 먼저 빌드됩니다 — Pages에 추가 설정은 필요 없습니다.
 
 ### 공개 범위
 
