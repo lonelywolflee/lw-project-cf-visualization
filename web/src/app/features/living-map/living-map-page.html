@@ -335,14 +335,59 @@
         @if (note.analogyKo; as analogy) {
         <dt>비유하자면</dt>
         <dd>{{ analogy }}</dd>
-        } @if (note.seNoteKo; as seNote) {
-        <dt>SE 각주</dt>
-        <dd>{{ seNote }}</dd>
-        } @if (note.aeNoteKo; as aeNote) {
-        <dt>AE 각주</dt>
-        <dd>{{ aeNote }}</dd>
         }
       </dl>
+
+      @if (note.se; as seLayer) {
+      <div class="role-layer">
+        <p class="layer-head">SE 심화</p>
+        <dl class="note">
+          @if (seLayer.archKo; as arch) {
+          <dt>동작 원리</dt>
+          <dd>{{ arch }}</dd>
+          } @if (seLayer.opsKo; as ops) {
+          <dt>운영·튜닝</dt>
+          <dd>{{ ops }}</dd>
+          } @if (seLayer.limitsKo; as limits) {
+          <dt>한계·주의</dt>
+          <dd>{{ limits }}</dd>
+          }
+        </dl>
+      </div>
+      } @if (note.ae; as aeLayer) {
+      <div class="role-layer">
+        <p class="layer-head">AE 어필</p>
+        <dl class="note">
+          @if (aeLayer.pitchKo; as pitch) {
+          <dt>대화의 문</dt>
+          <dd>{{ pitch }}</dd>
+          } @if (aeLayer.valueKo; as value) {
+          <dt>비즈니스 가치</dt>
+          <dd>{{ value }}</dd>
+          } @if (aeLayer.objections; as objections) { @for (objection of objections; track
+          objection.q) {
+          <dt>“{{ objection.q }}”</dt>
+          <dd>{{ objection.a }}</dd>
+          } }
+        </dl>
+      </div>
+      } @if (note.battlecard; as cards) {
+      <div class="role-layer">
+        <p class="layer-head">경쟁 비교</p>
+        @for (card of cards; track card.competitor) {
+        <div class="battlecard">
+          <p class="bc-head">
+            vs {{ card.competitor }} @if (card.grounding === 'official') {
+            <a [href]="card.sourceUrl" target="_blank" rel="noopener noreferrer">공식 근거</a>
+            } @else {
+            <span class="bc-badge">사내 검수 자료</span>
+            }
+          </p>
+          <p class="bc-body">{{ card.vsKo }}</p>
+        </div>
+        }
+      </div>
+      }
       <p class="c-src">
         노트 출처:
         <a [href]="note.sourceUrl" target="_blank" rel="noopener noreferrer">원문 페이지 (새 창)</a>

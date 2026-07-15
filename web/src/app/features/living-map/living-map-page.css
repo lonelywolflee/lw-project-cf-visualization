@@ -390,6 +390,57 @@
   margin: 0.25rem 0 0;
 }
 
+.role-layer {
+  border-top: 1.5px dashed var(--lm-line);
+  margin-top: 0.9rem;
+  padding-top: 0.5rem;
+}
+
+.layer-head {
+  color: var(--lm-lane2);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.battlecard {
+  border: 1.5px solid var(--lm-line);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.bc-head {
+  font-size: 0.9rem;
+  font-weight: 750;
+  margin: 0;
+}
+
+.bc-head a {
+  color: var(--lm-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  margin-left: 0.3rem;
+}
+
+.bc-badge {
+  background: var(--lm-lane2-soft);
+  border-radius: 4px;
+  color: var(--lm-lane2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-left: 0.3rem;
+  padding: 0.05rem 0.4rem;
+}
+
+.bc-body {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0.3rem 0 0;
+}
+
 .c-src {
   border-top: 1.5px dashed var(--lm-line);
   color: var(--lm-faint);

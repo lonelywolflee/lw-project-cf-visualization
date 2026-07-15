@@ -131,6 +131,24 @@ const curatedData: CuratedData = {
       misconceptionKo: '방화벽이라 네트워크 장비라고 오해한다.',
       customerQuestionKo: '"AWS WAF 이미 쓰는데요?"',
       analogyKo: '공항 검색대와 같다.',
+      se: { opsKo: '로그 모드로 시작해 차단 모드로 올린다.' },
+      ae: {
+        pitchKo: '오탐 걱정부터 풀어주며 연다.',
+        objections: [{ q: '이미 Akamai 쓰는데요?', a: '통합 엣지 경로로 정면 대응한다.' }],
+      },
+      battlecard: [
+        {
+          competitor: 'Akamai',
+          vsKo: '엣지 통합은 강점, 전담 PS 조직은 열세.',
+          grounding: 'internal-reviewed',
+        },
+        {
+          competitor: 'AWS WAF',
+          vsKo: '관리형 룰 자동 갱신 주기가 강점.',
+          grounding: 'official',
+          sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+        },
+      ],
       sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
       verifiedAt: '2026-07-15T00:00:00Z',
     },
@@ -505,5 +523,20 @@ describe('LivingMapPage', () => {
     expect(harness.routeNativeElement?.querySelector('.replay-panel')?.textContent).toContain(
       '정거장 1 / 3',
     );
+  });
+
+  it('renders the SE/AE layers and battlecards with grounding marks', async () => {
+    const harness = await RouterTestingHarness.create('/?product=waf');
+    const card = harness.routeNativeElement?.querySelector('.learning-card');
+
+    expect(card?.textContent).toContain('SE 심화');
+    expect(card?.textContent).toContain('운영·튜닝');
+    expect(card?.textContent).toContain('AE 어필');
+    expect(card?.textContent).toContain('이미 Akamai 쓰는데요?');
+    expect(card?.textContent).toContain('경쟁 비교');
+    // internal-reviewed renders a badge; official renders a citation link.
+    expect(card?.querySelector('.bc-badge')?.textContent).toContain('사내 검수 자료');
+    const officialLinks = Array.from(card?.querySelectorAll('.bc-head a') ?? []);
+    expect(officialLinks.some((link) => link.textContent?.includes('공식 근거'))).toBe(true);
   });
 });
