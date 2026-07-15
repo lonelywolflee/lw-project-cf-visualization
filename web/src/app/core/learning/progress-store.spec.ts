@@ -122,6 +122,16 @@ describe('ProgressStore', () => {
     expect(store.statusOf('waf')).toBe('visited');
   });
 
+  it('tracks opened cards separately from verify-granted states', () => {
+    const store = createStore();
+    store.recordVisit('waf');
+    store.recordVisit('waf'); // dedup
+    store.recordRecall('compute-platform', [{ productId: 'workers', correct: true }], 2, 'verify');
+    // workers is verified but its card was never opened — openedIds says so.
+    expect(store.statusOf('workers')).toBe('verified');
+    expect(store.state().openedIds).toEqual(['waf']);
+  });
+
   it('parses pre-v2 records: kind defaults to verify, nodeReviews to empty', () => {
     localStorage.setItem(
       PROGRESS_STORAGE_KEY,

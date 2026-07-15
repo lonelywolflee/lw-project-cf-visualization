@@ -648,6 +648,15 @@
   margin: 0 0 0.8rem;
 }
 
+.spray-warning {
+  border: 1.5px dashed var(--lm-accent);
+  border-radius: 8px;
+  color: var(--lm-accent);
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem;
+  padding: 0.5rem 0.7rem;
+}
+
 .area-lane {
   color: var(--lm-faint);
   font-family: ui-monospace, 'SF Mono', Menlo, monospace;

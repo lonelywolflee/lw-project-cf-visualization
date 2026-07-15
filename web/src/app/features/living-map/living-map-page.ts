@@ -200,11 +200,12 @@ export class LivingMapPage {
     const total = this.slotTotal();
     const curated = this.curatedStore.curated();
     // Content-learning rate: of the products that HAVE a note, how many
-    // has the learner at least opened — surfaces the "verified without
-    // ever reading" decoupling the adversarial review flagged.
+    // cards the learner actually OPENED. Based on openedIds, not node
+    // status — a verify hit grants `verified` without a visit, and that
+    // is exactly the decoupling this metric exists to surface.
     const noteIds = curated?.learningNotes.map((note) => note.productId) ?? [];
-    const states = this.progress.state().nodeStates;
-    const openedNotes = noteIds.filter((id) => states[id] !== undefined).length;
+    const opened = new Set(this.progress.state().openedIds);
+    const openedNotes = noteIds.filter((id) => opened.has(id)).length;
     const json = this.progress.exportJson({
       recallRate: total === 0 ? null : this.verifiedSlotCount() / total,
       slotTotal: total,
@@ -296,6 +297,7 @@ export class LivingMapPage {
     this.query.set('');
     this.entered.set(new Set());
     this.wrongEntries.set([]);
+    this.demotedToPractice.set(false);
   }
 
   protected setMode(mode: 'explore' | 'recall' | 'replay'): void {
@@ -351,6 +353,8 @@ export class LivingMapPage {
   protected readonly entered = signal<ReadonlySet<string>>(new Set());
   /** Entered products that belong elsewhere — shown after grading. */
   protected readonly wrongEntries = signal<readonly RecallChip[]>([]);
+  /** True when the spray guard downgraded the session to practice. */
+  protected readonly demotedToPractice = signal(false);
 
   /** Autocomplete candidates; empty until three typed characters. */
   protected readonly suggestions = computed(() => {
@@ -394,12 +398,18 @@ export class LivingMapPage {
     const result = scoreRecall(pool, this.entered());
     this.score.set(result);
     const answerIds = new Set(pool.answers.map((answer) => answer.id));
-    this.wrongEntries.set(this.enteredChips().filter((chip) => !answerIds.has(chip.id)));
+    const wrong = this.enteredChips().filter((chip) => !answerIds.has(chip.id));
+    this.wrongEntries.set(wrong);
+    // Spray guard: when off-area entries outnumber the hits (precision
+    // below one half), the session was catalogue-browsing, not recall —
+    // it records as practice and grants no verification.
+    const demoted = wrong.length > result.correctSlots;
+    this.demotedToPractice.set(demoted);
     this.progress.recordRecall(
       areaValue.layer,
       result.results.map(({ productId, correct }) => ({ productId, correct })),
       result.totalSlots,
-      'verify',
+      demoted ? 'practice' : 'verify',
     );
   }
 

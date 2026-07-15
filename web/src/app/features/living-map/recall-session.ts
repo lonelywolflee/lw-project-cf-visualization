@@ -117,10 +117,12 @@ export function buildRecallPool(
 }
 
 /**
- * Autocomplete for the verify session's free-recall input. Suggestions
- * open only from three typed characters — the learner must retrieve the
- * name's beginning, not recognize it in a list — and never include ids
- * already entered. Matching is case-insensitive over name and id.
+ * Autocomplete for the verify session's free-recall input. The learner
+ * must retrieve how a name STARTS, not fish for letters it contains, so
+ * matching is prefix-of-a-word (case-insensitive over name and id words).
+ * Below three characters only an exact name/id match suggests — that
+ * keeps two-letter products (D1, KV, R2) reachable by typing them out in
+ * full while never opening a browsable list. Entered ids never repeat.
  */
 export function suggestProducts(
   catalog: Catalog,
@@ -129,12 +131,19 @@ export function suggestProducts(
   limit = 8,
 ): readonly RecallChip[] {
   const needle = query.trim().toLowerCase();
-  if (needle.length < 3) return [];
+  if (needle.length === 0) return [];
+  const matches = (name: string, id: string): boolean => {
+    if (needle.length < 3) {
+      return name === needle || id === needle;
+    }
+    return (
+      name.split(/[\s/-]+/).some((word) => word.startsWith(needle)) ||
+      id.split('-').some((word) => word.startsWith(needle))
+    );
+  };
   return catalog.products
     .filter(
-      (product) =>
-        !enteredIds.has(product.id) &&
-        (product.name.toLowerCase().includes(needle) || product.id.includes(needle)),
+      (product) => !enteredIds.has(product.id) && matches(product.name.toLowerCase(), product.id),
     )
     .map((product) => ({ id: product.id, name: product.name }))
     .sort(compareChips)

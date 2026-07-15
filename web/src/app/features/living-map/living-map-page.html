@@ -124,15 +124,23 @@
       } @if (score(); as s) {
       <div class="recall-result" role="status">
         <p class="result-line">
-          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 @if (recallKind() === 'verify') { —
-          검증 상태와 리포트에 기록됐습니다. } @else { — 연습 결과는 익혔음까지만 반영됩니다. }
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 @if (recallKind() === 'verify' &&
+          !demotedToPractice()) { — 검증 상태와 리포트에 기록됐습니다. } @else if (recallKind() ===
+          'verify') { — 아래 사유로 연습으로 기록됐습니다. } @else { — 연습 결과는 익혔음까지만
+          반영됩니다. }
         </p>
+        @if (demotedToPractice()) {
+        <p class="spray-warning">
+          영역 밖 답({{ wrongEntries().length }}개)이 정답({{ s.correctSlots }}개)보다 많습니다 —
+          카탈로그 훑기는 회상이 아니라서 이 세션은 검증(✓) 없이 연습으로만 기록됐습니다.
+        </p>
+        }
         <ul class="result-list">
           @for (result of s.results; track result.productId) {
           <li [class.missed]="!result.correct">
-            {{ result.name }} @if (result.correct) { @if (recallKind() === 'verify') { ✓ 검증됨 }
-            @else { ✓ 익혔음 } } @else { ✗ 놓침 @if (recallKind() === 'verify') { — 다시 흐려집니다
-            } }
+            {{ result.name }} @if (result.correct) { @if (recallKind() === 'verify' &&
+            !demotedToPractice()) { ✓ 검증됨 } @else { ✓ 익혔음 } } @else { ✗ 놓침 @if (recallKind()
+            === 'verify' && !demotedToPractice()) { — 다시 흐려집니다 } }
           </li>
           }
         </ul>
@@ -143,6 +151,11 @@
         </p>
         }
         <div class="recall-actions">
+          @if (recallKind() === 'practice') {
+          <button type="button" class="tool" (click)="startArea(p.layer, 'verify')">
+            이제 기억으로 검증하기 ✍
+          </button>
+          }
           <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
           <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
         </div>
