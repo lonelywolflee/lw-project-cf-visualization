@@ -15,20 +15,40 @@ export type NodeStatus = 'visited' | 'marked' | 'verified';
 
 const STATUS_RANK: Record<NodeStatus, number> = { visited: 0, marked: 1, verified: 2 };
 
+/**
+ * Session kinds: `practice` is chip recognition (a scaffold — it can mark
+ * a node, never verify it), `verify` is free recall by typed input and is
+ * the only path to `verified`. Records from before this split were all
+ * chip sessions graded as verification; they parse as 'verify' so the
+ * learner's history keeps its meaning at the time it was written.
+ */
+export type RecallKind = 'practice' | 'verify';
+
 /** One finished recall session over a single map area (layer). */
 export interface RecallEntry {
   /** Local date, YYYY-MM-DD. */
   readonly date: string;
   /** The layer the session covered. */
   readonly area: string;
+  readonly kind: RecallKind;
   readonly correctSlots: number;
   readonly totalSlots: number;
+}
+
+/** Per-node verify tracking; drives node-level re-fog intervals. */
+export interface NodeReview {
+  /** Local date (YYYY-MM-DD) of the last correct verify placement. */
+  readonly last: string;
+  /** Consecutive verify successes; a miss clears the whole record. */
+  readonly streak: number;
 }
 
 /** The whole persisted record; see the versioning policy in the store. */
 export interface ProgressState {
   readonly schemaVersion: 1;
   readonly nodeStates: Readonly<Record<string, NodeStatus>>;
+  /** Absent in pre-v2 records; parsed as empty (legacy area fallback). */
+  readonly nodeReviews: Readonly<Record<string, NodeReview>>;
   readonly recallLog: readonly RecallEntry[];
   /** Distinct local dates (YYYY-MM-DD) with at least one visit. */
   readonly sessionLog: readonly string[];
@@ -39,6 +59,7 @@ const STORAGE_KEY = 'cf-viz-learning-progress';
 const EMPTY_STATE: ProgressState = {
   schemaVersion: 1,
   nodeStates: {},
+  nodeReviews: {},
   recallLog: [],
   sessionLog: [],
 };
@@ -68,6 +89,17 @@ function parseState(raw: unknown): ProgressState | null {
     if (!isNodeStatus(value)) return null;
     states[key] = value;
   }
+  const reviews: Record<string, NodeReview> = {};
+  const nodeReviews = candidate['nodeReviews'];
+  if (nodeReviews !== undefined) {
+    if (typeof nodeReviews !== 'object' || nodeReviews === null) return null;
+    for (const [key, value] of Object.entries(nodeReviews)) {
+      if (typeof value !== 'object' || value === null) return null;
+      const review = value as Record<string, unknown>;
+      if (typeof review['last'] !== 'string' || typeof review['streak'] !== 'number') return null;
+      reviews[key] = { last: review['last'], streak: review['streak'] };
+    }
+  }
   const log: RecallEntry[] = [];
   for (const entry of recallLog as unknown[]) {
     if (typeof entry !== 'object' || entry === null) return null;
@@ -80,9 +112,13 @@ function parseState(raw: unknown): ProgressState | null {
     ) {
       return null;
     }
+    // Pre-split records carry no kind; they were graded as verification.
+    const kind = record['kind'] ?? 'verify';
+    if (kind !== 'practice' && kind !== 'verify') return null;
     log.push({
       date: record['date'],
       area: record['area'],
+      kind,
       correctSlots: record['correctSlots'],
       totalSlots: record['totalSlots'],
     });
@@ -91,6 +127,7 @@ function parseState(raw: unknown): ProgressState | null {
   return {
     schemaVersion: 1,
     nodeStates: states,
+    nodeReviews: reviews,
     recallLog: log,
     sessionLog: sessionLog as string[],
   };
@@ -164,29 +201,50 @@ export class ProgressStore {
   }
 
   /**
-   * Applies one finished recall session: correct placements upgrade to
-   * `verified`, wrong ones demote to `visited` (re-fogging the node), and
-   * the session lands in the recall log.
+   * Applies one finished recall session. A `verify` session (free recall)
+   * is the only path to `verified`: correct placements upgrade and start
+   * or extend the node's review streak, wrong ones demote to `visited`
+   * and clear the streak. A `practice` session (chip recognition) is a
+   * scaffold — a correct pick raises a node to at most `marked`, a miss
+   * changes nothing. Both land in the recall log with their kind.
    */
   recordRecall(
     area: string,
     placements: readonly { readonly productId: string; readonly correct: boolean }[],
     totalSlots: number,
+    kind: RecallKind,
   ): void {
     const correctSlots = placements.filter((placement) => placement.correct).length;
+    const day = localToday();
     this.stateSignal.update((state) => {
       const nodeStates = { ...state.nodeStates };
+      const nodeReviews = { ...state.nodeReviews };
       for (const placement of placements) {
+        if (kind === 'practice') {
+          if (placement.correct) {
+            const current = nodeStates[placement.productId];
+            if (current === undefined || STATUS_RANK[current] < STATUS_RANK.marked) {
+              nodeStates[placement.productId] = 'marked';
+            }
+          }
+          continue;
+        }
         if (placement.correct) {
           nodeStates[placement.productId] = 'verified';
-        } else if (nodeStates[placement.productId] !== undefined) {
-          nodeStates[placement.productId] = 'visited';
+          const previous = nodeReviews[placement.productId];
+          nodeReviews[placement.productId] = { last: day, streak: (previous?.streak ?? 0) + 1 };
+        } else {
+          if (nodeStates[placement.productId] !== undefined) {
+            nodeStates[placement.productId] = 'visited';
+          }
+          delete nodeReviews[placement.productId];
         }
       }
       return {
         ...state,
         nodeStates,
-        recallLog: [...state.recallLog, { date: localToday(), area, correctSlots, totalSlots }],
+        nodeReviews,
+        recallLog: [...state.recallLog, { date: day, area, kind, correctSlots, totalSlots }],
       };
     });
   }

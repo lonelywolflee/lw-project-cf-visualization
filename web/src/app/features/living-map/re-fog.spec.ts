@@ -1,11 +1,11 @@
 import type { RecallEntry } from '../../core/learning/progress-store';
 
-import { addDays, areaReviewStates } from './re-fog';
+import { addDays, areaReviewStates, nodeReviewStates } from './re-fog';
 
 const AREA = 'application-security';
 
 function session(date: string, correctSlots: number, totalSlots = 10, area = AREA): RecallEntry {
-  return { date, area, correctSlots, totalSlots };
+  return { date, area, kind: 'verify', correctSlots, totalSlots };
 }
 
 describe('addDays', () => {
@@ -87,5 +87,27 @@ describe('areaReviewStates', () => {
     );
     expect(states.get(AREA)?.stale).toBe(true);
     expect(states.get('compute-platform')?.stale).toBe(false);
+  });
+});
+
+describe('nodeReviewStates', () => {
+  it('schedules each node by its own streak — the per-item SM-2 property', () => {
+    const states = nodeReviewStates(
+      {
+        waf: { last: '2026-07-10', streak: 1 }, // +1d → due 07-11, stale
+        cdn: { last: '2026-07-10', streak: 2 }, // +4d → due 07-14, stale today (07-15)
+        dns: { last: '2026-07-10', streak: 3 }, // +14d → due 07-24, fresh
+      },
+      '2026-07-15',
+    );
+    expect(states.get('waf')).toMatchObject({ dueDate: '2026-07-11', stale: true });
+    expect(states.get('cdn')).toMatchObject({ dueDate: '2026-07-14', stale: true });
+    expect(states.get('dns')).toMatchObject({ dueDate: '2026-07-24', stale: false });
+    expect(states.get('unknown')).toBeUndefined();
+  });
+
+  it('caps the interval at fourteen days for long streaks', () => {
+    const states = nodeReviewStates({ waf: { last: '2026-07-01', streak: 9 } }, '2026-07-10');
+    expect(states.get('waf')?.dueDate).toBe('2026-07-15');
   });
 });

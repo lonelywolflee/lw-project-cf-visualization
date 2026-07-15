@@ -36,7 +36,7 @@ describe('ProgressStore', () => {
     store.recordVisit('waf');
     expect(store.statusOf('waf')).toBe('marked');
     // Marking a verified node must not demote it either.
-    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5);
+    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5, 'verify');
     expect(store.statusOf('waf')).toBe('verified');
     store.markLearned('waf');
     expect(store.statusOf('waf')).toBe('verified');
@@ -53,19 +53,91 @@ describe('ProgressStore', () => {
         { productId: 'ddos', correct: false },
       ],
       4,
+      'verify',
     );
     expect(store.statusOf('waf')).toBe('verified');
     expect(store.statusOf('ddos')).toBe('visited'); // 재안개: 익힘 해제
     expect(store.state().recallLog).toEqual([
-      { date: '2026-07-15', area: 'application-security', correctSlots: 1, totalSlots: 4 },
+      {
+        date: '2026-07-15',
+        area: 'application-security',
+        kind: 'verify',
+        correctSlots: 1,
+        totalSlots: 4,
+      },
     ]);
     expect(store.verifiedCount()).toBe(1);
   });
 
   it('does not resurrect a node the learner never touched on a wrong recall', () => {
     const store = createStore();
-    store.recordRecall('l3', [{ productId: 'spectrum', correct: false }], 3);
+    store.recordRecall('l3', [{ productId: 'spectrum', correct: false }], 3, 'verify');
     expect(store.statusOf('spectrum')).toBeUndefined();
+  });
+
+  it('caps practice sessions at marked — verification needs free recall', () => {
+    const store = createStore();
+    store.recordRecall(
+      'compute-platform',
+      [{ productId: 'workers', correct: true }],
+      2,
+      'practice',
+    );
+    expect(store.statusOf('workers')).toBe('marked');
+    expect(store.state().nodeReviews['workers']).toBeUndefined();
+    // A practice miss neither demotes nor resurrects.
+    store.recordRecall(
+      'compute-platform',
+      [{ productId: 'workers', correct: false }],
+      2,
+      'practice',
+    );
+    expect(store.statusOf('workers')).toBe('marked');
+    // Practice never demotes a verified node either.
+    store.recordRecall('compute-platform', [{ productId: 'workers', correct: true }], 2, 'verify');
+    store.recordRecall(
+      'compute-platform',
+      [{ productId: 'workers', correct: true }],
+      2,
+      'practice',
+    );
+    expect(store.statusOf('workers')).toBe('verified');
+    expect(store.state().recallLog.map((entry) => entry.kind)).toEqual([
+      'practice',
+      'practice',
+      'verify',
+      'practice',
+    ]);
+  });
+
+  it('tracks per-node verify reviews: streak grows, a miss clears it', () => {
+    const store = createStore();
+    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5, 'verify');
+    expect(store.state().nodeReviews['waf']).toEqual({ last: '2026-07-15', streak: 1 });
+    vi.setSystemTime(new Date('2026-07-16T09:00:00'));
+    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5, 'verify');
+    expect(store.state().nodeReviews['waf']).toEqual({ last: '2026-07-16', streak: 2 });
+    store.recordRecall('application-security', [{ productId: 'waf', correct: false }], 5, 'verify');
+    expect(store.state().nodeReviews['waf']).toBeUndefined();
+    expect(store.statusOf('waf')).toBe('visited');
+  });
+
+  it('parses pre-v2 records: kind defaults to verify, nodeReviews to empty', () => {
+    localStorage.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        nodeStates: { waf: 'verified' },
+        recallLog: [
+          { date: '2026-07-01', area: 'application-security', correctSlots: 3, totalSlots: 4 },
+        ],
+        sessionLog: ['2026-07-01'],
+      }),
+    );
+    const store = createStore();
+    expect(store.statusOf('waf')).toBe('verified');
+    expect(store.state().recallLog[0]?.kind).toBe('verify');
+    expect(store.state().nodeReviews).toEqual({});
   });
 
   it('deduplicates session days', () => {
@@ -119,7 +191,7 @@ describe('ProgressStore', () => {
   it('round-trips through export and import, and rejects invalid imports', () => {
     const store = createStore();
     store.markLearned('waf');
-    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5);
+    store.recordRecall('application-security', [{ productId: 'waf', correct: true }], 5, 'verify');
     const exported = store.exportJson({ recallRate: 0.2 });
 
     localStorage.clear();

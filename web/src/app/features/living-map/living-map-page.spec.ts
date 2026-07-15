@@ -332,14 +332,17 @@ describe('LivingMapPage', () => {
     expect(element?.querySelector('.lanes')).toBeNull(); // 지도 대신 회상 화면
   });
 
-  it('runs a full recall session: pick limit, scoring, verification, and demotion', async () => {
+  it('runs a chip practice session: pick limit, scoring, and the marked cap', async () => {
     const progress = TestBed.inject(ProgressStore);
-    progress.markLearned('workers'); // 익힘 상태에서 놓치면 강등되어야 한다.
-    const harness = await RouterTestingHarness.create('/?mode=recall&area=compute-platform');
+    progress.markLearned('workers');
+    const harness = await RouterTestingHarness.create(
+      '/?mode=recall&area=compute-platform&kind=practice',
+    );
     const element = harness.routeNativeElement;
 
-    // The compute area has 2 slots (workers, r2); picks are capped at 2.
+    // Practice keeps the slot scaffold; picks are capped at 2.
     expect(element?.textContent).toContain('슬롯이 2개');
+    expect(element?.textContent).toContain('익혔음까지만');
     const chip = (name: string): HTMLButtonElement | undefined =>
       Array.from(element?.querySelectorAll<HTMLButtonElement>('.recall-chip') ?? []).find(
         (button) => button.textContent?.trim() === name,
@@ -359,14 +362,68 @@ describe('LivingMapPage', () => {
     await harness.fixture.whenStable();
 
     expect(element?.querySelector('.result-line')?.textContent).toContain('정답 1 / 2');
-    expect(progress.statusOf('r2')).toBe('verified');
-    expect(progress.statusOf('workers')).toBe('visited'); // marked → 강등
-    expect(progress.state().recallLog).toHaveLength(1);
+    // Recognition is a scaffold: marked at most, no verification, no demotion.
+    expect(progress.statusOf('r2')).toBe('marked');
+    expect(progress.statusOf('workers')).toBe('marked');
     expect(progress.state().recallLog[0]).toMatchObject({
       area: 'compute-platform',
+      kind: 'practice',
       correctSlots: 1,
       totalSlots: 2,
     });
+  });
+
+  it('verifies through free recall: typed input, hidden slot count, wrong entries', async () => {
+    const progress = TestBed.inject(ProgressStore);
+    const harness = await RouterTestingHarness.create('/?mode=recall&area=compute-platform');
+    const element = harness.routeNativeElement;
+
+    // The verify session never reveals how many slots the area has.
+    expect(element?.textContent).toContain('몇 개인지는 알려주지 않습니다');
+    expect(element?.textContent).not.toContain('슬롯이 2개');
+    const input = element?.querySelector<HTMLInputElement>('.verify-input input');
+    expect(input).not.toBeNull();
+
+    const type = async (value: string): Promise<void> => {
+      if (input === null || input === undefined) return;
+      input.value = value;
+      input.dispatchEvent(new Event('input'));
+      await harness.fixture.whenStable();
+    };
+
+    await type('Wo'); // two characters — the gate stays closed
+    expect(element?.querySelectorAll('.suggestion')).toHaveLength(0);
+    await type('Wor');
+    const workersSuggestion = Array.from(
+      element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [],
+    ).find((button) => button.textContent?.trim() === 'Workers');
+    workersSuggestion?.click();
+    await harness.fixture.whenStable();
+
+    await type('CDN'); // wrong-area entry: graded as such, no penalty logic
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.suggestion') ?? [])
+      .find((button) => button.textContent?.trim() === 'CDN')
+      ?.click();
+    await harness.fixture.whenStable();
+
+    element?.querySelector<HTMLButtonElement>('.recall-submit')?.click();
+    await harness.fixture.whenStable();
+
+    expect(element?.querySelector('.result-line')?.textContent).toContain('정답 1 / 2');
+    expect(element?.querySelector('.wrong-entries')?.textContent).toContain('CDN');
+    expect(progress.statusOf('workers')).toBe('verified');
+    expect(progress.state().nodeReviews['workers']).toMatchObject({ streak: 1 });
+    expect(progress.state().recallLog[0]).toMatchObject({ kind: 'verify' });
+  });
+
+  it('enters a verify session from the area card buttons', async () => {
+    const harness = await RouterTestingHarness.create('/?mode=recall');
+    const element = harness.routeNativeElement;
+
+    element?.querySelector<HTMLButtonElement>('.area-card .area-verify')?.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Location).path()).toContain('kind=verify');
+    expect(harness.routeNativeElement?.querySelector('.verify-input')).not.toBeNull();
   });
 
   it('collapses an unknown recall area back to the area list', async () => {
@@ -418,6 +475,28 @@ describe('LivingMapPage', () => {
     expect(element?.querySelector('.refog-nudge')).toBeNull();
     expect(element?.textContent).not.toContain('재안개');
     expect(nodeByName(element, 'WAF')?.classList.contains('refog')).toBe(false);
+  });
+
+  it('re-fogs per node once its own review interval passes', async () => {
+    const ok = TestBed.inject(ProgressStore).importJson(
+      JSON.stringify({
+        schemaVersion: 1,
+        nodeStates: { waf: 'verified', cdn: 'verified' },
+        nodeReviews: {
+          waf: { last: '2026-01-01', streak: 1 }, // long past due → stale
+          cdn: { last: localToday(), streak: 1 }, // verified today → fresh
+        },
+        recallLog: [],
+        sessionLog: [],
+      }),
+    );
+    expect(ok).toBe(true);
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    expect(nodeByName(element, 'WAF')?.classList.contains('refog')).toBe(true);
+    expect(nodeByName(element, 'CDN')?.classList.contains('refog')).toBe(false);
+    expect(element?.textContent).toContain('재안개 1');
   });
 
   it('offers scenario and solution lenses in the lens bar', async () => {

@@ -62,10 +62,50 @@
   <div class="recall">
     @if (pool(); as p) {
     <section class="recall-session" aria-labelledby="recall-heading">
-      <h2 id="recall-heading">회상 — {{ layerLabelOf(p.layer) }} 영역을 채우세요</h2>
+      @if (recallKind() === 'verify') {
+      <h2 id="recall-heading">검증 — {{ layerLabelOf(p.layer) }} 영역을 기억으로 채우세요</h2>
       <p class="recall-sub">
-        이 영역에는 슬롯이 {{ p.answers.length }}개 있습니다. 아래 칩에서 이 영역에 속하는 제품만
-        고르세요 (함정이 섞여 있습니다). 남은 선택 {{ p.answers.length - picked().size }}개.
+        이 영역에 속한다고 기억나는 제품을 모두 입력하세요. 몇 개인지는 알려주지 않습니다 —
+        그것까지가 기억입니다. 여기서 맞힌 것만 검증(✓)됩니다.
+      </p>
+      @if (score() === null) {
+      <div class="verify-input">
+        <input
+          type="text"
+          [value]="query()"
+          (input)="onQueryInput($event)"
+          placeholder="제품 이름 (3글자부터 제안이 열립니다)"
+          aria-label="제품 이름 입력"
+        />
+        @if (suggestions().length > 0) {
+        <div class="suggestions" role="listbox" aria-label="제안">
+          @for (candidate of suggestions(); track candidate.id) {
+          <button type="button" class="suggestion" (click)="addEntry(candidate.id)">
+            {{ candidate.name }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+      } @if (enteredChips().length > 0) {
+      <div class="recall-chips" role="group" aria-label="입력한 제품">
+        @for (chip of enteredChips(); track chip.id) {
+        <button
+          type="button"
+          class="recall-chip picked"
+          [disabled]="score() !== null"
+          (click)="removeEntry(chip.id)"
+        >
+          {{ chip.name }} ✕
+        </button>
+        }
+      </div>
+      } } @else {
+      <h2 id="recall-heading">연습 — {{ layerLabelOf(p.layer) }} 영역 칩 고르기</h2>
+      <p class="recall-sub">
+        이 영역에는 슬롯이 {{ p.answers.length }}개 있습니다. 칩에서 이 영역 제품만 고르세요 (함정이
+        섞여 있습니다). 남은 선택 {{ p.answers.length - picked().size }}개. 연습은 익혔음까지만
+        올립니다 — 검증(✓)은 "직접 채우기"에서.
       </p>
       <div class="recall-chips" role="group" aria-label="후보 제품">
         @for (chip of p.chips; track chip.id) {
@@ -81,57 +121,85 @@
         </button>
         }
       </div>
-
-      @if (score(); as s) {
+      } @if (score(); as s) {
       <div class="recall-result" role="status">
         <p class="result-line">
-          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 — 이 결과가 검증 상태와 리포트에
-          기록됐습니다.
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 @if (recallKind() === 'verify') { —
+          검증 상태와 리포트에 기록됐습니다. } @else { — 연습 결과는 익혔음까지만 반영됩니다. }
         </p>
         <ul class="result-list">
           @for (result of s.results; track result.productId) {
           <li [class.missed]="!result.correct">
-            {{ result.name }} @if (result.correct) { ✓ 검증됨 } @else { ✗ 놓침 — 다시 흐려집니다 }
+            {{ result.name }} @if (result.correct) { @if (recallKind() === 'verify') { ✓ 검증됨 }
+            @else { ✓ 익혔음 } } @else { ✗ 놓침 @if (recallKind() === 'verify') { — 다시 흐려집니다
+            } }
           </li>
           }
         </ul>
+        @if (recallKind() === 'verify' && wrongEntries().length > 0) {
+        <p class="wrong-entries">
+          영역 밖 답: @for (chip of wrongEntries(); track chip.id) { {{ chip.name }} } — 이 제품들은
+          다른 영역에 삽니다. 카드에서 위치를 확인하세요.
+        </p>
+        }
         <div class="recall-actions">
           <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
           <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
         </div>
       </div>
+      } @else { @if (recallKind() === 'verify') {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitVerify()"
+      >
+        제출하고 채점하기
+      </button>
       } @else {
       <button
         type="button"
         class="recall-submit"
         [disabled]="picked().size === 0"
-        (click)="submitRecall()"
+        (click)="submitPractice()"
       >
         제출하고 채점하기
       </button>
-      }
+      } }
     </section>
     } @else {
     <section class="recall-areas" aria-labelledby="recall-heading">
       <h2 id="recall-heading">회상 모드 — 어느 영역을 채워볼까요?</h2>
       <p class="recall-sub">
-        영역을 고르면 그 자리가 백지가 됩니다. 정답으로 채우면 노드가 검증(✓)되고, 놓치면 다시
-        흐려집니다.
+        영역을 고르면 그 자리가 백지가 됩니다. <strong>직접 채우기(검증)</strong>는 기억으로
+        입력하는 진짜 시험 — 맞히면 검증(✓), 놓치면 다시 흐려집니다. <strong>칩 연습</strong>은
+        고르기 연습이라 익혔음까지만 올립니다.
       </p>
       <div class="area-grid">
         @for (areaOption of areas(); track areaOption.layer) {
-        <button
-          type="button"
-          class="area-card"
-          [class.stale]="isAreaStale(areaOption.layer)"
-          (click)="startArea(areaOption.layer)"
-        >
+        <div class="area-card" [class.stale]="isAreaStale(areaOption.layer)">
           <span class="area-lane">{{ areaOption.laneLabel }}</span>
           <span class="area-name">{{ areaOption.layerLabel }}</span>
           @if (isAreaStale(areaOption.layer)) {
           <span class="stale-badge">🌫 안개가 다시 꼈어요 — 다시 채워볼까요?</span>
           }
-        </button>
+          <div class="area-actions">
+            <button
+              type="button"
+              class="area-verify"
+              (click)="startArea(areaOption.layer, 'verify')"
+            >
+              직접 채우기 ✍
+            </button>
+            <button
+              type="button"
+              class="area-practice"
+              (click)="startArea(areaOption.layer, 'practice')"
+            >
+              칩 연습
+            </button>
+          </div>
+        </div>
         }
       </div>
     </section>
