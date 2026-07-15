@@ -148,11 +148,75 @@ const curatedPricingSchema = z.strictObject({
 });
 
 /**
+ * SE depth layer: procedures, not topic labels. At least one field must
+ * be present when the object exists — an empty layer says nothing.
+ */
+const seLayerSchema = z
+  .strictObject({
+    /** How it works: data path, termination points, key composition. */
+    archKo: nonBlankString(400).optional(),
+    /** How to run it: tuning, rollout, false-positive procedure. */
+    opsKo: nonBlankString(400).optional(),
+    /** Where it stops: limits, caveats, prerequisites. */
+    limitsKo: nonBlankString(400).optional(),
+  })
+  .refine(
+    (layer) =>
+      layer.archKo !== undefined || layer.opsKo !== undefined || layer.limitsKo !== undefined,
+    { error: 'se layer must carry at least one field' },
+  );
+
+const aeObjectionSchema = z.strictObject({
+  /** The customer's words, verbatim-ish ("이미 Akamai 쓰는데요"). */
+  q: nonBlankString(200),
+  /** The straight answer — never "avoid the comparison". */
+  a: nonBlankString(400),
+});
+
+/** AE sales layer: pitch, CFO-language value, and objection handling. */
+const aeLayerSchema = z
+  .strictObject({
+    pitchKo: nonBlankString(400).optional(),
+    valueKo: nonBlankString(400).optional(),
+    objections: z.array(aeObjectionSchema).min(1).max(3).optional(),
+  })
+  .refine(
+    (layer) =>
+      layer.pitchKo !== undefined || layer.valueKo !== undefined || layer.objections !== undefined,
+    { error: 'ae layer must carry at least one field' },
+  );
+
+/**
+ * One honest competitor comparison. Competitive claims rarely exist on
+ * Cloudflare's own pages, so grounding is explicit: 'official' entries
+ * must cite an approved-host page; 'internal-reviewed' entries render
+ * with a distinct badge so they never impersonate a cited fact.
+ */
+const battlecardSchema = z
+  .strictObject({
+    competitor: nonBlankString(40),
+    vsKo: nonBlankString(400),
+    grounding: z.enum(['official', 'internal-reviewed']),
+    sourceUrl: canonicalSourceUrl.optional(),
+  })
+  .check((ctx) => {
+    if (ctx.value.grounding === 'official' && ctx.value.sourceUrl === undefined) {
+      ctx.issues.push({
+        code: 'custom',
+        message: "grounding 'official' requires a sourceUrl",
+        path: ['sourceUrl'],
+        input: undefined,
+      });
+    }
+  });
+
+/**
  * Learner-facing note for one product, written quote-first: each field
  * leans on cited official wording, and `sourceUrl`/`verifiedAt` attribute
  * the page the note was checked against. The three required fields are
  * the learning card's core (왜 존재하나 / 흔한 오해 / 대표 고객 질문);
- * the optional fields add an analogy and role-specific footnotes.
+ * the optional layers add an analogy, SE depth, AE sales language, and
+ * competitor battlecards.
  */
 const learningNoteSchema = z.strictObject({
   productId: idSlugSchema,
@@ -160,8 +224,9 @@ const learningNoteSchema = z.strictObject({
   misconceptionKo: nonBlankString(400),
   customerQuestionKo: nonBlankString(400),
   analogyKo: nonBlankString(400).optional(),
-  seNoteKo: nonBlankString(400).optional(),
-  aeNoteKo: nonBlankString(400).optional(),
+  se: seLayerSchema.optional(),
+  ae: aeLayerSchema.optional(),
+  battlecard: z.array(battlecardSchema).min(1).optional(),
   sourceUrl: canonicalSourceUrl,
   verifiedAt: utcInstant,
 });
@@ -248,6 +313,15 @@ export type UsageMeter = NonNullable<PricingTier['meters']>[number];
 
 /** Quote-first learner note for one product. */
 export type LearningNote = CuratedData['learningNotes'][number];
+
+/** SE depth layer of a note. */
+export type NoteSeLayer = NonNullable<LearningNote['se']>;
+
+/** AE sales layer of a note. */
+export type NoteAeLayer = NonNullable<LearningNote['ae']>;
+
+/** One competitor comparison of a note. */
+export type NoteBattlecard = NonNullable<LearningNote['battlecard']>[number];
 
 /** Customer-situation lens over the map. */
 export type CuratedScenario = CuratedData['scenarios'][number];

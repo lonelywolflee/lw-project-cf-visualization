@@ -23,6 +23,9 @@ import {
   type IncludedLimit,
   type LearningNote,
   type NarrationStop,
+  type NoteAeLayer,
+  type NoteBattlecard,
+  type NoteSeLayer,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,
@@ -134,11 +137,34 @@ function normalizeLearningNote(note: LearningNote): LearningNote {
   if (note.analogyKo !== undefined) {
     normalized.analogyKo = note.analogyKo;
   }
-  if (note.seNoteKo !== undefined) {
-    normalized.seNoteKo = note.seNoteKo;
+  if (note.se !== undefined) {
+    const se: NoteSeLayer = {};
+    if (note.se.archKo !== undefined) se.archKo = note.se.archKo;
+    if (note.se.opsKo !== undefined) se.opsKo = note.se.opsKo;
+    if (note.se.limitsKo !== undefined) se.limitsKo = note.se.limitsKo;
+    normalized.se = se;
   }
-  if (note.aeNoteKo !== undefined) {
-    normalized.aeNoteKo = note.aeNoteKo;
+  if (note.ae !== undefined) {
+    const ae: NoteAeLayer = {};
+    if (note.ae.pitchKo !== undefined) ae.pitchKo = note.ae.pitchKo;
+    if (note.ae.valueKo !== undefined) ae.valueKo = note.ae.valueKo;
+    if (note.ae.objections !== undefined) {
+      ae.objections = note.ae.objections.map((objection) => ({ q: objection.q, a: objection.a }));
+    }
+    normalized.ae = ae;
+  }
+  if (note.battlecard !== undefined) {
+    normalized.battlecard = [...note.battlecard]
+      .sort((a, b) => compareCodepoints(a.competitor, b.competitor))
+      .map((card) => {
+        const normalizedCard: NoteBattlecard = {
+          competitor: card.competitor,
+          vsKo: card.vsKo,
+          grounding: card.grounding,
+        };
+        if (card.sourceUrl !== undefined) normalizedCard.sourceUrl = card.sourceUrl;
+        return normalizedCard;
+      });
   }
   return normalized;
 }
