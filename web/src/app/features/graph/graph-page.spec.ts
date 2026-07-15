@@ -66,7 +66,7 @@ const curatedData: CuratedData = {
     {
       productId: 'ddos',
       roleKo: 'L3~L7 DDoS를 흡수합니다.',
-      placements: [{ lane: 'public-web', layer: 'network-l3-l4' }],
+      placements: [{ lane: 'public-web', layer: 'network-l4' }],
       sourceUrl: 'https://www.cloudflare.com/products/',
       verifiedAt: '2026-07-14T00:00:00Z',
     },

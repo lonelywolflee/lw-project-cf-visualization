@@ -275,7 +275,7 @@
         },
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l3"
         }
       ],
       "sourceUrl": "https://www.cloudflare.com/products/",
@@ -331,7 +331,7 @@
     },
     {
       "productId": "email-routing",
-      "roleKo": "커스텀 도메인 이메일 주소를 만들어 원하는 곳으로 라우팅합니다.",
+      "roleKo": "커스텀 도메인 이메일 주소를 만들어 원하는 곳으로 라우팅합니다 — MX 레코드 기반이라 웹 요청 경로 밖에서 동작합니다.",
       "placements": [
         {
           "lane": "public-web",
@@ -455,7 +455,7 @@
       "placements": [
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l3"
         }
       ],
       "sourceUrl": "https://developers.cloudflare.com/directory/",
@@ -479,7 +479,7 @@
       "placements": [
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l4"
         },
         {
           "lane": "zero-trust",
@@ -507,7 +507,7 @@
       "placements": [
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l3"
         },
         {
           "lane": "zero-trust",
@@ -631,7 +631,7 @@
       "placements": [
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l4"
         }
       ],
       "sourceUrl": "https://developers.cloudflare.com/directory/",
@@ -643,7 +643,7 @@
       "placements": [
         {
           "lane": "public-web",
-          "layer": "network-l3-l4"
+          "layer": "network-l4"
         }
       ],
       "sourceUrl": "https://www.cloudflare.com/products/",
@@ -1667,7 +1667,7 @@
       "customerQuestionKo": "\"게임 서버 DDoS는 어떻게 막나요?\" — 웹 프록시는 HTTP만 받으므로, TCP/UDP를 그대로 프록시하는 Spectrum이 맞는 층이라고 답합니다.",
       "sourceUrl": "https://www.cloudflare.com/application-services/products/cloudflare-spectrum/",
       "verifiedAt": "2026-07-15T00:00:00Z",
-      "analogyKo": "여객 검색대(웹) 옆의 화물 검색대입니다 — 상자 모양(프로토콜)이 달라도 검사는 같게."
+      "analogyKo": "장갑 호송차입니다 — 상자를 열어보지 않은 채(내용 검사 없음) 어떤 화물(TCP/UDP)이든 목적지까지 나르고, 습격(DDoS)은 호송차가 대신 맞습니다."
     },
     {
       "productId": "ssl",
@@ -1743,13 +1743,14 @@
     {
       "productId": "workers",
       "whyKo": "공식 요약대로 \"전 세계 330개 이상 도시에서 cold start 없이 서버리스 함수를 몇 초 만에 배포\"하기 위해 존재합니다. 요청이 Origin까지 갈 필요 없이 엣지에서 끝납니다.",
-      "misconceptionKo": "\"AWS Lambda 같은 리전 함수\"로 오해하기 쉽습니다 — 리전 선택이 없는 전역 실행이고, cold start가 구조적으로 없습니다(V8 isolate).",
+      "misconceptionKo": "\"AWS Lambda 같은 리전 함수\"로 오해하기 쉽습니다 — 리전 선택이 없는 전역 실행이고, V8 isolate 기반이라 cold start가 사실상 없습니다(밀리초 미만이지 물리적 0은 아닙니다).",
       "customerQuestionKo": "\"기존 Node 서버를 그대로 옮길 수 있나요?\" — 실행 모델이 다르므로(HTTP 핸들러 중심) 이식 범위를 먼저 가르는 것이 정직한 답입니다.",
       "sourceUrl": "https://www.cloudflare.com/products/workers/",
       "verifiedAt": "2026-07-15T00:00:00Z",
-      "analogyKo": "자판기 네트워크입니다 — 본사 창고(Origin)까지 가지 않고 가장 가까운 자판기에서 바로 꺼냅니다.",
+      "analogyKo": "동네마다 주방이 있는 셈입니다 — CDN 편의점이 완제품을 건넨다면, Workers 주방은 주문을 받아 즉석에서 조리합니다. 본사 주방(Origin)까지 갈 필요가 없습니다.",
       "se": {
-        "archKo": "CPU 시간 과금(벽시계 아님)과 isolate 모델이 아키텍처 설계의 출발점입니다."
+        "archKo": "CPU 시간 과금(벽시계 아님)과 isolate 모델이 아키텍처 설계의 출발점입니다.",
+        "limitsKo": "전역 실행이 기본이지만 데이터 상주 요구가 나오면 \"리전 없음\"으로 끝내지 마세요 — Durable Objects jurisdiction 같은 데이터 위치 제어 옵션으로 답해야 규제 대화가 삽니다."
       }
     },
     {
@@ -1818,7 +1819,7 @@
     },
     {
       "productId": "ddos",
-      "captionKo": "엣지에 닿은 요청은 먼저 L3/4 방어막을 지납니다. 규모로 밀어붙이는 공격은 여기서 \"unlimited, unmetered\"로 흡수되고, 정상 요청만 다음 층으로 내려갑니다.",
+      "captionKo": "엣지에 닿은 요청은 먼저 네트워크층 방어막(L3)을 지납니다. 규모로 밀어붙이는 공격은 여기서 \"unlimited, unmetered\"로 흡수되고, 정상 요청만 다음 층으로 내려갑니다.",
       "sourceUrl": "https://www.cloudflare.com/application-services/products/ddos-for-web/",
       "verifiedAt": "2026-07-15T00:00:00Z"
     },

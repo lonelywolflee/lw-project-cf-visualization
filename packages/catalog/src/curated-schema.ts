@@ -33,7 +33,8 @@ export type CuratedLane = (typeof CURATED_LANES)[number];
 export const CURATED_LANE_LAYERS = {
   'public-web': [
     'dns-connectivity',
-    'network-l3-l4',
+    'network-l3',
+    'network-l4',
     'application-security',
     'application-performance',
     'compute-platform',

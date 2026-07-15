@@ -56,7 +56,8 @@ export const LANE_LABELS: Record<
  */
 export const LAYER_LABELS: Record<CuratedLayer, string> = {
   'dns-connectivity': 'DNS · 연결',
-  'network-l3-l4': 'L3/L4 네트워크',
+  'network-l3': 'L3 네트워크 (IP 대역)',
+  'network-l4': 'L4 프록시 (TCP/UDP)',
   'application-security': 'L7 보안',
   'application-performance': 'L7 성능',
   'compute-platform': '컴퓨팅',
