@@ -85,6 +85,12 @@ const catalog: Catalog = {
       summary: 'SASE platform.',
       sourceIds: [source.id],
     },
+    {
+      id: 'security',
+      name: 'Security',
+      summary: 'Inbound security bundle.',
+      sourceIds: [source.id],
+    },
   ],
   useCases: [],
   relationships: [],
@@ -141,6 +147,12 @@ const curatedData: CuratedData = {
       solutionId: 'sase',
       productIds: ['waf', 'cdn'],
       sourceUrl: 'https://www.cloudflare.com/sase/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+    {
+      solutionId: 'security',
+      productIds: ['waf'],
+      sourceUrl: 'https://www.cloudflare.com/solutions/security/',
       verifiedAt: '2026-07-14T00:00:00Z',
     },
   ],
@@ -220,6 +232,7 @@ const curatedData: CuratedData = {
       whyKo: 'VPN을 대체하는 접근 모델입니다.',
       misconceptionKo: 'VPN의 신형이 아니라 접근 모델의 교체입니다.',
       customerQuestionKo: '"뭐부터 도입하나요?" — Access부터 단계 도입.',
+      boundariesKo: [{ solutionId: 'security', noteKo: '인바운드 vs 아웃바운드의 방향 차이.' }],
       sourceUrl: 'https://www.cloudflare.com/sase/',
       verifiedAt: '2026-07-15T00:00:00Z',
     },
@@ -597,7 +610,7 @@ describe('LivingMapPage', () => {
     );
 
     expect(chips[0]).toBe('렌즈 없음');
-    expect(chips).toContain('상황 로그인 공격 방어');
+    expect(chips).toContain('딜 상황 로그인 공격 방어');
     expect(chips).toContain('솔루션 Cloudflare One');
   });
 
@@ -707,6 +720,67 @@ describe('LivingMapPage', () => {
     // WAF has no name-trap sibling — no pair link on its card.
     await harness.navigateByUrl('/?product=waf');
     expect(harness.routeNativeElement?.querySelector('.pair-link')).toBeNull();
+  });
+
+  it('opens the canonical solution card from its lens and keeps the filter on close', async () => {
+    const harness = await RouterTestingHarness.create('/');
+    const element = harness.routeNativeElement;
+
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.lens-chip') ?? [])
+      .find((chip) => chip.textContent?.includes('Cloudflare One'))
+      ?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toBe('?lens=sase&solution=sase');
+    const card = element?.querySelector('aside[aria-label="솔루션 카드"]');
+    expect(card?.querySelector('.p-name')?.textContent).toContain('Cloudflare One');
+    expect(card?.querySelector('.s-oneliner')?.textContent).toContain('Zero Trust 묶음');
+    expect(card?.textContent).toContain('구성 제품 2');
+    // 경계: 자기 노트의 boundariesKo + 공유 제품(교집합 파생 — WAF)
+    expect(card?.textContent).toContain('인바운드 vs 아웃바운드');
+    expect(card?.textContent).toContain('공유:');
+
+    // 카드 닫기 → 필터는 유지
+    card?.querySelector<HTMLButtonElement>('.card-close')?.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Location).path()).toBe('?lens=sase');
+    expect(element?.querySelector('aside[aria-label="솔루션 카드"]')).toBeNull();
+  });
+
+  it('swaps to a product card from a composition chip, keeping the lens', async () => {
+    const harness = await RouterTestingHarness.create('/?lens=sase&solution=sase');
+    const element = harness.routeNativeElement;
+
+    Array.from(
+      element?.querySelectorAll<HTMLButtonElement>(
+        'aside[aria-label="솔루션 카드"] .recall-chip',
+      ) ?? [],
+    )
+      .find((chip) => chip.textContent?.trim() === 'WAF')
+      ?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toBe('?product=waf&lens=sase');
+    expect(
+      harness.routeNativeElement?.querySelector('.learning-card .p-name')?.textContent,
+    ).toContain('WAF');
+  });
+
+  it('mirrors one-directional boundaries onto the neighbour and falls back without a note', async () => {
+    const harness = await RouterTestingHarness.create('/?solution=security');
+    const element = harness.routeNativeElement;
+
+    const card = element?.querySelector('aside[aria-label="솔루션 카드"]');
+    // security has no note — fallback badge with the crawled summary.
+    expect(card?.querySelector('.fallback-badge')?.textContent).toContain('학습 노트 준비 중');
+    expect(card?.textContent).toContain('Inbound security bundle.');
+    // sase's boundary toward security mirrors back here.
+    expect(card?.textContent).toContain('인바운드 vs 아웃바운드');
+    expect(card?.textContent).toContain('Cloudflare One');
+
+    // Hostile ids collapse to no card.
+    await harness.navigateByUrl('/?solution=%3Cscript%3E');
+    expect(harness.routeNativeElement?.querySelector('aside[aria-label="솔루션 카드"]')).toBeNull();
   });
 
   it('renders the SE/AE layers and battlecards with grounding marks', async () => {
