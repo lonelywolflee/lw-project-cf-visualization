@@ -142,6 +142,10 @@ artifact는 독립적인 lifecycle을 가진 별도 document다.
   placements(lane/layer), `roleKo`, compositions, pricing tier(사용량 meter 포함).
 - 모든 entry는 approved hostname의 `sourceUrl`과 `verifiedAt`을 필수로 가진다. 요금 수치는
   인용한 공식 page에서 `verifiedAt` 시점에 확인한 값만 기록한다.
+- **유일한 예외는 battlecard(경쟁 비교)다**: 경쟁 비교는 공식 page에 존재하지 않으므로
+  `grounding` field로 근거를 명시한다 — `'official'`은 approved host `sourceUrl` 필수(schema가
+  강제), `'internal-reviewed'`는 사람 검수를 거친 사내 지식이며 UI가 "사내 검수 자료" badge로
+  공식 인용과 시각적으로 구분한다. 이 예외를 다른 collection으로 확장하지 않는다.
 - Curated entry가 참조하는 product/solution id는 commit된 catalog에 존재해야 한다.
   `pnpm validate:data`가 shape, cross-reference, artifact 신선도(source 재빌드 byte와
   일치)를 함께 검증한다.
@@ -157,8 +161,10 @@ app/
 ├── shared/                     # Domain ownership이 없는 reusable UI
 └── features/
     ├── catalog/                # Routes와 layout gate (CatalogShell)
-    ├── map/                    # 경로·레이어 지도(홈)와 product detail panel
-    └── graph/                  # 솔루션 구성 focus graph
+    ├── living-map/             # 학습 지도(홈): 탐험·재생·회상 모드, 학습 카드, 렌즈, 진도, 재안개
+    ├── map/                    # 공용 지도 selector와 product detail panel
+    ├── graph/                  # 솔루션 구성 focus graph
+    └── calculator/             # 사용량 기반 요금 계산기
 ```
 
 - Standalone component와 route-level lazy loading을 기본으로 한다.
@@ -191,7 +197,7 @@ app/
 - 최소 HTML fixture를 사용하는 parser regression test
 - Normalization의 deterministic output test
 - Invalid crawl 결과가 기존 web data를 보존하는 test
-- Angular search, filter, detail state test
+- 세 화면(지도·그래프·계산기)의 URL 상태, redirect, 상태 gate test
 - 주요 route의 accessibility와 responsive smoke test
 - Production static build test
 
@@ -212,10 +218,12 @@ acceptance criteria, test plan, 선행 dependency를 포함한다.
 2. Catalog runtime schema, types, fixture, validator
 3. Source config와 metadata crawler
 4. Validated atomic web data update
-5. Angular catalog loading과 application shell
-6. Hierarchy, search, filter, detail
-7. Relationship visualization과 accessible fallback
-8. Cloudflare Pages deployment
+5. Curated dataset contract와 `build:curated` pipeline
+6. Angular data loading과 layout gate (catalog + curated)
+7. 경로·레이어 지도와 detail panel
+8. 솔루션 구성 graph와 accessible fallback
+9. 사용량 기반 요금 계산기
+10. Cloudflare Pages deployment
 
 관련 없는 refactor를 기능 Issue에 섞지 않는다. 새로운 dependency는 표준 API로 해결할 수 없는
 구체적 이유가 있을 때만 추가한다.

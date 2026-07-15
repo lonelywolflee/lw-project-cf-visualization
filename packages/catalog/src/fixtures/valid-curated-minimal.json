@@ -1,10 +1,16 @@
 {
   "schemaVersion": "1",
+  "learningNotes": [],
   "products": [
     {
       "productId": "waf",
       "roleKo": "SQL 주입·XSS 같은 웹 공격 패턴을 요청이 Origin에 닿기 전에 차단합니다.",
-      "placements": [{ "lane": "public-web", "layer": "application-security" }],
+      "placements": [
+        {
+          "lane": "public-web",
+          "layer": "application-security"
+        }
+      ],
       "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
@@ -26,7 +32,13 @@
           "name": "Free",
           "monthlyUsd": 0,
           "featuresKo": ["무료 관리형 룰셋"],
-          "limits": [{ "metric": "custom-rules", "included": 5, "labelKo": "커스텀 룰" }]
+          "limits": [
+            {
+              "metric": "custom-rules",
+              "included": 5,
+              "labelKo": "커스텀 룰"
+            }
+          ]
         },
         {
           "id": "enterprise",
@@ -38,7 +50,10 @@
               "metric": "requests",
               "included": 10000000,
               "per": "month",
-              "overage": { "usd": 0.3, "perUnits": 1000000 },
+              "overage": {
+                "usd": 0.3,
+                "perUnits": 1000000
+              },
               "labelKo": "요청 수"
             }
           ]
@@ -47,5 +62,8 @@
       "sourceUrl": "https://www.cloudflare.com/plans/",
       "verifiedAt": "2026-07-14T00:00:00Z"
     }
-  ]
+  ],
+  "scenarios": [],
+  "narration": [],
+  "solutionNotes": []
 }

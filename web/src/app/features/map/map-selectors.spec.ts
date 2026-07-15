@@ -77,6 +77,10 @@ const catalog: Catalog = {
 
 const curated: CuratedData = {
   schemaVersion: '1',
+  learningNotes: [],
+  scenarios: [],
+  narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'waf',
@@ -89,7 +93,7 @@ const curated: CuratedData = {
       productId: 'ddos',
       roleKo: 'L3~L7 DDoS를 흡수합니다.',
       placements: [
-        { lane: 'public-web', layer: 'network-l3-l4' },
+        { lane: 'public-web', layer: 'network-l4' },
         { lane: 'public-web', layer: 'application-security' },
       ],
       sourceUrl: 'https://www.cloudflare.com/products/',
@@ -165,7 +169,8 @@ describe('buildMapModel', () => {
     const publicWeb = model.lanes[0];
     expect(publicWeb?.layers.map((layer) => layer.layer)).toEqual([
       'dns-connectivity',
-      'network-l3-l4',
+      'network-l3',
+      'network-l4',
       'application-security',
       'application-performance',
       'compute-platform',
@@ -177,7 +182,7 @@ describe('buildMapModel', () => {
 
   it('places multi-placement products on every one of their layers', () => {
     const publicWeb = model.lanes[0];
-    const l3 = publicWeb?.layers.find((layer) => layer.layer === 'network-l3-l4');
+    const l3 = publicWeb?.layers.find((layer) => layer.layer === 'network-l4');
     const appSec = publicWeb?.layers.find((layer) => layer.layer === 'application-security');
     expect(l3?.products.map((chip) => chip.id)).toContain('ddos');
     expect(appSec?.products.map((chip) => chip.id)).toContain('ddos');

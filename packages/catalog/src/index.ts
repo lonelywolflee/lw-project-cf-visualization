@@ -33,12 +33,23 @@ export {
   type CuratedLayer,
   type CuratedPricing,
   type CuratedProduct,
+  type CuratedScenario,
   type IncludedLimit,
+  type LearningNote,
+  type NarrationStop,
+  type NoteAeLayer,
+  type NoteBattlecard,
+  type NoteSeLayer,
+  type SolutionBoundary,
+  type SolutionNote,
   type PricingTier,
   type ProductPlacement,
   type UsageMeter,
 } from './curated-schema.js';
-export { collectCuratedReferenceIssues } from './curated-integrity.js';
+export {
+  collectCuratedReferenceIssues,
+  KNOWN_PRODUCT_SOLUTION_COLLISIONS,
+} from './curated-integrity.js';
 export {
   parseCuratedData,
   safeParseCuratedData,

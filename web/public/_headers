@@ -4,7 +4,11 @@
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 
-# The catalog is refreshed manually (pnpm crawl) at a stable URL, so the
-# browser must revalidate it on every load to pick up a redeployed dataset.
+# Both data documents are refreshed manually (pnpm crawl / pnpm
+# build:curated) at stable URLs, so the browser must revalidate them on
+# every load to pick up a redeployed dataset — and so the pair can never
+# skew (a new catalog served next to a stale cached curated document).
 /data/catalog.json
+  Cache-Control: public, max-age=0, must-revalidate
+/data/curated.json
   Cache-Control: public, max-age=0, must-revalidate

@@ -1,27 +1,41 @@
 # Cloudflare Product & Solution Explorer
 
 Cloudflare의 공식 제품군과 solution을 학습하기 위한 정적 visualization project입니다.
-TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고, Angular web application이
-생성된 JSON을 읽어 제품과 관계를 보여줍니다.
+TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고, 손으로 큐레이션한
+레이어 배치·솔루션 구성·요금 data를 더해, Angular web application이 이를 지도·그래프·
+계산기로 시각화합니다.
 
-> 현재 pnpm workspace와 세 package(`web`, `crawler`, `packages/catalog`)의 bootstrap이
-> 완료되어 아래 command를 실행할 수 있습니다. `pnpm crawl`이 공식 source 수집, schema
-> validation, `web/public/data/catalog.json` 갱신까지 수행합니다. web은 `catalog.json`을
-> schema validation과 함께 불러와
-> product family 계층 탐색, product·solution 상세(공식 출처 링크 포함), URL로 공유
-> 가능한 검색·필터, 출처가 표기된 관계 시각화(접근 가능한 목록 병행), loading·오류·빈
-> 데이터 상태를 제공합니다.
+> 세 화면을 제공합니다: 탐험·재생·회상 세 모드로 Cloudflare를 학습하는
+> **살아있는 지도**(`/` — 안개 걷기, 출처가 달린 학습 카드(SE 심화·AE
+> 어필·경쟁 비교 계층 포함), 고객 상황과 솔루션이 지도 위 제품 경로를 밝히는
+> 렌즈, 솔루션 렌즈를 누르면 열리는 정본 솔루션 카드(한 문장 정의·3종 노트·
+> 구성 제품 칩·이웃과의 경계와 공유 제품), 요청의 일생을 정거장별 자막으로
+> 따라가는 재생, 기억으로 직접 입력하는 검증과 칩 고르기 연습으로 나뉜 백지
+> 회상 시험 — 솔루션도 구성 재현·경계 문항으로 같은 루프에 들어갑니다 —,
+> 노드·솔루션별 검증 시점부터 간격을 세는 재안개, 진도 리포트 내보내기),
+> 솔루션이 어떤 제품들로 구성되는지 보여주는
+> **구성 그래프**(`/solutions`), 예상 사용량을 입력하면 티어별 월 비용을 추정하는
+> **요금 계산기**(`/calculator`). 모든 화면의 상태(선택·모드·영역)는 URL이라 링크로
+> 공유할 수 있으며, 무엇을 선택하든 공식 출처 링크와 확인 시각이 함께 표시됩니다.
 
 ## 목표
 
-이 project는 다음 질문에 답할 수 있는 탐색 화면을 만드는 것을 목표로 합니다.
+이 project는 Cloudflare를 처음 접하는 사람이 다음 질문에 답할 수 있게 하는 것을 목표로
+합니다.
 
-- Cloudflare에는 어떤 공식 product family와 product가 있는가?
-- 각 product는 어떤 solution과 use case에 연결되는가?
-- 수집된 정보의 공식 출처는 어디인가?
+- 각 제품은 방문자와 Origin 서버 사이 요청 경로의 어느 위치(레이어)에서 어떤 역할을 하는가?
+- 하나의 요청은 어떤 제품들을 어떤 순서로 지나가는가? (재생 모드의 여정)
+- 고객 상황이나 솔루션이 주어지면 어떤 제품 조합이 관여하는가? (렌즈)
+- 각 솔루션은 어떤 제품들로 구성되며, 어떤 제품이 여러 솔루션에 공유되는가?
+- 각 제품의 요금 티어는 어떻게 구성되고, 예상 사용량 기준 월 비용은 얼마인가?
+- 그리고 배운 것을 백지에서 재현할 수 있는가? (회상 모드와 재안개가 측정)
+- 이 모든 정보의 공식 출처는 어디인가?
 
-MVP는 product family 탐색, 검색과 filter, 상세 정보, 출처가 포함된 관계 보기를 제공합니다.
 로그인, browser 편집, backend API, database, scheduled crawling은 포함하지 않습니다.
+
+학습 관문은 두 단계입니다: 관문 1은 종이 백지 지도 재현(재현율 = 올바른 슬롯/70),
+관문 2는 [시나리오 방어](./docs/gate-2-scenario-defense.md) — 고객 상황과 표준
+반론 앞에서 제품 조합·기술 근거·경쟁 대응을 소리 내어 구성하는 오프라인 시험입니다.
 
 ## 동작 방식
 
@@ -161,8 +175,11 @@ pnpm build
 pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
-`http://127.0.0.1:8788`에서 두 화면의 직접 진입(`/`, `/solutions`)과 딥링크
-(`/?product=<id>`, `/solutions?solution=<id>`), 은퇴한 v1 경로의 redirect
+`http://127.0.0.1:8788`에서 세 화면의 직접 진입(`/`, `/solutions`, `/calculator`)과 딥링크
+(`/?product=<id>`, `/?lens=<id>`, `/?mode=replay&stop=<n>`,
+`/?mode=recall&area=<layer>&kind=<verify|practice>`,
+`/solutions?solution=<id>`, `/calculator?products=<id,...>`),
+은퇴한 v1 경로의 redirect
 (`/browse`, `/discovery` → `/`, `/relationships` → `/solutions`,
 `/products/<id>` → `/?product=<id>`, `/solutions/<id>` → `/solutions?solution=<id>`),
 그리고 `/data/catalog.json`·`/data/curated.json` 응답을 확인합니다. 일상적인 개발에는
@@ -189,9 +206,10 @@ push는 preview deployment로 배포됩니다.
 - Application rollback: Pages dashboard → Deployments에서 이전 deployment의
   `Rollback to this deployment`를 실행합니다. 모든 deployment는 immutable하게 보존되므로
   즉시 이전 상태로 복귀합니다.
-- Data rollback: `catalog.json`을 갱신한 commit을 `git revert`한 뒤 push하면 새
-  deployment가 이전 data로 다시 배포됩니다. Rollback 후에도 `pnpm validate:data`로
-  data 유효성을 확인합니다.
+- Data rollback: data를 갱신한 commit(`catalog.json`, 또는 `data/curated/` +
+  `curated.json`)을 `git revert`한 뒤 push하면 새 deployment가 이전 data로 다시
+  배포됩니다. Rollback 후에도 `pnpm validate:data`로 data 유효성(신선도 포함)을
+  확인합니다.
 
 ## License
 

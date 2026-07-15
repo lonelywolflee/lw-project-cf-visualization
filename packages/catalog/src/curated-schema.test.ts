@@ -5,6 +5,10 @@ import { safeParseCuratedData, type CuratedData } from './index.js';
 function buildValidCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
+    scenarios: [],
+    narration: [],
+    solutionNotes: [],
     products: [
       {
         productId: 'waf',
@@ -86,6 +90,10 @@ describe('curatedDataSchema', () => {
   it('accepts empty collections (curation grows incrementally)', () => {
     const result = safeParseCuratedData({
       schemaVersion: '1',
+      learningNotes: [],
+      scenarios: [],
+      narration: [],
+      solutionNotes: [],
       products: [],
       compositions: [],
       pricing: [],
@@ -258,6 +266,144 @@ describe('curatedDataSchema', () => {
         ],
       },
       'pricing[0].tiers[0].meters[0].overage.perUnits',
+    );
+  });
+
+  it('accepts a learning note with and without the optional fields', () => {
+    const data = buildValidCuratedData();
+    const note = {
+      productId: 'waf',
+      whyKo: '공격 패턴은 요청 단계에서 잡는 게 싸다.',
+      misconceptionKo: '방화벽이라 네트워크 장비라고 오해한다.',
+      customerQuestionKo: '"AWS WAF 이미 쓰는데요?"',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expect(safeParseCuratedData({ ...data, learningNotes: [note] }).success).toBe(true);
+    expect(
+      safeParseCuratedData({
+        ...data,
+        learningNotes: [
+          {
+            ...note,
+            analogyKo: '공항 검색대.',
+            se: { archKo: 'TLS 해제 후 검사.', opsKo: '로그 모드로 시작.' },
+            ae: {
+              valueKo: '오탐 튜닝 인건비 절감.',
+              objections: [{ q: '이미 벤더 WAF 쓰는데요?', a: '엣지 위치와 관리형 룰 갱신 주기.' }],
+            },
+            battlecard: [
+              {
+                competitor: 'Akamai',
+                vsKo: '통합 엣지가 강점, 전용 프로페셔널 서비스는 열세.',
+                grounding: 'internal-reviewed',
+              },
+            ],
+          },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects empty role layers and ungrounded official battlecards', () => {
+    const data = buildValidCuratedData();
+    const note = {
+      productId: 'waf',
+      whyKo: '이유.',
+      misconceptionKo: '오해.',
+      customerQuestionKo: '질문?',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expectShapeIssue({ ...data, learningNotes: [{ ...note, se: {} }] }, 'learningNotes[0].se');
+    expectShapeIssue({ ...data, learningNotes: [{ ...note, ae: {} }] }, 'learningNotes[0].ae');
+    // 'official' grounding demands a citation — the whole point of the badge.
+    expectShapeIssue(
+      {
+        ...data,
+        learningNotes: [
+          {
+            ...note,
+            battlecard: [{ competitor: 'Akamai', vsKo: '비교.', grounding: 'official' }],
+          },
+        ],
+      },
+      'learningNotes[0].battlecard[0].sourceUrl',
+    );
+    expectShapeIssue(
+      {
+        ...data,
+        learningNotes: [
+          {
+            ...note,
+            ae: {
+              objections: [
+                { q: '반론1?', a: '답1.' },
+                { q: '반론2?', a: '답2.' },
+                { q: '반론3?', a: '답3.' },
+                { q: '반론4?', a: '답4.' },
+              ],
+            },
+          },
+        ],
+      },
+      'learningNotes[0].ae.objections',
+    );
+  });
+
+  it('rejects a learning note with a blank required field or an unknown key', () => {
+    const data = buildValidCuratedData();
+    const note = {
+      productId: 'waf',
+      whyKo: ' ',
+      misconceptionKo: '오해.',
+      customerQuestionKo: '질문?',
+      sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expectShapeIssue({ ...data, learningNotes: [note] }, 'learningNotes[0].whyKo');
+    expectShapeIssue(
+      { ...data, learningNotes: [{ ...note, whyKo: '이유.', extra: true }] },
+      'learningNotes[0].extra',
+    );
+  });
+
+  it('accepts a scenario with and without the optional talk track', () => {
+    const data = buildValidCuratedData();
+    const scenario = {
+      id: 'flash-sale-surge',
+      titleKo: '이커머스 세일 폭주',
+      situationKo: '정상 트래픽이 순간 폭주하는 상황입니다.',
+      productIds: ['waiting-room', 'cdn'],
+      sourceUrl: 'https://developers.cloudflare.com/waiting-room/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expect(safeParseCuratedData({ ...data, scenarios: [scenario] }).success).toBe(true);
+    expect(
+      safeParseCuratedData({
+        ...data,
+        scenarios: [{ ...scenario, talkTrackKo: '지난 피크 이벤트 경험을 물으세요.' }],
+      }).success,
+    ).toBe(true);
+  });
+
+  it('rejects a scenario with fewer than two members or duplicate members', () => {
+    const data = buildValidCuratedData();
+    const scenario = {
+      id: 'flash-sale-surge',
+      titleKo: '이커머스 세일 폭주',
+      situationKo: '정상 트래픽이 순간 폭주하는 상황입니다.',
+      productIds: ['waiting-room', 'cdn'],
+      sourceUrl: 'https://developers.cloudflare.com/waiting-room/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    expectShapeIssue(
+      { ...data, scenarios: [{ ...scenario, productIds: ['waiting-room'] }] },
+      'scenarios[0].productIds',
+    );
+    expectShapeIssue(
+      { ...data, scenarios: [{ ...scenario, productIds: ['cdn', 'cdn'] }] },
+      'scenarios[0].productIds',
     );
   });
 

@@ -63,6 +63,10 @@ function buildCatalog(): Catalog {
 function buildCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
+    scenarios: [],
+    narration: [],
+    solutionNotes: [],
     products: [
       {
         productId: 'waf',
@@ -109,6 +113,28 @@ describe('collectCuratedReferenceIssues', () => {
         },
       ],
       pricing: [{ ...first(curated.pricing), productId: 'ghost-priced' }],
+      learningNotes: [
+        {
+          productId: 'ghost-note',
+          whyKo: '이유.',
+          misconceptionKo: '오해.',
+          customerQuestionKo: '질문?',
+          sourceUrl: 'https://www.cloudflare.com/products/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
+      scenarios: [
+        {
+          // 'sase' is a solution id in buildCatalog — the shared ?lens=
+          // namespace makes that collision a rejected reference issue.
+          id: 'sase',
+          titleKo: '충돌 시나리오',
+          situationKo: '렌즈 네임스페이스가 겹칩니다.',
+          productIds: ['waf', 'ghost-lens-member'],
+          sourceUrl: 'https://www.cloudflare.com/products/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
     };
     expect(collectCuratedReferenceIssues(broken, buildCatalog())).toEqual([
       {
@@ -131,6 +157,83 @@ describe('collectCuratedReferenceIssues', () => {
         path: 'pricing[0].productId',
         message: "Unknown products id 'ghost-priced'",
       },
+      {
+        code: 'unknown-entity-reference',
+        path: 'learningNotes[0].productId',
+        message: "Unknown products id 'ghost-note'",
+      },
+      {
+        code: 'duplicate-id',
+        path: 'scenarios[0].id',
+        message: "Scenario id 'sase' collides with a solution id",
+      },
+      {
+        code: 'unknown-entity-reference',
+        path: 'scenarios[0].productIds[1]',
+        message: "Unknown products id 'ghost-lens-member'",
+      },
     ]);
+  });
+
+  it('validates solution notes: references, self-boundaries, and the collision snapshot', () => {
+    const curated = buildCuratedData();
+    const note = {
+      solutionId: 'sase',
+      oneLinerKo: '직원 접속을 지키는 묶음.',
+      whyKo: '이유.',
+      misconceptionKo: '오해.',
+      customerQuestionKo: '질문?',
+      sourceUrl: 'https://www.cloudflare.com/sase/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    };
+    // Valid note against the fixture catalog (solution 'sase' exists).
+    expect(
+      collectCuratedReferenceIssues({ ...curated, solutionNotes: [note] }, buildCatalog()),
+    ).toEqual([]);
+    // Self-boundary and an unknown neighbour are both rejected.
+    const issues = collectCuratedReferenceIssues(
+      {
+        ...curated,
+        solutionNotes: [
+          {
+            ...note,
+            boundariesKo: [
+              { solutionId: 'sase', noteKo: '자기 자신.' },
+              { solutionId: 'ghost-solution', noteKo: '유령 이웃.' },
+            ],
+          },
+        ],
+      },
+      buildCatalog(),
+    );
+    expect(issues).toContainEqual({
+      code: 'duplicate-id',
+      path: 'solutionNotes[0].boundariesKo[0].solutionId',
+      message: "Solution 'sase' cannot bound itself",
+    });
+    expect(issues).toContainEqual({
+      code: 'unknown-entity-reference',
+      path: 'solutionNotes[0].boundariesKo[1].solutionId',
+      message: "Unknown solutions id 'ghost-solution'",
+    });
+  });
+
+  it('fails on a product∩solution id collision outside the known snapshot', () => {
+    const catalog = buildCatalog();
+    // The fixture catalog has product 'waf'; add a solution with the same id.
+    const collided = {
+      ...catalog,
+      solutions: [
+        ...catalog.solutions,
+        { id: 'waf', name: 'WAF Solution', summary: 'Colliding.', sourceIds: ['waf-product-page'] },
+      ],
+    };
+    const issues = collectCuratedReferenceIssues(buildCuratedData(), collided);
+    expect(issues).toContainEqual({
+      code: 'duplicate-id',
+      path: 'catalog.solutions[waf]',
+      message:
+        "New product∩solution id collision 'waf' — update KNOWN_PRODUCT_SOLUTION_COLLISIONS after re-confirming the progress-key namespace contract",
+    });
   });
 });

@@ -7,6 +7,10 @@ import { CURATED_URL, CuratedStore } from './curated-store';
 
 const emptyCurated = {
   schemaVersion: '1',
+  learningNotes: [],
+  scenarios: [],
+  narration: [],
+  solutionNotes: [],
   products: [],
   compositions: [],
   pricing: [],

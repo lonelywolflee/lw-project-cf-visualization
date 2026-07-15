@@ -59,6 +59,10 @@ const VALID_CATALOG = {
 
 const VALID_CURATED_SOURCE = {
   schemaVersion: '1',
+  learningNotes: [],
+  scenarios: [],
+  narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'waf',

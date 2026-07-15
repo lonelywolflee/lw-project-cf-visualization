@@ -33,7 +33,8 @@ export type CuratedLane = (typeof CURATED_LANES)[number];
 export const CURATED_LANE_LAYERS = {
   'public-web': [
     'dns-connectivity',
-    'network-l3-l4',
+    'network-l3',
+    'network-l4',
     'application-security',
     'application-performance',
     'compute-platform',
@@ -148,10 +149,159 @@ const curatedPricingSchema = z.strictObject({
 });
 
 /**
+ * SE depth layer: procedures, not topic labels. At least one field must
+ * be present when the object exists — an empty layer says nothing.
+ */
+const seLayerSchema = z
+  .strictObject({
+    /** How it works: data path, termination points, key composition. */
+    archKo: nonBlankString(400).optional(),
+    /** How to run it: tuning, rollout, false-positive procedure. */
+    opsKo: nonBlankString(400).optional(),
+    /** Where it stops: limits, caveats, prerequisites. */
+    limitsKo: nonBlankString(400).optional(),
+  })
+  .refine(
+    (layer) =>
+      layer.archKo !== undefined || layer.opsKo !== undefined || layer.limitsKo !== undefined,
+    { error: 'se layer must carry at least one field' },
+  );
+
+const aeObjectionSchema = z.strictObject({
+  /** The customer's words, verbatim-ish ("이미 Akamai 쓰는데요"). */
+  q: nonBlankString(200),
+  /** The straight answer — never "avoid the comparison". */
+  a: nonBlankString(400),
+});
+
+/** AE sales layer: pitch, CFO-language value, and objection handling. */
+const aeLayerSchema = z
+  .strictObject({
+    pitchKo: nonBlankString(400).optional(),
+    valueKo: nonBlankString(400).optional(),
+    objections: z.array(aeObjectionSchema).min(1).max(3).optional(),
+  })
+  .refine(
+    (layer) =>
+      layer.pitchKo !== undefined || layer.valueKo !== undefined || layer.objections !== undefined,
+    { error: 'ae layer must carry at least one field' },
+  );
+
+/**
+ * One honest competitor comparison. Competitive claims rarely exist on
+ * Cloudflare's own pages, so grounding is explicit: 'official' entries
+ * must cite an approved-host page; 'internal-reviewed' entries render
+ * with a distinct badge so they never impersonate a cited fact.
+ */
+const battlecardSchema = z
+  .strictObject({
+    competitor: nonBlankString(40),
+    vsKo: nonBlankString(400),
+    grounding: z.enum(['official', 'internal-reviewed']),
+    sourceUrl: canonicalSourceUrl.optional(),
+  })
+  .check((ctx) => {
+    if (ctx.value.grounding === 'official' && ctx.value.sourceUrl === undefined) {
+      ctx.issues.push({
+        code: 'custom',
+        message: "grounding 'official' requires a sourceUrl",
+        path: ['sourceUrl'],
+        input: undefined,
+      });
+    }
+  });
+
+/**
+ * Learner-facing note for one product, written quote-first: each field
+ * leans on cited official wording, and `sourceUrl`/`verifiedAt` attribute
+ * the page the note was checked against. The three required fields are
+ * the learning card's core (왜 존재하나 / 흔한 오해 / 대표 고객 질문);
+ * the optional layers add an analogy, SE depth, AE sales language, and
+ * competitor battlecards.
+ */
+const learningNoteSchema = z.strictObject({
+  productId: idSlugSchema,
+  whyKo: nonBlankString(400),
+  misconceptionKo: nonBlankString(400),
+  customerQuestionKo: nonBlankString(400),
+  analogyKo: nonBlankString(400).optional(),
+  se: seLayerSchema.optional(),
+  ae: aeLayerSchema.optional(),
+  battlecard: z.array(battlecardSchema).min(1).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
+ * A customer-situation lens: a short narrative plus the products it lights
+ * up on the map. Solutions already act as lenses through compositions;
+ * scenarios cover situations that cut across solution boundaries (a flash
+ * sale, a VPN-replacement mandate). Grounded like every other entry:
+ * `sourceUrl` is the official page the mapping was checked against.
+ */
+const curatedScenarioSchema = z.strictObject({
+  id: idSlugSchema,
+  titleKo: nonBlankString(80),
+  situationKo: nonBlankString(400),
+  productIds: z
+    .array(idSlugSchema)
+    .min(2)
+    .refine((ids) => new Set(ids).size === ids.length, {
+      error: 'productIds must not contain duplicate ids',
+    }),
+  talkTrackKo: nonBlankString(400).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
+ * Canonical learning card for one SOLUTION — the design's "정본 솔루션
+ * 카드". Mirrors the product note's core (why/misconception/question) plus
+ * the solution-specific fields: a one-line definition (the recall pass
+ * bar) and one-directional boundary notes toward neighbour solutions.
+ * Shared-product lists are NEVER stored here — they derive from
+ * composition intersections (single source of truth).
+ */
+const solutionNoteSchema = z.strictObject({
+  solutionId: idSlugSchema,
+  oneLinerKo: nonBlankString(200),
+  whyKo: nonBlankString(400),
+  misconceptionKo: nonBlankString(400),
+  customerQuestionKo: nonBlankString(400),
+  boundariesKo: z
+    .array(
+      z.strictObject({
+        solutionId: idSlugSchema,
+        noteKo: nonBlankString(400),
+      }),
+    )
+    .min(1)
+    .optional(),
+  seAngleKo: nonBlankString(400).optional(),
+  aeAngleKo: nonBlankString(400).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
+ * One stop of the replay documentary: what the request experiences at this
+ * product, quote-first like every learning surface. Array order in
+ * `narration` IS the journey order — authored order is meaning (the same
+ * rule pricing tiers follow), so normalization never sorts it.
+ */
+const narrationStopSchema = z.strictObject({
+  productId: idSlugSchema,
+  captionKo: nonBlankString(400),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
  * Runtime schema for the curated dataset — knowledge that official pages do
  * not carry in structured form (map placements, beginner-friendly Korean
- * role lines, solution compositions, tier pricing). Every entry cites the
- * official page it was verified against and when.
+ * role lines, solution compositions, tier pricing, learning notes,
+ * scenario lenses, the replay narration). Every entry cites the official
+ * page it was verified against and when.
  *
  * Prefer {@link parseCuratedData} / {@link safeParseCuratedData}; catalog
  * cross-references are validated separately by
@@ -162,6 +312,10 @@ export const curatedDataSchema = z.strictObject({
   products: z.array(curatedProductSchema),
   compositions: z.array(curatedCompositionSchema),
   pricing: z.array(curatedPricingSchema),
+  learningNotes: z.array(learningNoteSchema),
+  solutionNotes: z.array(solutionNoteSchema),
+  scenarios: z.array(curatedScenarioSchema),
+  narration: z.array(narrationStopSchema),
 });
 
 /** A fully validated curated dataset document. */
@@ -187,3 +341,27 @@ export type IncludedLimit = NonNullable<PricingTier['limits']>[number];
 
 /** Calculator-consumable usage dimension of a tier. */
 export type UsageMeter = NonNullable<PricingTier['meters']>[number];
+
+/** Quote-first learner note for one product. */
+export type LearningNote = CuratedData['learningNotes'][number];
+
+/** SE depth layer of a note. */
+export type NoteSeLayer = NonNullable<LearningNote['se']>;
+
+/** AE sales layer of a note. */
+export type NoteAeLayer = NonNullable<LearningNote['ae']>;
+
+/** One competitor comparison of a note. */
+export type NoteBattlecard = NonNullable<LearningNote['battlecard']>[number];
+
+/** Customer-situation lens over the map. */
+export type CuratedScenario = CuratedData['scenarios'][number];
+
+/** One journey stop of the replay documentary (array order = journey). */
+export type NarrationStop = CuratedData['narration'][number];
+
+/** Canonical learning card for one solution. */
+export type SolutionNote = CuratedData['solutionNotes'][number];
+
+/** One one-directional boundary note toward a neighbour solution. */
+export type SolutionBoundary = NonNullable<SolutionNote['boundariesKo']>[number];

@@ -57,6 +57,10 @@ function buildCatalog(): Catalog {
 function buildCuratedData(): CuratedData {
   return {
     schemaVersion: '1',
+    learningNotes: [],
+    scenarios: [],
+    narration: [],
+    solutionNotes: [],
     products: [
       {
         productId: 'waf',
@@ -137,6 +141,61 @@ describe('normalizeCuratedData', () => {
     ]);
   });
 
+  it('sorts scenarios by id and their members by product id', () => {
+    const base = buildCuratedData();
+    const normalized = normalizeCuratedData({
+      ...base,
+      scenarios: [
+        {
+          id: 'vpn-replacement',
+          titleKo: 'VPN 대체',
+          situationKo: '신원 기반 접근으로 옮깁니다.',
+          talkTrackKo: '헬프데스크 티켓 수로 시작하세요.',
+          productIds: ['gateway', 'access'],
+          sourceUrl: 'https://www.cloudflare.com/sase/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+        {
+          id: 'api-abuse-defense',
+          titleKo: 'API 남용 방어',
+          situationKo: '정상처럼 보이는 남용을 거릅니다.',
+          productIds: ['waf', 'api-shield'],
+          sourceUrl: 'https://developers.cloudflare.com/api-shield/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
+    });
+    expect(normalized.scenarios.map((scenario) => scenario.id)).toEqual([
+      'api-abuse-defense',
+      'vpn-replacement',
+    ]);
+    expect(normalized.scenarios[0]?.productIds).toEqual(['api-shield', 'waf']);
+    expect(normalized.scenarios[1]?.talkTrackKo).toBe('헬프데스크 티켓 수로 시작하세요.');
+  });
+
+  it('keeps narration in authored order — the array order is the journey', () => {
+    const base = buildCuratedData();
+    const normalized = normalizeCuratedData({
+      ...base,
+      narration: [
+        {
+          productId: 'waf',
+          captionKo: '요청의 내용을 엽니다.',
+          sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+        {
+          // Alphabetically before 'waf' — must still render second.
+          productId: 'gateway',
+          captionKo: '나가는 트래픽을 거릅니다.',
+          sourceUrl: 'https://www.cloudflare.com/zero-trust/products/gateway/',
+          verifiedAt: '2026-07-15T00:00:00Z',
+        },
+      ],
+    });
+    expect(normalized.narration.map((stop) => stop.productId)).toEqual(['waf', 'gateway']);
+  });
+
   it('is idempotent', () => {
     const once = normalizeCuratedData(buildCuratedData());
     expect(normalizeCuratedData(once)).toEqual(once);
@@ -168,6 +227,10 @@ describe('buildCuratedArtifact', () => {
           placements: [...entry.placements].reverse(),
           productId: entry.productId,
         })),
+        learningNotes: [],
+        scenarios: [],
+        narration: [],
+        solutionNotes: [],
         schemaVersion: '1',
       }),
     );

@@ -7,6 +7,10 @@ import { CuratedStore } from '../core/catalog/curated-store';
 /** A valid curated document with zero coverage — the neutral test default. */
 export const EMPTY_CURATED: CuratedData = {
   schemaVersion: '1',
+  learningNotes: [],
+  scenarios: [],
+  narration: [],
+  solutionNotes: [],
   products: [],
   compositions: [],
   pricing: [],

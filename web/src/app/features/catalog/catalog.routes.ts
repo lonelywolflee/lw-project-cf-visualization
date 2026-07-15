@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { MapPage } from '../map/map-page';
+import { LivingMapPage } from '../living-map/living-map-page';
 import { CatalogShell } from './catalog-shell';
 
 /**
@@ -11,11 +11,12 @@ import { CatalogShell } from './catalog-shell';
  * on screen once BOTH documents reached `success`. Children may therefore
  * assume the catalog and curated signals are present.
  *
- * The two visualizations are the whole surface: the map at `/` (product
- * selection via `?product=`) and the composition graph at `/solutions`
- * (`?solution=` + `?product=`). Every retired v1 route stays as a redirect
- * so old deep links land on the equivalent view instead of a dead end —
- * the detail pages map onto the panel selection params.
+ * Three screens are the whole surface: the map at `/` (product selection
+ * via `?product=`), the composition graph at `/solutions` (`?solution=` +
+ * `?product=`), and the pricing calculator at `/calculator` (scenario
+ * params, see calculator-params). Every retired v1 route stays as a
+ * redirect so old deep links land on the equivalent view instead of a
+ * dead end — the detail pages map onto the panel selection params.
  */
 export const CATALOG_ROUTES: Routes = [
   {
@@ -25,7 +26,7 @@ export const CATALOG_ROUTES: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        component: MapPage,
+        component: LivingMapPage,
         title: 'Cloudflare Product & Solution Explorer',
       },
       {

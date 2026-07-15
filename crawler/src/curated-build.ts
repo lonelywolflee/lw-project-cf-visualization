@@ -19,9 +19,17 @@ import {
   type CuratedData,
   type CuratedPricing,
   type CuratedProduct,
+  type CuratedScenario,
   type IncludedLimit,
+  type LearningNote,
+  type NarrationStop,
+  type NoteAeLayer,
+  type NoteBattlecard,
+  type NoteSeLayer,
   type PricingTier,
   type ProductPlacement,
+  type SolutionBoundary,
+  type SolutionNote,
   type UsageMeter,
 } from '@cf-viz/catalog';
 
@@ -119,10 +127,107 @@ function normalizePricing(pricing: CuratedPricing): CuratedPricing {
   };
 }
 
+function normalizeLearningNote(note: LearningNote): LearningNote {
+  const normalized: LearningNote = {
+    productId: note.productId,
+    whyKo: note.whyKo,
+    misconceptionKo: note.misconceptionKo,
+    customerQuestionKo: note.customerQuestionKo,
+    sourceUrl: note.sourceUrl,
+    verifiedAt: note.verifiedAt,
+  };
+  if (note.analogyKo !== undefined) {
+    normalized.analogyKo = note.analogyKo;
+  }
+  if (note.se !== undefined) {
+    const se: NoteSeLayer = {};
+    if (note.se.archKo !== undefined) se.archKo = note.se.archKo;
+    if (note.se.opsKo !== undefined) se.opsKo = note.se.opsKo;
+    if (note.se.limitsKo !== undefined) se.limitsKo = note.se.limitsKo;
+    normalized.se = se;
+  }
+  if (note.ae !== undefined) {
+    const ae: NoteAeLayer = {};
+    if (note.ae.pitchKo !== undefined) ae.pitchKo = note.ae.pitchKo;
+    if (note.ae.valueKo !== undefined) ae.valueKo = note.ae.valueKo;
+    if (note.ae.objections !== undefined) {
+      ae.objections = note.ae.objections.map((objection) => ({ q: objection.q, a: objection.a }));
+    }
+    normalized.ae = ae;
+  }
+  if (note.battlecard !== undefined) {
+    normalized.battlecard = [...note.battlecard]
+      .sort((a, b) => compareCodepoints(a.competitor, b.competitor))
+      .map((card) => {
+        const normalizedCard: NoteBattlecard = {
+          competitor: card.competitor,
+          vsKo: card.vsKo,
+          grounding: card.grounding,
+        };
+        if (card.sourceUrl !== undefined) normalizedCard.sourceUrl = card.sourceUrl;
+        return normalizedCard;
+      });
+  }
+  return normalized;
+}
+
+function normalizeScenario(scenario: CuratedScenario): CuratedScenario {
+  const normalized: CuratedScenario = {
+    id: scenario.id,
+    titleKo: scenario.titleKo,
+    situationKo: scenario.situationKo,
+    productIds: [...scenario.productIds].sort(compareCodepoints),
+    sourceUrl: scenario.sourceUrl,
+    verifiedAt: scenario.verifiedAt,
+  };
+  if (scenario.talkTrackKo !== undefined) {
+    normalized.talkTrackKo = scenario.talkTrackKo;
+  }
+  return normalized;
+}
+
+function normalizeSolutionBoundary(boundary: SolutionBoundary): SolutionBoundary {
+  return { solutionId: boundary.solutionId, noteKo: boundary.noteKo };
+}
+
+function normalizeSolutionNote(note: SolutionNote): SolutionNote {
+  const normalized: SolutionNote = {
+    solutionId: note.solutionId,
+    oneLinerKo: note.oneLinerKo,
+    whyKo: note.whyKo,
+    misconceptionKo: note.misconceptionKo,
+    customerQuestionKo: note.customerQuestionKo,
+    sourceUrl: note.sourceUrl,
+    verifiedAt: note.verifiedAt,
+  };
+  if (note.boundariesKo !== undefined) {
+    normalized.boundariesKo = [...note.boundariesKo]
+      .sort((a, b) => compareCodepoints(a.solutionId, b.solutionId))
+      .map(normalizeSolutionBoundary);
+  }
+  if (note.seAngleKo !== undefined) {
+    normalized.seAngleKo = note.seAngleKo;
+  }
+  if (note.aeAngleKo !== undefined) {
+    normalized.aeAngleKo = note.aeAngleKo;
+  }
+  return normalized;
+}
+
+function normalizeNarrationStop(stop: NarrationStop): NarrationStop {
+  return {
+    productId: stop.productId,
+    captionKo: stop.captionKo,
+    sourceUrl: stop.sourceUrl,
+    verifiedAt: stop.verifiedAt,
+  };
+}
+
 /**
  * Canonical form of a valid curated dataset: collections sorted by their
  * entry id, placements by lane/layer, composition members by id; every
- * object rebuilt in schema key order. Idempotent.
+ * object rebuilt in schema key order. Narration keeps its authored order —
+ * the array order IS the journey (the pricing-tier rule). Idempotent.
  */
 export function normalizeCuratedData(curated: CuratedData): CuratedData {
   return {
@@ -136,6 +241,16 @@ export function normalizeCuratedData(curated: CuratedData): CuratedData {
     pricing: [...curated.pricing]
       .sort((a, b) => compareCodepoints(a.productId, b.productId))
       .map(normalizePricing),
+    learningNotes: [...curated.learningNotes]
+      .sort((a, b) => compareCodepoints(a.productId, b.productId))
+      .map(normalizeLearningNote),
+    solutionNotes: [...curated.solutionNotes]
+      .sort((a, b) => compareCodepoints(a.solutionId, b.solutionId))
+      .map(normalizeSolutionNote),
+    scenarios: [...curated.scenarios]
+      .sort((a, b) => compareCodepoints(a.id, b.id))
+      .map(normalizeScenario),
+    narration: curated.narration.map(normalizeNarrationStop),
   };
 }
 
