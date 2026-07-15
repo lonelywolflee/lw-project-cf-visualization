@@ -31,6 +31,10 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 
 로그인, browser 편집, backend API, database, scheduled crawling은 포함하지 않습니다.
 
+학습 관문은 두 단계입니다: 관문 1은 종이 백지 지도 재현(재현율 = 올바른 슬롯/70),
+관문 2는 [시나리오 방어](./docs/gate-2-scenario-defense.md) — 고객 상황과 표준
+반론 앞에서 제품 조합·기술 근거·경쟁 대응을 소리 내어 구성하는 오프라인 시험입니다.
+
 ## 동작 방식
 
 ```text
