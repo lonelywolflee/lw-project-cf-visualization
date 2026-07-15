@@ -747,6 +747,19 @@ describe('LivingMapPage', () => {
     expect(element?.querySelector('aside[aria-label="솔루션 카드"]')).toBeNull();
   });
 
+  it('clears the lens and the solution card together on a re-click', async () => {
+    const harness = await RouterTestingHarness.create('/?lens=sase&solution=sase');
+    const element = harness.routeNativeElement;
+
+    Array.from(element?.querySelectorAll<HTMLButtonElement>('.lens-chip') ?? [])
+      .find((chip) => chip.textContent?.includes('Cloudflare One'))
+      ?.click();
+    await harness.fixture.whenStable();
+
+    expect(TestBed.inject(Location).path()).toBe('');
+    expect(element?.querySelector('aside[aria-label="솔루션 카드"]')).toBeNull();
+  });
+
   it('swaps to a product card from a composition chip, keeping the lens', async () => {
     const harness = await RouterTestingHarness.create('/?lens=sase&solution=sase');
     const element = harness.routeNativeElement;
