@@ -256,14 +256,16 @@ Pages build system(v2)은 root `package.json`의 `packageManager` field로 pnpm 
 push는 preview deployment로 배포됩니다. Build command의 `pnpm build`는 workspace 의존
 순서를 따르므로 공유 contract가 먼저 빌드됩니다 — Pages에 추가 설정은 필요 없습니다.
 
-### 접근 제어 (사내 한정 공개)
+### 공개 범위
 
-이 도구는 사내 온보딩용이므로 배포 후 Cloudflare Access로 도메인을 보호합니다.
-Zero Trust dashboard → Access → Applications에서 self-hosted application을 추가하고,
-production 도메인과 preview 도메인(`*.<project>.pages.dev`)을 대상으로 사내 email
-도메인 허용 정책을 겁니다. Server-side runtime이 없어도 Access는 CDN 앞단에서
-동작하므로 static 배포와 충돌하지 않습니다 — 이 도구가 가르치는 제품(Access)으로
-도구 자신을 보호하는 구성입니다.
+모든 내용이 공식 공개 자료(`cloudflare.com`, `developers.cloudflare.com`)에서 만들어졌고
+record마다 출처 URL과 확인 시각이 붙어 있으므로, **접근 제어 없이 public으로
+배포합니다**. 학습 진도는 각자의 browser localStorage에만 저장되어 서버로 전송되지
+않습니다.
+
+이후 공개 범위를 좁힐 일이 생기면 배포 구조 변경 없이 Cloudflare Access를 켜는 것으로
+충분합니다 (Zero Trust dashboard → Access → Applications에서 production·preview 도메인에
+정책 추가 — Access는 CDN 앞단에서 동작하므로 static 배포와 충돌하지 않습니다).
 
 ### 수동 배포 (첫 배포·비상용)
 
