@@ -68,7 +68,9 @@
   align-items: start;
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  /* Panel scales with the monitor (28%) up to a reading ceiling —
+     same rule as the map's learning card. */
+  grid-template-columns: minmax(0, 1fr) minmax(320px, min(28%, 42rem));
 }
 
 @media (max-width: 960px) {

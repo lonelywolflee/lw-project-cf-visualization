@@ -108,7 +108,10 @@
 }
 
 .map-layout.card-open {
-  grid-template-columns: minmax(0, 1fr) minmax(400px, 460px);
+  /* The card column scales with the monitor (30%) between a working
+     minimum and a reading ceiling — Korean prose past ~46rem per line
+     costs more readability than the width buys. */
+  grid-template-columns: minmax(0, 1fr) minmax(400px, min(30%, 46rem));
 }
 
 @media (max-width: 980px) {
