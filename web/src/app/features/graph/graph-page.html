@@ -1,0 +1,144 @@
+<section class="graph-page" aria-labelledby="graph-heading">
+  <header class="graph-head">
+    <h1 id="graph-heading">솔루션 구성 그래프</h1>
+    <p class="graph-sub">
+      솔루션이 어떤 제품들로 이루어지는지 봅니다. 여러 솔루션에 공유되는 제품은 따로 표시되며,
+      선택하면 다른 솔루션으로 건너갈 수 있습니다.
+    </p>
+  </header>
+
+  @if (focus(); as f) {
+  <div class="graph-layout">
+    <div class="canvas">
+      <div class="focus-bar">
+        <button type="button" class="back-button" (click)="selectSolution(null)">
+          ← 전체 솔루션
+        </button>
+        <span class="focus-name">{{ f.solution.name }}</span>
+      </div>
+
+      @if (f.members; as members) {
+      <svg
+        class="graph-svg"
+        [attr.viewBox]="viewBox"
+        aria-hidden="true"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        @for (node of nodes(); track node.id) {
+        <line
+          class="edge"
+          [class.edge-shared]="node.sharedWith.length > 0"
+          [attr.x1]="hubX"
+          [attr.y1]="hubY"
+          [attr.x2]="node.x"
+          [attr.y2]="node.y"
+        />
+        } @for (node of nodes(); track node.id) {
+        <g
+          class="gnode"
+          [class.selected]="selectedProductId() === node.id"
+          (click)="selectProduct(node.id)"
+        >
+          @if (node.sharedWith.length > 0) {
+          <circle class="shared-ring" [attr.cx]="node.x" [attr.cy]="node.y" r="14" />
+          }
+          <circle class="dot" [attr.cx]="node.x" [attr.cy]="node.y" r="9" />
+          <text [attr.x]="node.labelX" [attr.y]="node.labelY" [attr.text-anchor]="node.anchor">
+            {{ node.name }}
+          </text>
+        </g>
+        }
+        <g class="hub" (click)="clearProduct()">
+          <circle [attr.cx]="hubX" [attr.cy]="hubY" r="52" />
+          <text [attr.x]="hubX" [attr.y]="hubY + 4" text-anchor="middle">
+            {{ f.solution.name }}
+          </text>
+        </g>
+      </svg>
+
+      <div class="member-list" role="group" aria-label="구성 제품">
+        @for (member of members; track member.id) {
+        <button
+          type="button"
+          class="chip"
+          [class.selected]="selectedProductId() === member.id"
+          [attr.aria-pressed]="selectedProductId() === member.id"
+          (click)="selectProduct(member.id)"
+        >
+          {{ member.name }} @if (member.sharedWith.length > 0) {
+          <span class="shared-badge">공유</span>
+          }
+        </button>
+        }
+      </div>
+
+      @if (f.source; as compositionSource) {
+      <p class="graph-src">
+        구성 출처:
+        <a [href]="compositionSource.url" target="_blank" rel="noopener noreferrer"
+          >공식 솔루션 페이지 (새 창)</a
+        >
+        · 확인일 {{ compositionSource.verifiedAt | date: 'mediumDate' }}
+      </p>
+      } } @else {
+      <div class="empty-composition" role="status">
+        <p>
+          이 솔루션의 구성은 아직 큐레이션되지 않았습니다 — 공식 페이지가 구성 제품을 확인할 수 있는
+          형태로 제공하지 않아, 출처 없는 구성을 만들지 않습니다.
+        </p>
+      </div>
+      }
+    </div>
+
+    <aside class="panel" aria-label="상세" aria-live="polite">
+      @if (panelView(); as p) {
+      <app-product-panel [view]="p" />
+      @if (sharedSolutions().length > 0) {
+      <h3 class="pivot-sec">함께 포함된 솔루션</h3>
+      <ul class="pivot-list">
+        @for (shared of sharedSolutions(); track shared.id) {
+        <li>
+          <button type="button" class="pivot-button" (click)="selectSolution(shared.id)">
+            {{ shared.name }} 구성 보기
+          </button>
+        </li>
+        }
+      </ul>
+      } } @else {
+      <p class="s-eyebrow">Solution</p>
+      <h2 class="s-name">{{ f.solution.name }}</h2>
+      <p class="s-summary" lang="en">{{ f.solution.summary }}</p>
+      @if (f.members; as members) {
+      <p class="s-count">
+        구성 제품 {{ members.length }}개 — 그래프 노드나 칩을 선택하면 제품 상세가 열립니다.
+      </p>
+      } @if (pricedMemberIds().length > 0) {
+      <a
+        class="s-cost-link"
+        routerLink="/calculator"
+        [queryParams]="{ products: pricedMemberIds().join(',') }"
+      >
+        이 구성을 요금 계산기로 계산하기 →
+      </a>
+      } @else {
+      <p class="s-cost-note">
+        구성 제품에 큐레이션된 요금이 아직 없어 요금 계산기에서 계산할 수 없습니다.
+      </p>
+      } }
+    </aside>
+  </div>
+  } @else {
+  <div class="overview" aria-label="솔루션 목록">
+    @for (card of cards(); track card.id) {
+    <button type="button" class="solution-card" (click)="selectSolution(card.id)">
+      <span class="card-name">{{ card.name }}</span>
+      @if (card.memberCount !== null) {
+      <span class="card-count">구성 제품 {{ card.memberCount }}개</span>
+      } @else {
+      <span class="card-count card-uncurated">구성 미확인</span>
+      }
+    </button>
+    }
+  </div>
+  }
+</section>

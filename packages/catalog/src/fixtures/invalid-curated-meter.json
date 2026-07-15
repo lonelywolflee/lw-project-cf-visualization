@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1",
+  "learningNotes": [],
+  "products": [],
+  "compositions": [],
+  "pricing": [
+    {
+      "productId": "waf",
+      "tiers": [
+        {
+          "id": "paid",
+          "name": "Paid",
+          "monthlyUsd": 5,
+          "meters": [
+            {
+              "metric": "requests",
+              "included": 10000000,
+              "per": "month",
+              "overage": {
+                "usd": 0.3,
+                "perUnits": 0
+              }
+            }
+          ]
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/plans/",
+      "verifiedAt": "2026-07-14T00:00:00Z"
+    }
+  ],
+  "scenarios": [],
+  "narration": [],
+  "solutionNotes": []
+}

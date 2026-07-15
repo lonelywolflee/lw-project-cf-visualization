@@ -1,0 +1,749 @@
+<section class="living-map" aria-labelledby="map-heading">
+  <header class="map-head">
+    <div class="head-row">
+      <h1 id="map-heading">Cloudflare 제품 지도</h1>
+      <div class="mode-toggle" role="group" aria-label="지도 모드">
+        <button
+          type="button"
+          class="mode"
+          [class.on]="!isRecall() && !isReplay()"
+          [attr.aria-pressed]="!isRecall() && !isReplay()"
+          (click)="setMode('explore')"
+        >
+          탐험
+        </button>
+        <button
+          type="button"
+          class="mode"
+          [class.on]="isReplay()"
+          [attr.aria-pressed]="isReplay()"
+          (click)="setMode('replay')"
+        >
+          재생 ▶
+        </button>
+        <button
+          type="button"
+          class="mode"
+          [class.on]="isRecall()"
+          [attr.aria-pressed]="isRecall()"
+          (click)="setMode('recall')"
+        >
+          회상 ✏
+        </button>
+      </div>
+      <div class="head-tools">
+        <span class="fog-count">
+          밝힌 노드 {{ progress.revealedCount() }} / 67 · 검증 슬롯 {{ verifiedSlotCount() }} / {{
+          slotTotal() }} · 솔루션 {{ progress.solutionVerifiedCount() }} / {{ solutionAreas().length
+          }} @if (staleTotal() > 0) { · 재안개 {{ staleTotal() }} }
+        </span>
+        <button type="button" class="tool" (click)="exportReport()">리포트 내보내기</button>
+        <label class="tool tool-import">
+          가져오기<input type="file" accept="application/json" (change)="importReport($event)" />
+        </label>
+        @if (importResult(); as result) {
+        <span class="import-note" role="status">
+          @if (result === 'imported') { 가져왔습니다 ✓ } @else { 파일이 올바르지 않습니다 }
+        </span>
+        }
+      </div>
+    </div>
+    <p class="map-sub">
+      아무 노드나 눌러서 시작하세요. 잠금은 없습니다 — 익힌 자리가 밝아지고, 남은 안개가 다음에 갈
+      곳을 알려줍니다.
+    </p>
+    @if (!isRecall() && staleTotal() > 0) {
+    <button type="button" class="refog-nudge" (click)="setMode('recall')">
+      🌫 검증했던 영역·솔루션 {{ staleTotal() }}곳에 안개가 다시 꼈습니다 — 다시 채워볼까요?
+    </button>
+    }
+  </header>
+
+  @if (isRecall()) {
+  <div class="recall">
+    @if (pool(); as p) {
+    <section class="recall-session" aria-labelledby="recall-heading">
+      @if (recallKind() === 'verify') {
+      <h2 id="recall-heading">검증 — {{ layerLabelOf(p.layer) }} 영역을 기억으로 채우세요</h2>
+      <p class="recall-sub">
+        이 영역에 속한다고 기억나는 제품을 모두 입력하세요. 몇 개인지는 알려주지 않습니다 —
+        그것까지가 기억입니다. 여기서 맞힌 것만 검증(✓)됩니다.
+      </p>
+      @if (score() === null) {
+      <div class="verify-input">
+        <input
+          type="text"
+          [value]="query()"
+          (input)="onQueryInput($event)"
+          placeholder="제품 이름 (3글자부터 제안이 열립니다)"
+          aria-label="제품 이름 입력"
+        />
+        @if (suggestions().length > 0) {
+        <div class="suggestions" role="listbox" aria-label="제안">
+          @for (candidate of suggestions(); track candidate.id) {
+          <button type="button" class="suggestion" (click)="addEntry(candidate.id)">
+            {{ candidate.name }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+      } @if (enteredChips().length > 0) {
+      <div class="recall-chips" role="group" aria-label="입력한 제품">
+        @for (chip of enteredChips(); track chip.id) {
+        <button
+          type="button"
+          class="recall-chip picked"
+          [disabled]="score() !== null"
+          (click)="removeEntry(chip.id)"
+        >
+          {{ chip.name }} ✕
+        </button>
+        }
+      </div>
+      } } @else {
+      <h2 id="recall-heading">연습 — {{ layerLabelOf(p.layer) }} 영역 칩 고르기</h2>
+      <p class="recall-sub">
+        이 영역에는 슬롯이 {{ p.answers.length }}개 있습니다. 칩에서 이 영역 제품만 고르세요 (함정이
+        섞여 있습니다). 남은 선택 {{ p.answers.length - picked().size }}개. 연습은 익혔음까지만
+        올립니다 — 검증(✓)은 "직접 채우기"에서.
+      </p>
+      <div class="recall-chips" role="group" aria-label="후보 제품">
+        @for (chip of p.chips; track chip.id) {
+        <button
+          type="button"
+          class="recall-chip"
+          [class.picked]="picked().has(chip.id)"
+          [attr.aria-pressed]="picked().has(chip.id)"
+          [disabled]="score() !== null"
+          (click)="togglePick(chip.id)"
+        >
+          {{ chip.name }}
+        </button>
+        }
+      </div>
+      } @if (score(); as s) {
+      <div class="recall-result" role="status">
+        <p class="result-line">
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 @if (recallKind() === 'verify' &&
+          !demotedToPractice()) { — 검증 상태와 리포트에 기록됐습니다. } @else if (recallKind() ===
+          'verify') { — 아래 사유로 연습으로 기록됐습니다. } @else { — 연습 결과는 익혔음까지만
+          반영됩니다. }
+        </p>
+        @if (demotedToPractice()) {
+        <p class="spray-warning">
+          영역 밖 답({{ wrongEntries().length }}개)이 정답({{ s.correctSlots }}개)보다 많습니다 —
+          카탈로그 훑기는 회상이 아니라서 이 세션은 검증(✓) 없이 연습으로만 기록됐습니다.
+        </p>
+        }
+        <ul class="result-list">
+          @for (result of s.results; track result.productId) {
+          <li [class.missed]="!result.correct">
+            {{ result.name }} @if (result.correct) { @if (recallKind() === 'verify' &&
+            !demotedToPractice()) { ✓ 검증됨 } @else { ✓ 익혔음 } } @else { ✗ 놓침 @if (recallKind()
+            === 'verify' && !demotedToPractice()) { — 다시 흐려집니다 } }
+          </li>
+          }
+        </ul>
+        @if (recallKind() === 'verify' && wrongEntries().length > 0) {
+        <p class="wrong-entries">
+          영역 밖 답: @for (chip of wrongEntries(); track chip.id) { {{ chip.name }} } — 이 제품들은
+          다른 영역에 삽니다. 카드에서 위치를 확인하세요.
+        </p>
+        }
+        <div class="recall-actions">
+          @if (recallKind() === 'practice') {
+          <button type="button" class="tool" (click)="startArea(p.layer, 'verify')">
+            이제 기억으로 검증하기 ✍
+          </button>
+          }
+          <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
+          <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
+        </div>
+      </div>
+      } @else { @if (recallKind() === 'verify') {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitVerify()"
+      >
+        제출하고 채점하기
+      </button>
+      } @else {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="picked().size === 0"
+        (click)="submitPractice()"
+      >
+        제출하고 채점하기
+      </button>
+      } }
+    </section>
+    } @else if (solutionPool(); as sp) {
+    <section class="recall-session" aria-labelledby="recall-heading">
+      @if (solutionStep() === -1) {
+      <h2 id="recall-heading">검증 — {{ sp.solutionName }}의 구성 제품을 기억으로 채우세요</h2>
+      <p class="recall-sub">
+        이 솔루션을 이루는 제품을 모두 입력하세요. 몇 개인지는 알려주지 않습니다. 80% 이상 맞혀야
+        솔루션이 검증(✓)됩니다 — 입력한 제품들의 지도 상태는 여기서 바뀌지 않습니다.
+      </p>
+      } @else if (boundaryQuestion(); as bq) {
+      <h2 id="recall-heading">경계 — {{ sp.solutionName }} ↔ {{ bq.neighbourName }}</h2>
+      <p class="recall-sub">
+        두 솔루션이 공유하는 제품을 모두 입력하세요. 경계를 놓치면 {{ sp.solutionName }}의 검증이
+        해제됩니다 — 상대 솔루션의 기록은 바뀌지 않습니다.
+      </p>
+      } @if (score() === null) {
+      <div class="verify-input">
+        <input
+          type="text"
+          [value]="query()"
+          (input)="onQueryInput($event)"
+          placeholder="제품 이름 (3글자부터 제안이 열립니다)"
+          aria-label="제품 이름 입력"
+        />
+        @if (suggestions().length > 0) {
+        <div class="suggestions" role="listbox" aria-label="제안">
+          @for (candidate of suggestions(); track candidate.id) {
+          <button type="button" class="suggestion" (click)="addEntry(candidate.id)">
+            {{ candidate.name }}
+          </button>
+          }
+        </div>
+        }
+      </div>
+      } @if (enteredChips().length > 0) {
+      <div class="recall-chips" role="group" aria-label="입력한 제품">
+        @for (chip of enteredChips(); track chip.id) {
+        <button
+          type="button"
+          class="recall-chip picked"
+          [disabled]="score() !== null"
+          (click)="removeEntry(chip.id)"
+        >
+          {{ chip.name }} ✕
+        </button>
+        }
+      </div>
+      } @if (score(); as s) {
+      <div class="recall-result" role="status">
+        <p class="result-line">
+          정답 {{ s.correctSlots }} / {{ s.totalSlots }} 슬롯 — @if (solutionStep() === -1) { @if
+          (demotedToPractice()) { 아래 사유로 연습으로만 기록됐습니다. } @else if (s.totalSlots > 0
+          && s.correctSlots / s.totalSlots >= 0.8) { 솔루션이 검증(✓)됐습니다. } @else { 80%에 못
+          미쳐 솔루션 검증이 해제되고 다시 흐려집니다. } } @else { @if (s.correctSlots ===
+          s.totalSlots && wrongEntries().length === 0) { 경계가 또렷합니다 — 기록만 남습니다. }
+          @else { 경계를 놓쳐 이 솔루션의 검증이 해제됩니다. } }
+        </p>
+        @if (demotedToPractice()) {
+        <p class="spray-warning">
+          정답 밖 답({{ wrongEntries().length }}개)이 정답({{ s.correctSlots }}개)보다 많습니다 —
+          카탈로그 훑기는 회상이 아니라서 이 세션은 검증(✓) 없이 연습으로만 기록됐습니다.
+        </p>
+        }
+        <ul class="result-list">
+          @for (result of s.results; track result.productId) {
+          <li [class.missed]="!result.correct">
+            {{ result.name }} @if (result.correct) { ✓ } @else { ✗ 놓침 }
+          </li>
+          }
+        </ul>
+        @if (wrongEntries().length > 0 && !demotedToPractice()) {
+        <p class="wrong-entries">
+          정답 밖 입력: @for (chip of wrongEntries(); track chip.id) { {{ chip.name }} } — 솔루션
+          카드에서 구성과 경계를 다시 확인하세요.
+        </p>
+        }
+        <div class="recall-actions">
+          @if (solutionStep() === -1 && sp.boundaryQuestions.length > 0) {
+          <button type="button" class="tool" (click)="startBoundaryQuestion(0)">
+            경계 문항 풀기 ({{ sp.boundaryQuestions.length }}개) →
+          </button>
+          } @else if (solutionStep() >= 0 && solutionStep() + 1 < sp.boundaryQuestions.length) {
+          <button type="button" class="tool" (click)="startBoundaryQuestion(solutionStep() + 1)">
+            다음 경계 문항 →
+          </button>
+          }
+          <button type="button" class="tool" (click)="setMode('recall')">다른 영역 고르기</button>
+          <button type="button" class="tool" (click)="setMode('explore')">탐험으로 돌아가기</button>
+        </div>
+      </div>
+      } @else { @if (solutionStep() === -1) {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitSolutionCompose()"
+      >
+        제출하고 채점하기
+      </button>
+      } @else {
+      <button
+        type="button"
+        class="recall-submit"
+        [disabled]="entered().size === 0"
+        (click)="submitSolutionBoundary()"
+      >
+        제출하고 채점하기
+      </button>
+      } }
+    </section>
+    } @else {
+    <section class="recall-areas" aria-labelledby="recall-heading">
+      <h2 id="recall-heading">회상 모드 — 어느 영역을 채워볼까요?</h2>
+      <p class="recall-sub">
+        영역을 고르면 그 자리가 백지가 됩니다. <strong>직접 채우기(검증)</strong>는 기억으로
+        입력하는 진짜 시험 — 맞히면 검증(✓), 놓치면 다시 흐려집니다. <strong>칩 연습</strong>은
+        고르기 연습이라 익혔음까지만 올립니다.
+      </p>
+      <div class="area-grid">
+        @for (areaOption of areas(); track areaOption.layer) {
+        <div class="area-card" [class.stale]="isAreaStale(areaOption.layer)">
+          <span class="area-lane">{{ areaOption.laneLabel }}</span>
+          <span class="area-name">{{ areaOption.layerLabel }}</span>
+          @if (isAreaStale(areaOption.layer)) {
+          <span class="stale-badge">🌫 안개가 다시 꼈어요 — 다시 채워볼까요?</span>
+          }
+          <div class="area-actions">
+            <button
+              type="button"
+              class="area-verify"
+              (click)="startArea(areaOption.layer, 'verify')"
+            >
+              직접 채우기 ✍
+            </button>
+            <button
+              type="button"
+              class="area-practice"
+              (click)="startArea(areaOption.layer, 'practice')"
+            >
+              칩 연습
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      <h3 class="solutions-head">솔루션 — 구성을 기억으로 재현하기</h3>
+      <p class="recall-sub">
+        솔루션의 구성 제품을 직접 채우고, 이웃과 공유하는 제품(경계)까지 답합니다. 여기서의 채점은
+        솔루션에만 기록됩니다 — 제품 노드의 상태는 바뀌지 않습니다.
+      </p>
+      <div class="area-grid">
+        @for (solutionOption of solutionAreas(); track solutionOption.id) {
+        <div class="area-card" [class.stale]="isLensStale(solutionOption.id)">
+          <span class="area-lane">솔루션</span>
+          <span class="area-name">{{ solutionOption.name }}</span>
+          @if (isLensStale(solutionOption.id)) {
+          <span class="stale-badge">🌫 안개가 다시 꼈어요 — 다시 채워볼까요?</span>
+          }
+          <div class="area-actions">
+            <button
+              type="button"
+              class="area-verify"
+              (click)="startSolutionArea(solutionOption.id)"
+            >
+              직접 채우기 ✍
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+    }
+  </div>
+  } @else { @if (isReplay()) { @if (currentStop(); as replayStop) {
+  <section class="replay-panel" aria-live="polite">
+    <p class="replay-count">요청의 일생 — 정거장 {{ stopIndex() }} / {{ replayStops().length }}</p>
+    <h2 class="replay-name">{{ replayStop.name }}</h2>
+    <p class="replay-caption">{{ replayStop.captionKo }}</p>
+    <p class="replay-meta">
+      <a [href]="replayStop.sourceUrl" target="_blank" rel="noopener noreferrer">원문 (새 창)</a>
+      · 확인일 {{ replayStop.verifiedAt | date: 'mediumDate' }}
+    </p>
+    <div class="replay-controls">
+      <button
+        type="button"
+        class="tool"
+        [disabled]="stopIndex() <= 1"
+        (click)="goToStop(stopIndex() - 1)"
+      >
+        ← 이전
+      </button>
+      <button
+        type="button"
+        class="tool"
+        [disabled]="stopIndex() >= replayStops().length"
+        (click)="goToStop(stopIndex() + 1)"
+      >
+        다음 →
+      </button>
+      @if (!reducedMotion) {
+      <button type="button" class="tool" (click)="togglePlay()">
+        {{ playing() ? '일시정지 ⏸' : '자동 재생 ▶' }}
+      </button>
+      }
+      <button type="button" class="tool" (click)="setMode('explore')">탐험으로</button>
+    </div>
+  </section>
+  } } @else {
+  <div class="lens-bar" role="group" aria-label="렌즈 선택">
+    <button
+      type="button"
+      class="lens-chip"
+      [class.on]="activeLens() === null"
+      (click)="setLens(null)"
+    >
+      렌즈 없음
+    </button>
+    @for (lensOption of lenses(); track lensOption.id) {
+    <button
+      type="button"
+      class="lens-chip"
+      [class.on]="activeLens()?.id === lensOption.id"
+      [class.stale]="lensOption.kind === 'solution' && isLensStale(lensOption.id)"
+      (click)="toggleLens(lensOption.id)"
+    >
+      <span class="lens-kind">{{ lensOption.kind === 'scenario' ? '딜 상황' : '솔루션' }}</span>
+      {{ lensOption.title }}
+    </button>
+    }
+  </div>
+  @if (activeLens(); as activeLensView) {
+  <aside class="lens-panel" aria-live="polite">
+    @if (activeLensView.situationKo; as situation) {
+    <p class="lens-situation">{{ situation }}</p>
+    } @if (activeLensView.talkTrackKo; as talkTrack) {
+    <p class="lens-talk"><strong>대화의 문</strong> — {{ talkTrack }}</p>
+    }
+    <p class="lens-meta">
+      제품 {{ activeLensView.productIds.size }}개를 밝힙니다 ·
+      <a [href]="activeLensView.sourceUrl" target="_blank" rel="noopener noreferrer"
+        >원문 (새 창)</a
+      >
+      · 확인일 {{ activeLensView.verifiedAt | date: 'mediumDate' }} @if (activeLensView.kind ===
+      'solution') { ·
+      <a [routerLink]="['/solutions']" [queryParams]="{ solution: activeLensView.id }"
+        >구성 그래프로 보기</a
+      >
+      }
+    </p>
+  </aside>
+  } } @if (model(); as m) {
+  <div class="map-layout" [class.card-open]="card() !== null || solutionCard() !== null">
+    <div class="lanes">
+      @for (lane of m.lanes; track lane.lane) {
+      <section class="lane lane-{{ lane.lane }}" [attr.aria-label]="lane.title">
+        <p class="lane-title">{{ lane.title }}</p>
+        <div class="journey">
+          <div class="endpoint"><span class="endpoint-name">{{ lane.from }}</span></div>
+          <div class="edge">
+            <p class="edge-title">{{ lane.edge }}</p>
+            @for (layer of lane.layers; track layer.layer) {
+            <div class="layer" [class.off-path]="layer.offPath">
+              <span class="layer-name">
+                {{ layer.label }} @if (layer.offPath) { <span class="layer-tag">경로 밖</span> }
+              </span>
+              <div class="nodes">
+                @if (layer.groups; as groups) { @for (group of groups; track group.familyId) { @if
+                (isExpanded(group.familyId)) {
+                <div class="family-group expanded">
+                  <button
+                    type="button"
+                    class="family-toggle"
+                    [attr.aria-expanded]="true"
+                    (click)="toggleGroup(group.familyId)"
+                  >
+                    {{ group.familyName }} ▾
+                  </button>
+                  @for (chip of group.products; track chip.id) {
+                  <button
+                    type="button"
+                    class="node st-{{ statusOf(chip.id) }}"
+                    [class.refog]="isRefogged(chip.id)"
+                    [class.lens-hit]="inLens(chip.id)"
+                    [class.lens-dim]="dimmedByLens(chip.id)"
+                    [class.replay-current]="isReplayCurrent(chip.id)"
+                    [class.replay-passed]="isReplayPassed(chip.id)"
+                    [class.selected]="selectedId() === chip.id"
+                    [attr.aria-pressed]="selectedId() === chip.id"
+                    (click)="open(chip.id)"
+                  >
+                    {{ chip.name }}
+                  </button>
+                  }
+                </div>
+                } @else {
+                <button
+                  type="button"
+                  class="family-toggle collapsed"
+                  [class.lens-dim]="activeLens() !== null && lensCountIn(group.products) === 0"
+                  [attr.aria-expanded]="false"
+                  (click)="toggleGroup(group.familyId)"
+                >
+                  {{ group.familyName }} · {{ group.products.length }}개 중 안개 {{
+                  unvisitedIn(group.products) }} @if (lensCountIn(group.products) > 0) {
+                  <span class="lens-badge">렌즈 {{ lensCountIn(group.products) }}</span>
+                  } ▸
+                </button>
+                } } } @else { @for (chip of layer.products; track chip.id) {
+                <button
+                  type="button"
+                  class="node st-{{ statusOf(chip.id) }}"
+                  [class.refog]="isRefogged(chip.id)"
+                  [class.lens-hit]="inLens(chip.id)"
+                  [class.lens-dim]="dimmedByLens(chip.id)"
+                  [class.replay-current]="isReplayCurrent(chip.id)"
+                  [class.replay-passed]="isReplayPassed(chip.id)"
+                  [class.selected]="selectedId() === chip.id"
+                  [attr.aria-pressed]="selectedId() === chip.id"
+                  (click)="open(chip.id)"
+                >
+                  {{ chip.name }}
+                </button>
+                } @empty {
+                <span class="empty-layer">배치된 제품 없음</span>
+                } }
+              </div>
+            </div>
+            }
+          </div>
+          <div class="endpoint"><span class="endpoint-name">{{ lane.to }}</span></div>
+        </div>
+      </section>
+      } @if (m.unplaced.length > 0) {
+      <section class="lane lane-unplaced" aria-label="배치 미정 제품">
+        <p class="lane-title">배치 미정 — 큐레이션 대기 {{ m.unplaced.length }}개</p>
+        <div class="nodes">
+          @for (chip of m.unplaced; track chip.id) {
+          <button
+            type="button"
+            class="node st-{{ statusOf(chip.id) }}"
+            [class.lens-dim]="dimmedByLens(chip.id)"
+            [attr.aria-pressed]="selectedId() === chip.id"
+            (click)="open(chip.id)"
+          >
+            {{ chip.name }}
+          </button>
+          }
+        </div>
+      </section>
+      }
+    </div>
+
+    @if (card(); as c) {
+    <aside class="learning-card" aria-label="학습 카드" aria-live="polite">
+      <header class="card-head">
+        <p class="c-eyebrow">{{ c.familyName }}</p>
+        <button type="button" class="card-close" (click)="close()" aria-label="카드 닫기">✕</button>
+      </header>
+      <h2 class="p-name">{{ c.product.name }}</h2>
+      @if (c.note; as noteForPills) {
+      <div class="layer-pills" aria-label="카드에 담긴 내용">
+        @if (noteForPills.se) {
+        <span class="pill">SE 심화 ↓</span>
+        } @if (noteForPills.ae) {
+        <span class="pill">AE 어필 ↓</span>
+        } @if (noteForPills.battlecard; as cards) {
+        <span class="pill pill-bc">경쟁 비교 {{ cards.length }} ↓</span>
+        }
+      </div>
+      } @if (c.pairedWith; as pair) {
+      <p class="pair-link">
+        혼동 짝:
+        <button type="button" (click)="open(pair.id)">{{ pair.name }}</button>
+        — 이름이 닮았지만 다른 항목입니다
+      </p>
+      } @if (c.roleKo; as role) {
+      <p class="c-role">{{ role }}</p>
+      } @if (c.note; as note) {
+      <dl class="note">
+        <dt>왜 존재하나</dt>
+        <dd>{{ note.whyKo }}</dd>
+        <dt>흔한 오해</dt>
+        <dd>{{ note.misconceptionKo }}</dd>
+        <dt>고객이 실제로 묻는 질문</dt>
+        <dd>{{ note.customerQuestionKo }}</dd>
+        @if (note.analogyKo; as analogy) {
+        <dt>비유하자면</dt>
+        <dd>{{ analogy }}</dd>
+        }
+      </dl>
+
+      @if (note.se; as seLayer) {
+      <div class="role-layer">
+        <p class="layer-head">SE 심화</p>
+        <dl class="note">
+          @if (seLayer.archKo; as arch) {
+          <dt>동작 원리</dt>
+          <dd>{{ arch }}</dd>
+          } @if (seLayer.opsKo; as ops) {
+          <dt>운영·튜닝</dt>
+          <dd>{{ ops }}</dd>
+          } @if (seLayer.limitsKo; as limits) {
+          <dt>한계·주의</dt>
+          <dd>{{ limits }}</dd>
+          }
+        </dl>
+      </div>
+      } @if (note.ae; as aeLayer) {
+      <div class="role-layer">
+        <p class="layer-head">AE 어필</p>
+        <dl class="note">
+          @if (aeLayer.pitchKo; as pitch) {
+          <dt>대화의 문</dt>
+          <dd>{{ pitch }}</dd>
+          } @if (aeLayer.valueKo; as value) {
+          <dt>비즈니스 가치</dt>
+          <dd>{{ value }}</dd>
+          } @if (aeLayer.objections; as objections) { @for (objection of objections; track
+          objection.q) {
+          <dt>“{{ objection.q }}”</dt>
+          <dd>{{ objection.a }}</dd>
+          } }
+        </dl>
+      </div>
+      } @if (note.battlecard; as cards) {
+      <div class="role-layer">
+        <p class="layer-head">경쟁 비교</p>
+        @for (card of cards; track card.competitor) {
+        <div class="battlecard">
+          <p class="bc-head">
+            vs {{ card.competitor }}
+            <a [href]="card.sourceUrl" target="_blank" rel="noopener noreferrer">공식 근거</a>
+          </p>
+          <p class="bc-body">{{ card.vsKo }}</p>
+        </div>
+        }
+      </div>
+      }
+      <p class="c-src">
+        노트 출처:
+        <a [href]="note.sourceUrl" target="_blank" rel="noopener noreferrer">원문 페이지 (새 창)</a>
+        · 확인일 {{ note.verifiedAt | date: 'mediumDate' }}
+      </p>
+      } @else {
+      <div class="fallback">
+        <span class="fallback-badge">학습 노트 준비 중</span>
+        <p class="fallback-summary" lang="en">{{ c.product.summary }}</p>
+        <p class="fallback-hint">지금은 공식 요약과 원문 링크로 학습하세요.</p>
+      </div>
+      }
+
+      <div class="deeper">
+        @for (link of c.sources; track link.url) {
+        <a [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.title }} (새 창)</a>
+        } @if (c.hasPricing) {
+        <a routerLink="/calculator" [queryParams]="{ products: c.product.id }"
+          >요금 계산기에서 보기</a
+        >
+        }
+      </div>
+
+      @if (statusOf(c.product.id) === 'verified') {
+      <p class="learned-state verified">회상으로 검증된 노드 ✓</p>
+      } @else if (statusOf(c.product.id) === 'marked') {
+      <p class="learned-state">익혔음으로 표시됨 — 회상 모드에서 검증해 보세요</p>
+      } @else {
+      <button type="button" class="learn-button" (click)="markLearned(c.product.id)">
+        익혔음 ✓ — 노드가 밝아집니다
+      </button>
+      }
+    </aside>
+    } @else if (solutionCard(); as sc) {
+    <aside class="learning-card" aria-label="솔루션 카드" aria-live="polite">
+      <header class="card-head">
+        <p class="c-eyebrow">솔루션</p>
+        <button
+          type="button"
+          class="card-close"
+          (click)="closeSolutionCard()"
+          aria-label="카드 닫기"
+        >
+          ✕
+        </button>
+      </header>
+      <h2 class="p-name">{{ sc.name }}</h2>
+      @if (sc.note; as snote) {
+      <p class="s-oneliner">{{ snote.oneLinerKo }}</p>
+      <dl class="note">
+        <dt>왜 존재하나</dt>
+        <dd>{{ snote.whyKo }}</dd>
+        <dt>흔한 오해</dt>
+        <dd>{{ snote.misconceptionKo }}</dd>
+        <dt>고객이 실제로 묻는 질문</dt>
+        <dd>{{ snote.customerQuestionKo }}</dd>
+        @if (snote.seAngleKo; as seAngle) {
+        <dt>SE 각도</dt>
+        <dd>{{ seAngle }}</dd>
+        } @if (snote.aeAngleKo; as aeAngle) {
+        <dt>AE 각도</dt>
+        <dd>{{ aeAngle }}</dd>
+        }
+      </dl>
+      <p class="c-src">
+        노트 출처:
+        <a [href]="snote.sourceUrl" target="_blank" rel="noopener noreferrer"
+          >원문 페이지 (새 창)</a
+        >
+        · 확인일 {{ snote.verifiedAt | date: 'mediumDate' }}
+      </p>
+      } @else {
+      <div class="fallback">
+        <span class="fallback-badge">학습 노트 준비 중</span>
+        <p class="fallback-summary" lang="en">{{ sc.summary }}</p>
+        <p class="fallback-hint">지금은 구성 제품과 원문 링크로 학습하세요.</p>
+      </div>
+      }
+
+      <div class="role-layer">
+        <p class="layer-head">구성 제품 {{ sc.products.length }}</p>
+        <div class="recall-chips s-chips">
+          @for (chip of sc.products; track chip.id) {
+          <button type="button" class="recall-chip" (click)="open(chip.id)">{{ chip.name }}</button>
+          }
+        </div>
+      </div>
+
+      @if (sc.boundaries.length > 0) {
+      <div class="role-layer">
+        <p class="layer-head">이웃과의 경계</p>
+        @for (boundary of sc.boundaries; track boundary.solutionId) {
+        <div class="battlecard">
+          <p class="bc-head">
+            <button
+              type="button"
+              class="s-neighbour"
+              (click)="openSolutionCard(boundary.solutionId)"
+            >
+              ↔ {{ boundary.solutionName }}
+            </button>
+          </p>
+          <p class="bc-body">{{ boundary.noteKo }}</p>
+          @if (boundary.sharedProducts.length > 0) {
+          <p class="s-shared">
+            공유: @for (chip of boundary.sharedProducts; track chip.id) {
+            <button type="button" class="recall-chip" (click)="open(chip.id)">
+              {{ chip.name }}
+            </button>
+            }
+          </p>
+          }
+        </div>
+        }
+      </div>
+      } @if (solutionStatusOf(sc.id) === 'verified') {
+      <p class="learned-state verified">구성 재현으로 검증된 솔루션 ✓</p>
+      } @else if (solutionStatusOf(sc.id) === 'marked') {
+      <p class="learned-state">익혔음으로 표시됨 — 회상 모드에서 구성 재현으로 검증해 보세요</p>
+      } @else {
+      <button type="button" class="learn-button" (click)="markSolutionLearned(sc.id)">
+        정의를 기억으로 말해본 뒤 — 익혔음 ✓
+      </button>
+      }
+    </aside>
+    }
+  </div>
+  } }
+</section>

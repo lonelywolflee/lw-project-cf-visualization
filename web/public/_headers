@@ -1,0 +1,14 @@
+# Hashed build output (outputHashing: all) never changes for a given URL.
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Both data documents are refreshed manually (pnpm crawl / pnpm
+# build:curated) at stable URLs, so the browser must revalidate them on
+# every load to pick up a redeployed dataset — and so the pair can never
+# skew (a new catalog served next to a stale cached curated document).
+/data/catalog.json
+  Cache-Control: public, max-age=0, must-revalidate
+/data/curated.json
+  Cache-Control: public, max-age=0, must-revalidate

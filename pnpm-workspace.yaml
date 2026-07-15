@@ -1,0 +1,28 @@
+packages:
+  - web
+  - crawler
+  - packages/*
+
+# Refuse to install/run under a Node version outside engines.node.
+engineStrict: true
+
+# pnpm 11 blocks dependency postinstall scripts unless allowlisted here
+# (pnpm 11 syntax: allowBuilds map; the older onlyBuiltDependencies list is ignored).
+# esbuild: @angular/build, vitest, tsx
+# @parcel/watcher, lmdb, msgpackr-extract: @angular/cli
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+
+minimumReleaseAgeExclude:
+  - tsx@4.23.1
+  - '@angular-eslint/builder@22.1.0'
+  - '@angular-eslint/bundled-angular-compiler@22.1.0'
+  - '@angular-eslint/eslint-plugin-template@22.1.0'
+  - '@angular-eslint/eslint-plugin@22.1.0'
+  - '@angular-eslint/schematics@22.1.0'
+  - '@angular-eslint/template-parser@22.1.0'
+  - '@angular-eslint/utils@22.1.0'
+  - angular-eslint@22.1.0

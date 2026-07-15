@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Solutions | Cloudflare</title>
+    <link rel="canonical" href="https://www.cloudflare.com/solutions/" />
+    <meta
+      name="description"
+      content="Discover Cloudflare solutions for AI, frontends, workflows, platforms, security, and network performance."
+    />
+    <meta property="og:title" content="Solutions | Cloudflare" />
+  </head>
+  <body>
+    <main id="main-content" tabindex="-1">
+      <section>
+        <div class="relative">
+          <a
+            href="/solutions/ai/"
+            class="absolute inset-0 z-1"
+            aria-label="See solution about AI"
+          ></a>
+          <div class="flex h-full flex-1 flex-col items-start p-6 lg:p-8">
+            <p
+              class="text-foreground-200 dark:text-foreground-100 pt-2 pb-1"
+              data-cms-path="pages.solutions-page.benefits.0.title"
+              data-cms-type="text"
+            >
+              <strong>AI</strong>
+            </p>
+            <p
+              class="text-foreground-200/70 pb-4"
+              data-cms-path="pages.solutions-page.benefits.0.description"
+              data-cms-type="text"
+            >
+              <astro-island ssr await-children
+                ><script>
+                  (() => {
+                    var e = async (t) => {
+                      await (
+                        await t()
+                      )();
+                    };
+                    self.Astro = e;
+                  })();
+                </script>
+                <span>Build intelligent applications with AI at the edge</span
+                ><!--astro:end--></astro-island
+              >
+            </p>
+          </div>
+        </div>
+        <div class="relative">
+          <a
+            href="/solutions/frontends/"
+            class="absolute inset-0 z-1"
+            aria-label="See solution about Frontends"
+          ></a>
+          <div class="flex h-full flex-1 flex-col items-start p-6 lg:p-8">
+            <p
+              class="text-foreground-200 dark:text-foreground-100 pt-2 pb-1"
+              data-cms-path="pages.solutions-page.benefits.3.title"
+              data-cms-type="text"
+            >
+              <strong>Frontends</strong>
+            </p>
+            <p
+              class="text-foreground-200/70 pb-4"
+              data-cms-path="pages.solutions-page.benefits.3.description"
+              data-cms-type="text"
+            >
+              <astro-island ssr await-children
+                ><span>Deploy frontend applications globally in seconds</span
+                ><!--astro:end--></astro-island
+              >
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- chrome decoy: every www page repeats this footer; parsers must ignore it
+         (recon: identical /solutions/ links + shared h1 CTA on all pages) -->
+    <footer>
+      <h1>Build without boundaries</h1>
+      <nav>
+        <a href="/solutions/ai/">AI</a>
+        <a href="/solutions/security/">Security</a>
+        <a href="/solutions/network/">Network services</a>
+        <a href="/products/footer-decoy/">Footer decoy product</a>
+      </nav>
+    </footer>
+  </body>
+</html>

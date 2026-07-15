@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Cloudflare CDN - Global Content Delivery Network</title>
+    <link rel="canonical" href="https://www.cloudflare.com/products/cdn/" />
+    <meta
+      name="description"
+      content="Make your site faster and stop paying for bandwidth. CDN caches content in 330+ cities worldwide with zero-configuration setup and predictable pricing."
+    />
+    <meta property="og:title" content="Cloudflare CDN - Global Content Delivery Network " />
+  </head>
+  <body>
+    <main id="main-content" tabindex="-1">
+      <section>
+        <h2
+          class="text-foreground-100 max-w-[1080px]"
+          data-cms-path="products.cdn.sections.hero.title"
+          data-cms-type="text"
+        >
+          Make your site faster and stop overpaying for bandwidth
+        </h2>
+        <p
+          class="text-foreground-200/70"
+          data-cms-path="products.cdn.sections.hero.subtitle"
+          data-cms-type="text"
+        >
+          Cloudflare's CDN caches your static and dynamic content in data centers in over 335+
+          cities worldwide.
+        </p>
+      </section>
+      <section>
+        <h4 class="text-foreground-200 dark:text-foreground-100 font-medium text-balance">
+          Perfect for Content Delivery
+        </h4>
+        <div class="relative flex w-full flex-col items-start gap-1 p-6 md:p-8">
+          <p
+            class="text-foreground-200 dark:text-foreground-100 font-medium"
+            data-cms-path="products.cdn.sections.useCases.items.0.title"
+            data-cms-type="text"
+          >
+            Static Asset Acceleration
+          </p>
+          <span
+            class="text-foreground-200/70 leading-[1.2em]"
+            data-cms-path="products.cdn.sections.useCases.items.0.description"
+            data-cms-type="text"
+            ><astro-island ssr await-children
+              ><span
+                >Accelerating the delivery of static assets like images, CSS, and JavaScript to
+                improve site speed and Core Web Vitals.</span
+              ><!--astro:end--></astro-island
+            ></span
+          >
+        </div>
+        <!-- Deliberately reuses the exact use-case NAME stated on the sase
+             fixture ('Modernize remote access') with DIFFERENT summary copy:
+             both dedicated pages sit at equal merge precedence, reproducing
+             live risk R2 (cross-page use-case summary conflict). -->
+        <div class="relative flex w-full flex-col items-start gap-1 p-6 md:p-8">
+          <p
+            class="text-foreground-200 dark:text-foreground-100 font-medium"
+            data-cms-path="products.cdn.sections.useCases.items.1.title"
+            data-cms-type="text"
+          >
+            Modernize remote access
+          </p>
+          <span
+            class="text-foreground-200/70 leading-[1.2em]"
+            data-cms-path="products.cdn.sections.useCases.items.1.description"
+            data-cms-type="text"
+            ><astro-island ssr await-children
+              ><span>Serve remote teams cached content from the nearest edge location.</span
+              ><!--astro:end--></astro-island
+            ></span
+          >
+        </div>
+      </section>
+    </main>
+    <!-- chrome decoy: every www page repeats this footer; parsers must ignore it
+         (recon: identical /solutions/ links + shared h1 CTA on all pages) -->
+    <footer>
+      <h1>Build without boundaries</h1>
+      <nav>
+        <a href="/solutions/ai/">AI</a>
+        <a href="/solutions/security/">Security</a>
+        <a href="/solutions/network/">Network services</a>
+        <a href="/products/footer-decoy/">Footer decoy product</a>
+      </nav>
+    </footer>
+  </body>
+</html>
