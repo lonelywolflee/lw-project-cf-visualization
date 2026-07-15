@@ -403,7 +403,17 @@
         <button type="button" class="card-close" (click)="close()" aria-label="카드 닫기">✕</button>
       </header>
       <h2 class="p-name">{{ c.product.name }}</h2>
-      @if (c.pairedWith; as pair) {
+      @if (c.note; as noteForPills) {
+      <div class="layer-pills" aria-label="카드에 담긴 내용">
+        @if (noteForPills.se) {
+        <span class="pill">SE 심화 ↓</span>
+        } @if (noteForPills.ae) {
+        <span class="pill">AE 어필 ↓</span>
+        } @if (noteForPills.battlecard; as cards) {
+        <span class="pill pill-bc">경쟁 비교 {{ cards.length }} ↓</span>
+        }
+      </div>
+      } @if (c.pairedWith; as pair) {
       <p class="pair-link">
         혼동 짝:
         <button type="button" (click)="open(pair.id)">{{ pair.name }}</button>
