@@ -2408,11 +2408,69 @@
         {
           "id": "pay-as-you-go",
           "name": "Pay-as-you-go",
-          "monthlyUsd": null,
-          "noteKo": "사용자당 $7/월(연간 결제), 사용자 수 제한 없음 — 좌석형이라 계산기의 월 고정액 모델 밖입니다"
+          "monthlyUsd": 0,
+          "noteKo": "기본료 없음, 사용자당 $7/월(연간 결제) — 아래에 좌석 수를 넣으면 월 견적이 나옵니다",
+          "meters": [
+            {
+              "metric": "users",
+              "included": 0,
+              "per": "month",
+              "overage": {
+                "usd": 7,
+                "perUnits": 1
+              },
+              "labelKo": "사용자 수(명)"
+            }
+          ]
         }
       ],
       "sourceUrl": "https://www.cloudflare.com/zero-trust/products/access/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "waf",
+      "tiers": [
+        {
+          "id": "free",
+          "name": "Free",
+          "monthlyUsd": 0,
+          "noteKo": "플랜 요금(WAF 포함 티어 기준) — Free Managed Ruleset과 unmetered DDoS가 Free부터 포함",
+          "featuresKo": ["WAF Free Managed Ruleset", "Unmetered DDoS Protection"]
+        },
+        {
+          "id": "pro",
+          "name": "Pro",
+          "monthlyUsd": 20,
+          "noteKo": "연간 결제 기준 $20/월(월 결제 시 $25)"
+        },
+        {
+          "id": "business",
+          "name": "Business",
+          "monthlyUsd": 200,
+          "noteKo": "연간 결제 기준 $200/월(월 결제 시 $250)",
+          "featuresKo": ["PCI DSS 4.0 대응", "100% Uptime SLA"]
+        },
+        {
+          "id": "enterprise",
+          "name": "Enterprise",
+          "monthlyUsd": null,
+          "noteKo": "커스텀 견적 — 미션 크리티컬 앱 기준, 연간 계약"
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/plans/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "ddos",
+      "tiers": [
+        {
+          "id": "included",
+          "name": "전 플랜 포함",
+          "monthlyUsd": 0,
+          "noteKo": "Unmetered DDoS Protection — Free 플랜부터 전 티어 포함, 공격 규모 과금 없음"
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/plans/",
       "verifiedAt": "2026-07-15T00:00:00Z"
     }
   ],
