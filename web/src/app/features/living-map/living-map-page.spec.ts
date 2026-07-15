@@ -63,6 +63,20 @@ const catalog: Catalog = {
       familyId: 'security',
       sourceIds: [source.id],
     },
+    {
+      id: 'gateway',
+      name: 'Gateway',
+      summary: 'Filters outbound traffic.',
+      familyId: 'security',
+      sourceIds: [source.id],
+    },
+    {
+      id: 'secure-web-gateway',
+      name: 'Secure Web Gateway',
+      summary: 'DNS filtering category.',
+      familyId: 'security',
+      sourceIds: [source.id],
+    },
   ],
   solutions: [
     {
@@ -105,6 +119,20 @@ const curatedData: CuratedData = {
       roleKo: '콘텐츠를 캐싱합니다.',
       placements: [{ lane: 'public-web', layer: 'application-performance' }],
       sourceUrl: 'https://www.cloudflare.com/products/cdn/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+    {
+      productId: 'gateway',
+      roleKo: '아웃바운드 트래픽을 거릅니다.',
+      placements: [{ lane: 'zero-trust', layer: 'access-control' }],
+      sourceUrl: 'https://www.cloudflare.com/zero-trust/products/gateway/',
+      verifiedAt: '2026-07-14T00:00:00Z',
+    },
+    {
+      productId: 'secure-web-gateway',
+      roleKo: 'DNS 필터링 범주입니다.',
+      placements: [{ lane: 'zero-trust', layer: 'access-control' }],
+      sourceUrl: 'https://www.cloudflare.com/zero-trust/products/gateway/',
       verifiedAt: '2026-07-14T00:00:00Z',
     },
   ],
@@ -602,6 +630,20 @@ describe('LivingMapPage', () => {
     expect(harness.routeNativeElement?.querySelector('.replay-panel')?.textContent).toContain(
       '정거장 1 / 3',
     );
+  });
+
+  it('cross-links name-trap pairs on the card', async () => {
+    const harness = await RouterTestingHarness.create('/?product=gateway');
+    const element = harness.routeNativeElement;
+
+    const pairButton = element?.querySelector<HTMLButtonElement>('.pair-link button');
+    expect(pairButton?.textContent).toContain('Secure Web Gateway');
+    pairButton?.click();
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Location).path()).toBe('?product=secure-web-gateway');
+    // WAF has no name-trap sibling — no pair link on its card.
+    await harness.navigateByUrl('/?product=waf');
+    expect(harness.routeNativeElement?.querySelector('.pair-link')).toBeNull();
   });
 
   it('renders the SE/AE layers and battlecards with grounding marks', async () => {

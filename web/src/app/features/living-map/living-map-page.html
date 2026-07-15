@@ -390,7 +390,13 @@
         <button type="button" class="card-close" (click)="close()" aria-label="카드 닫기">✕</button>
       </header>
       <h2 class="p-name">{{ c.product.name }}</h2>
-      @if (c.roleKo; as role) {
+      @if (c.pairedWith; as pair) {
+      <p class="pair-link">
+        혼동 짝:
+        <button type="button" (click)="open(pair.id)">{{ pair.name }}</button>
+        — 이름이 닮았지만 다른 항목입니다
+      </p>
+      } @if (c.roleKo; as role) {
       <p class="c-role">{{ role }}</p>
       } @if (c.note; as note) {
       <dl class="note">

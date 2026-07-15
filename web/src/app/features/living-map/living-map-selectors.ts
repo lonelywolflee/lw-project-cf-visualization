@@ -6,6 +6,21 @@ import type { Catalog, CuratedData, LearningNote, Product } from '@cf-viz/catalo
  * file only joins what the learning card and the recall metric need.
  */
 
+/**
+ * Catalog name-trap pairs: two catalog entries that share an engine or a
+ * name and get mixed up on the map. The card cross-links them so the
+ * learner meets the confusion head-on instead of by accident. This is
+ * navigation over facts the notes already state — not new curated data.
+ */
+export const PAIRED_NODES: Readonly<Record<string, string>> = {
+  gateway: 'secure-web-gateway',
+  'secure-web-gateway': 'gateway',
+  ddos: 'ddos-for-web',
+  'ddos-for-web': 'ddos',
+  'email-routing': 'email-security',
+  'email-security': 'email-routing',
+};
+
 /** Everything the learning card renders for one product. */
 export interface LearningCardView {
   readonly product: Product;
@@ -14,6 +29,8 @@ export interface LearningCardView {
   readonly roleKo: string | null;
   /** The quote-first learning note; null → the card shows the fallback. */
   readonly note: LearningNote | null;
+  /** The name-trap sibling, when one exists in the catalog. */
+  readonly pairedWith: { readonly id: string; readonly name: string } | null;
   /** True when curated pricing exists (the card links the calculator). */
   readonly hasPricing: boolean;
   /** Official pages the product was crawled from. */
@@ -32,11 +49,17 @@ export function learningCardView(
     catalog.productFamilies.find((family) => family.id === product.familyId)?.name ??
     product.familyId;
   const sourceById = new Map(catalog.sources.map((source) => [source.id, source]));
+  const pairedId = PAIRED_NODES[productId];
+  const paired =
+    pairedId === undefined
+      ? undefined
+      : catalog.products.find((candidate) => candidate.id === pairedId);
   return {
     product,
     familyName,
     roleKo: curated.products.find((entry) => entry.productId === productId)?.roleKo ?? null,
     note: curated.learningNotes.find((entry) => entry.productId === productId) ?? null,
+    pairedWith: paired === undefined ? null : { id: paired.id, name: paired.name },
     hasPricing: curated.pricing.some((entry) => entry.productId === productId),
     sources: product.sourceIds.flatMap((sourceId) => {
       const source = sourceById.get(sourceId);

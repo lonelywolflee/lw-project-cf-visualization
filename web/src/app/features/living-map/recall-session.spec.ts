@@ -71,7 +71,7 @@ const curated = {
       productId: 'ddos',
       roleKo: '역할.',
       placements: [
-        placement('public-web', 'network-l3-l4'),
+        placement('public-web', 'network-l4'),
         placement('public-web', 'application-security'),
       ],
       sourceUrl: source.url,
@@ -80,14 +80,14 @@ const curated = {
     {
       productId: 'spectrum',
       roleKo: '역할.',
-      placements: [placement('public-web', 'network-l3-l4')],
+      placements: [placement('public-web', 'network-l4')],
       sourceUrl: source.url,
       verifiedAt: '2026-07-14T00:00:00Z',
     },
     {
       productId: 'magic-transit',
       roleKo: '역할.',
-      placements: [placement('public-web', 'network-l3-l4')],
+      placements: [placement('public-web', 'network-l4')],
       sourceUrl: source.url,
       verifiedAt: '2026-07-14T00:00:00Z',
     },
