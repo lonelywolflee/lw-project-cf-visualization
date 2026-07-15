@@ -812,6 +812,11 @@
   border-color: var(--lm-lane2);
 }
 
+.solutions-head {
+  font-size: 1.05rem;
+  margin: 1.6rem 0 0.3rem;
+}
+
 .stale-badge {
   color: var(--lm-lane2);
   font-size: 0.8rem;

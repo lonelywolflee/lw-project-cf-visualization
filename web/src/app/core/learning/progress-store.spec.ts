@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { PROGRESS_STORAGE_KEY, ProgressStore } from './progress-store';
+import { PROGRESS_STORAGE_KEY, ProgressStore, solutionKey } from './progress-store';
 
 describe('ProgressStore', () => {
   beforeEach(() => {
@@ -218,5 +218,64 @@ describe('ProgressStore', () => {
     expect(fresh.importJson(JSON.stringify({ schemaVersion: 2 }))).toBe(false);
     // Failed imports keep the current record.
     expect(fresh.statusOf('waf')).toBe('verified');
+  });
+
+  it('runs the solution state table on the namespaced key only', () => {
+    const store = createStore();
+    store.recordSolutionVisit('sase');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('visited');
+    store.markSolutionLearned('sase');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('marked');
+
+    // ① passed: verified + streak starts. Only ① ever touches the streak.
+    store.recordSolutionRecall('sase', 4, 5, 'verify', 'verify');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('verified');
+    expect(store.state().nodeReviews[solutionKey('sase')]?.streak).toBe(1);
+    expect(store.solutionVerifiedCount()).toBe(1);
+
+    // A correct ③ logs but changes nothing (demotion trigger only).
+    store.recordSolutionRecall('sase', 2, 2, 'verify', 'none');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('verified');
+    expect(store.state().nodeReviews[solutionKey('sase')]?.streak).toBe(1);
+
+    // A missed ③ (or a failed ①) demotes and clears the streak.
+    store.recordSolutionRecall('sase', 1, 2, 'verify', 'demote');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('visited');
+    expect(store.state().nodeReviews[solutionKey('sase')]).toBeUndefined();
+
+    // Spray-guarded ① records as practice with no state effect.
+    store.recordSolutionRecall('sase', 1, 5, 'practice', 'none');
+    expect(store.state().nodeStates[solutionKey('sase')]).toBe('visited');
+    const log = store.state().recallLog;
+    expect(log).toHaveLength(4);
+    expect(log.every((entry) => entry.area === solutionKey('sase'))).toBe(true);
+    expect(log[3]?.kind).toBe('practice');
+  });
+
+  it('keeps product and solution records apart for colliding ids (workflows)', () => {
+    const store = createStore();
+    // The catalog has BOTH a product and a solution named 'workflows' —
+    // the snapshot in KNOWN_PRODUCT_SOLUTION_COLLISIONS. The namespace is
+    // what keeps a solution session from corrupting the product's record.
+    store.recordRecall(
+      'compute-platform',
+      [{ productId: 'workflows', correct: true }],
+      5,
+      'verify',
+    );
+    expect(store.statusOf('workflows')).toBe('verified');
+    expect(store.state().nodeReviews['workflows']?.streak).toBe(1);
+
+    // A failed solution session must not touch the product.
+    store.recordSolutionRecall('workflows', 0, 4, 'verify', 'demote');
+    expect(store.statusOf('workflows')).toBe('verified');
+    expect(store.state().nodeReviews['workflows']?.streak).toBe(1);
+    expect(store.state().nodeStates[solutionKey('workflows')]).toBeUndefined();
+
+    // And the solution keys stay out of every product metric.
+    store.recordSolutionRecall('workflows', 4, 4, 'verify', 'verify');
+    expect(store.revealedCount()).toBe(1);
+    expect(store.verifiedCount()).toBe(1);
+    expect(store.solutionVerifiedCount()).toBe(1);
   });
 });

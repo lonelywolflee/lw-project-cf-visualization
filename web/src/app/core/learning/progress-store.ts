@@ -62,6 +62,32 @@ export interface ProgressState {
 
 const STORAGE_KEY = 'cf-viz-learning-progress';
 
+/**
+ * Namespace for solution learning states inside nodeStates/nodeReviews.
+ * Product ids and solution ids COLLIDE in the catalog (`workflows` is
+ * both), so a raw solution id as a progress key would corrupt the
+ * product's verified/streak/re-fog record. Every solution read or write
+ * must go through this key — the curated contract enforces the snapshot
+ * of known collisions (KNOWN_PRODUCT_SOLUTION_COLLISIONS), this prefix
+ * enforces the runtime side.
+ */
+export const SOLUTION_KEY_PREFIX = 'solution:';
+
+/** The namespaced progress key for one solution. */
+export function solutionKey(solutionId: string): string {
+  return `${SOLUTION_KEY_PREFIX}${solutionId}`;
+}
+
+/**
+ * How a finished solution session lands in the record. The log kind and
+ * the state effect are independent axes (design 상태 전이표):
+ *   verify  — ① passed (≥80% + spray guard): verified + streak+1
+ *   demote  — ① failed or ③ missed: back to visited, streak deleted
+ *   none    — spray-guarded ① (logged as practice) or a correct ③
+ *             (③ is only ever a demotion trigger, never an upgrade)
+ */
+export type SolutionRecallEffect = 'verify' | 'demote' | 'none';
+
 const EMPTY_STATE: ProgressState = {
   schemaVersion: 1,
   nodeStates: {},
@@ -172,11 +198,28 @@ export class ProgressStore {
   /** Read-only view of the whole record. */
   readonly state = this.stateSignal.asReadonly();
 
-  /** Count of nodes at or above each status, for map summaries. */
-  readonly revealedCount = computed(() => Object.keys(this.stateSignal().nodeStates).length);
+  /**
+   * Count of nodes at or above each status, for map summaries. Solution
+   * keys are excluded — "밝힌 노드 X/67" and the verified metrics count
+   * products only; solutions get their own counter below.
+   */
+  readonly revealedCount = computed(
+    () =>
+      Object.keys(this.stateSignal().nodeStates).filter(
+        (key) => !key.startsWith(SOLUTION_KEY_PREFIX),
+      ).length,
+  );
   readonly verifiedCount = computed(
     () =>
-      Object.values(this.stateSignal().nodeStates).filter((status) => status === 'verified').length,
+      Object.entries(this.stateSignal().nodeStates).filter(
+        ([key, status]) => status === 'verified' && !key.startsWith(SOLUTION_KEY_PREFIX),
+      ).length,
+  );
+  readonly solutionVerifiedCount = computed(
+    () =>
+      Object.entries(this.stateSignal().nodeStates).filter(
+        ([key, status]) => status === 'verified' && key.startsWith(SOLUTION_KEY_PREFIX),
+      ).length,
   );
 
   constructor() {
@@ -263,6 +306,54 @@ export class ProgressStore {
         nodeStates,
         nodeReviews,
         recallLog: [...state.recallLog, { date: day, area, kind, correctSlots, totalSlots }],
+      };
+    });
+  }
+
+  /** Solution card opened: at least `solution:<id>` visited. Deliberately
+   *  NOT in openedIds — that list feeds the product noteReadRate. */
+  recordSolutionVisit(solutionId: string): void {
+    this.upgrade(solutionKey(solutionId), 'visited');
+  }
+
+  /** ② 정의 자가 선언: marked is the ceiling (self-grading ≠ verification). */
+  markSolutionLearned(solutionId: string): void {
+    this.upgrade(solutionKey(solutionId), 'marked');
+  }
+
+  /**
+   * Applies one solution session question (① or ③) to the NAMESPACED key
+   * only. Product global state is never touched from here — the entered
+   * product ids exist for grading alone (design: 맥락 오염 방지). Only a
+   * 'verify' effect (question ① passed) starts or extends the streak.
+   */
+  recordSolutionRecall(
+    solutionId: string,
+    correctSlots: number,
+    totalSlots: number,
+    kind: RecallKind,
+    effect: SolutionRecallEffect,
+  ): void {
+    const key = solutionKey(solutionId);
+    const day = localToday();
+    this.stateSignal.update((state) => {
+      const nodeStates = { ...state.nodeStates };
+      const nodeReviews = { ...state.nodeReviews };
+      if (effect === 'verify') {
+        nodeStates[key] = 'verified';
+        const previous = nodeReviews[key];
+        nodeReviews[key] = { last: day, streak: (previous?.streak ?? 0) + 1 };
+      } else if (effect === 'demote') {
+        if (nodeStates[key] !== undefined) {
+          nodeStates[key] = 'visited';
+        }
+        delete nodeReviews[key];
+      }
+      return {
+        ...state,
+        nodeStates,
+        nodeReviews,
+        recallLog: [...state.recallLog, { date: day, area: key, kind, correctSlots, totalSlots }],
       };
     });
   }

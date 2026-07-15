@@ -150,6 +150,79 @@ export function suggestProducts(
     .slice(0, limit);
 }
 
+/**
+ * Question ③ of a solution session: "which products do A and B share?"
+ * Generated ONLY for boundary pairs whose composition intersection is
+ * non-empty (13 of 21 pairs are empty today — an empty pair would be an
+ * unanswerable question, so it simply does not exist).
+ */
+export interface SolutionBoundaryQuestion {
+  readonly neighbourId: string;
+  readonly neighbourName: string;
+  /** The shared products (composition intersection), name order. */
+  readonly answers: readonly RecallChip[];
+}
+
+/** A prepared recall session for one solution (design: 문항 ①+③). */
+export interface SolutionRecallPool {
+  readonly solutionId: string;
+  readonly solutionName: string;
+  /** Composition members — the slots of question ① (구성 재현). */
+  readonly answers: readonly RecallChip[];
+  /** Question ③ per non-empty boundary pair; may be empty (①만으로 성립). */
+  readonly boundaryQuestions: readonly SolutionBoundaryQuestion[];
+}
+
+/**
+ * Builds the solution session: question ① answers from the composition,
+ * question ③ from boundariesKo pairs (own entries plus mirrored ones —
+ * the same one-directional-storage rule the card renders by). Solutions
+ * without a composition are not recallable and yield null.
+ */
+export function buildSolutionRecallPool(
+  catalog: Catalog,
+  curated: CuratedData,
+  solutionId: string,
+): SolutionRecallPool | null {
+  const solution = catalog.solutions.find((candidate) => candidate.id === solutionId);
+  if (solution === undefined) return null;
+  const membersOf = (id: string): readonly string[] =>
+    curated.compositions.find((entry) => entry.solutionId === id)?.productIds ?? [];
+  const ownMembers = membersOf(solutionId);
+  if (ownMembers.length === 0) return null;
+
+  const nameById = new Map(catalog.products.map((product) => [product.id, product.name]));
+  const toChips = (ids: readonly string[]): readonly RecallChip[] =>
+    ids.map((id) => ({ id, name: nameById.get(id) ?? id })).sort(compareChips);
+
+  const ownSet = new Set(ownMembers);
+  const solutionNameById = new Map(catalog.solutions.map((entry) => [entry.id, entry.name]));
+  const neighbourIds = new Set<string>();
+  for (const note of curated.solutionNotes) {
+    for (const boundary of note.boundariesKo ?? []) {
+      if (note.solutionId === solutionId) neighbourIds.add(boundary.solutionId);
+      if (boundary.solutionId === solutionId) neighbourIds.add(note.solutionId);
+    }
+  }
+  const boundaryQuestions = [...neighbourIds]
+    .map((neighbourId) => ({
+      neighbourId,
+      neighbourName: solutionNameById.get(neighbourId) ?? neighbourId,
+      answers: toChips(membersOf(neighbourId).filter((id) => ownSet.has(id))),
+    }))
+    .filter((question) => question.answers.length > 0)
+    .sort((a, b) =>
+      a.neighbourName < b.neighbourName ? -1 : a.neighbourName > b.neighbourName ? 1 : 0,
+    );
+
+  return {
+    solutionId,
+    solutionName: solution.name,
+    answers: toChips(ownMembers),
+    boundaryQuestions,
+  };
+}
+
 /** Per-answer outcome of a submitted session. */
 export interface RecallResult {
   readonly productId: string;
@@ -166,9 +239,14 @@ export interface RecallScore {
 /**
  * Scores a submission: each answer slot is correct iff the learner picked
  * that product. Picking a decoy wastes one of the limited picks, which is
- * the natural penalty — decoys themselves are not graded entities.
+ * the natural penalty — decoys themselves are not graded entities. Takes
+ * anything with answer slots (an area pool, a solution pool, a boundary
+ * question) — grading is the same act everywhere.
  */
-export function scoreRecall(pool: RecallPool, pickedIds: ReadonlySet<string>): RecallScore {
+export function scoreRecall(
+  pool: { readonly answers: readonly RecallChip[] },
+  pickedIds: ReadonlySet<string>,
+): RecallScore {
   const results = pool.answers.map((answer) => ({
     productId: answer.id,
     name: answer.name,
