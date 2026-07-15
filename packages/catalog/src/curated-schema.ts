@@ -255,6 +255,35 @@ const curatedScenarioSchema = z.strictObject({
 });
 
 /**
+ * Canonical learning card for one SOLUTION — the design's "정본 솔루션
+ * 카드". Mirrors the product note's core (why/misconception/question) plus
+ * the solution-specific fields: a one-line definition (the recall pass
+ * bar) and one-directional boundary notes toward neighbour solutions.
+ * Shared-product lists are NEVER stored here — they derive from
+ * composition intersections (single source of truth).
+ */
+const solutionNoteSchema = z.strictObject({
+  solutionId: idSlugSchema,
+  oneLinerKo: nonBlankString(200),
+  whyKo: nonBlankString(400),
+  misconceptionKo: nonBlankString(400),
+  customerQuestionKo: nonBlankString(400),
+  boundariesKo: z
+    .array(
+      z.strictObject({
+        solutionId: idSlugSchema,
+        noteKo: nonBlankString(400),
+      }),
+    )
+    .min(1)
+    .optional(),
+  seAngleKo: nonBlankString(400).optional(),
+  aeAngleKo: nonBlankString(400).optional(),
+  sourceUrl: canonicalSourceUrl,
+  verifiedAt: utcInstant,
+});
+
+/**
  * One stop of the replay documentary: what the request experiences at this
  * product, quote-first like every learning surface. Array order in
  * `narration` IS the journey order — authored order is meaning (the same
@@ -284,6 +313,7 @@ export const curatedDataSchema = z.strictObject({
   compositions: z.array(curatedCompositionSchema),
   pricing: z.array(curatedPricingSchema),
   learningNotes: z.array(learningNoteSchema),
+  solutionNotes: z.array(solutionNoteSchema),
   scenarios: z.array(curatedScenarioSchema),
   narration: z.array(narrationStopSchema),
 });
@@ -329,3 +359,9 @@ export type CuratedScenario = CuratedData['scenarios'][number];
 
 /** One journey stop of the replay documentary (array order = journey). */
 export type NarrationStop = CuratedData['narration'][number];
+
+/** Canonical learning card for one solution. */
+export type SolutionNote = CuratedData['solutionNotes'][number];
+
+/** One one-directional boundary note toward a neighbour solution. */
+export type SolutionBoundary = NonNullable<SolutionNote['boundariesKo']>[number];

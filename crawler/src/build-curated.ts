@@ -73,6 +73,7 @@ const counts = [
   `${String(build.data.compositions.length)} compositions`,
   `${String(build.data.pricing.length)} pricing entries`,
   `${String(build.data.learningNotes.length)} learning notes`,
+  `${String(build.data.solutionNotes.length)} solution notes`,
   `${String(build.data.scenarios.length)} scenarios`,
   `${String(build.data.narration.length)} narration stops`,
 ].join(', ');

@@ -80,6 +80,7 @@ const curated: CuratedData = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'waf',

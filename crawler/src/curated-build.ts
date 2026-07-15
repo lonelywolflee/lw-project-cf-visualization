@@ -28,6 +28,8 @@ import {
   type NoteSeLayer,
   type PricingTier,
   type ProductPlacement,
+  type SolutionBoundary,
+  type SolutionNote,
   type UsageMeter,
 } from '@cf-viz/catalog';
 
@@ -184,6 +186,34 @@ function normalizeScenario(scenario: CuratedScenario): CuratedScenario {
   return normalized;
 }
 
+function normalizeSolutionBoundary(boundary: SolutionBoundary): SolutionBoundary {
+  return { solutionId: boundary.solutionId, noteKo: boundary.noteKo };
+}
+
+function normalizeSolutionNote(note: SolutionNote): SolutionNote {
+  const normalized: SolutionNote = {
+    solutionId: note.solutionId,
+    oneLinerKo: note.oneLinerKo,
+    whyKo: note.whyKo,
+    misconceptionKo: note.misconceptionKo,
+    customerQuestionKo: note.customerQuestionKo,
+    sourceUrl: note.sourceUrl,
+    verifiedAt: note.verifiedAt,
+  };
+  if (note.boundariesKo !== undefined) {
+    normalized.boundariesKo = [...note.boundariesKo]
+      .sort((a, b) => compareCodepoints(a.solutionId, b.solutionId))
+      .map(normalizeSolutionBoundary);
+  }
+  if (note.seAngleKo !== undefined) {
+    normalized.seAngleKo = note.seAngleKo;
+  }
+  if (note.aeAngleKo !== undefined) {
+    normalized.aeAngleKo = note.aeAngleKo;
+  }
+  return normalized;
+}
+
 function normalizeNarrationStop(stop: NarrationStop): NarrationStop {
   return {
     productId: stop.productId,
@@ -214,6 +244,9 @@ export function normalizeCuratedData(curated: CuratedData): CuratedData {
     learningNotes: [...curated.learningNotes]
       .sort((a, b) => compareCodepoints(a.productId, b.productId))
       .map(normalizeLearningNote),
+    solutionNotes: [...curated.solutionNotes]
+      .sort((a, b) => compareCodepoints(a.solutionId, b.solutionId))
+      .map(normalizeSolutionNote),
     scenarios: [...curated.scenarios]
       .sort((a, b) => compareCodepoints(a.id, b.id))
       .map(normalizeScenario),

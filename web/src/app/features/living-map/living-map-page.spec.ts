@@ -213,6 +213,17 @@ const curatedData: CuratedData = {
       verifiedAt: '2026-07-15T00:00:00Z',
     },
   ],
+  solutionNotes: [
+    {
+      solutionId: 'sase',
+      oneLinerKo: '직원 접속을 신원 기반으로 지키는 Zero Trust 묶음입니다.',
+      whyKo: 'VPN을 대체하는 접근 모델입니다.',
+      misconceptionKo: 'VPN의 신형이 아니라 접근 모델의 교체입니다.',
+      customerQuestionKo: '"뭐부터 도입하나요?" — Access부터 단계 도입.',
+      sourceUrl: 'https://www.cloudflare.com/sase/',
+      verifiedAt: '2026-07-15T00:00:00Z',
+    },
+  ],
 };
 
 describe('LivingMapPage', () => {

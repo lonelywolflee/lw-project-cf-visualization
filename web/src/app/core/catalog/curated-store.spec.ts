@@ -10,6 +10,7 @@ const emptyCurated = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [],
   compositions: [],
   pricing: [],

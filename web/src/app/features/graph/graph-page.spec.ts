@@ -62,6 +62,7 @@ const curatedData: CuratedData = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'ddos',
