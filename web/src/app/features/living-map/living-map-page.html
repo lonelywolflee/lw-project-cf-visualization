@@ -478,7 +478,9 @@
             <a [href]="card.sourceUrl" target="_blank" rel="noopener noreferrer">공식 근거</a>
             } @else {
             <span class="bc-badge">사내 검수 자료</span>
-            }
+            @if (card.sourceUrl; as bcSource) {
+            <a [href]="bcSource" target="_blank" rel="noopener noreferrer">우리 측 근거</a>
+            } }
           </p>
           <p class="bc-body">{{ card.vsKo }}</p>
         </div>

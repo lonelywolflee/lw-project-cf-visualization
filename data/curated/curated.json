@@ -19,7 +19,8 @@
         {
           "competitor": "AWS WAF",
           "vsKo": "살아남는 진짜 차별점은 하나입니다 — 단일 정책으로 AWS 밖(타 클라우드·온프레미스·임의 Origin)까지 한 번에 커버. 관리형 룰 자동 갱신과 엣지(Origin 도달 전) 차단은 AWS WAF(+CloudFront)도 하므로 근거로 쓰지 마세요. 워크로드가 AWS 안에만 있다면 통합 과금의 단순함은 인정하고 시작하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/waf/"
         }
       ]
     },
@@ -37,7 +38,8 @@
         {
           "competitor": "Zscaler ZIA",
           "vsKo": "SWG+ZTNA+DLP가 한 네트워크·한 콘솔인 통합이 강점. ZIA는 오래 쌓인 정책 템플릿과 운영 관행이 강점 — 콘솔 수와 트래픽 왕복 수를 세어 보이면 통합 논거가 삽니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/sase/"
         }
       ],
       "se": {
@@ -69,7 +71,8 @@
         {
           "competitor": "Akamai Prolexic",
           "vsKo": "아키텍처로 프레임하세요 — 지정 스크러빙 센터로의 우회 라우팅(Prolexic) vs 모든 데이터센터가 스크러빙 지점인 인라인 완화 + unmetered 과금. Prolexic도 always-on 옵션이 있으므로 \"온디맨드\"로 몰지 마세요. 커스텀 런북과 전담 대응팀은 Prolexic의 강점으로 인정하는 것이 정직합니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/ddos-for-web/"
         }
       ]
     },
@@ -103,7 +106,8 @@
         {
           "competitor": "AWS Lambda",
           "vsKo": "리전 없음·cold start 사실상 0·사용자 근접 실행이 강점. VPC 내부 자원 직접 접근, 긴 실행 시간, 무거운 런타임은 Lambda가 유리 — \"요청 경로의 코드는 Workers, 배치는 Lambda\"로 나눠 이기세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/products/workers/"
         }
       ],
       "ae": {
@@ -124,7 +128,8 @@
         {
           "competitor": "Zscaler ZPA",
           "vsKo": "네트워크 규모가 받쳐 주는 성능과 무료 50석이라는 낮은 진입 장벽이 우리 강점. ZPA는 엔터프라이즈 레퍼런스와 레거시 앱 커넥터 생태계가 두터움 — 시간 단위로 끝나는 배포 속도와 총비용으로 프레임하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/access/"
         }
       ],
       "se": {
@@ -145,7 +150,8 @@
         {
           "competitor": "DataDome",
           "vsKo": "인터넷 트래픽 규모로 학습한 ML과 요청 경로 네이티브 통합(별도 커넥터·모듈 배포 불필요, 서브밀리초 판정)이 강점. DataDome도 인라인 실시간 판정이므로 \"우리만 인라인\"은 금물. 봇 전문 벤더의 전담 리서치·이커머스 특화 튜닝은 인정하고, PoC에서 같은 트래픽으로 오탐·미탐률을 직접 비교하게 하는 것이 정공법입니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/bot-management/"
         }
       ],
       "ae": {
@@ -163,7 +169,8 @@
         {
           "competitor": "Google reCAPTCHA",
           "vsKo": "퍼즐 없음(이탈 감소)·개인정보 비추적·무료가 강점입니다. reCAPTCHA는 관성과 v3 점수 생태계 — 전환 작업량이 위젯 교체 수준임을 보여주면 관성이 무너집니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "official",
+          "sourceUrl": "https://developers.cloudflare.com/turnstile/"
         }
       ],
       "se": {
@@ -213,7 +220,8 @@
         {
           "competitor": "Akamai",
           "vsKo": "엣지 통합(같은 PoP에서 보안·컴퓨트)과 셀프서브 속도가 강점. 초대형 미디어 커스텀과 전담 프로페셔널 서비스 조직은 Akamai가 두터움 — \"비교 회피\" 대신 통합 vs 전담 서비스 프레임으로 정면 대응하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/cdn/"
         }
       ],
       "se": {
@@ -246,7 +254,8 @@
         {
           "competitor": "AWS ELB",
           "vsKo": "ELB는 AWS 안쪽의 분배, 이것은 클라우드·리전을 넘는 바깥쪽 분배 — 멀티클라우드·DR 요구가 나오는 순간 층이 달라 경쟁이 아니라 보완이 됩니다. vendor-neutral이 공식 문구.",
-          "grounding": "internal-reviewed"
+          "grounding": "official",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/load-balancing/"
         }
       ],
       "se": {
@@ -285,7 +294,8 @@
         {
           "competitor": "AWS Shield Advanced",
           "vsKo": "온프레미스·타 클라우드 IP 대역이 스코프에 있으면 Shield로는 못 덮습니다(AWS 리소스 한정) — 그 조건에서 전 PoP 애니캐스트 흡수와 3초 내 완화가 차별점이 됩니다. 순수 AWS-only 워크로드라면 Shield의 통합이 자연스러움을 인정하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/network-services/products/magic-transit/"
         }
       ],
       "ae": {
@@ -304,7 +314,8 @@
         {
           "competitor": "직접 노출(방화벽만)",
           "vsKo": "방화벽만 두고 서비스를 직접 노출하면 Origin IP와 포트가 그대로 표적이 됩니다. L4 프록시로 앞을 가리면 Origin IP·포트가 숨고 unmetered DDoS 방어가 씌워집니다 — 게임·SSH·메일처럼 웹이 아닌 서비스에 \"웹 수준의 방어\"를 입히는 유일한 축입니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/application-services/products/cloudflare-spectrum/"
         }
       ],
       "se": {
@@ -342,7 +353,8 @@
         {
           "competitor": "Proofpoint",
           "vsKo": "어플라이언스 없이 API 또는 인라인으로 붙는 가벼운 도입과 Zero Trust 스위트 묶음이 우리 강점. Proofpoint는 아카이빙·DLP까지 이메일 스위트의 폭이 넓음 — 승부처는 도입 마찰입니다. \"MX 레코드 변경 없이 파일럿부터 돌려 보시죠\"가 먹히는 지점입니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/email-security/"
         }
       ],
       "se": {
@@ -363,7 +375,8 @@
         {
           "competitor": "AWS S3",
           "vsKo": "egress 무료가 구조적 강점 — 꺼내 쓰는 빈도가 높을수록 격차가 커집니다. 스토리지 클래스·이벤트·생태계 폭은 S3가 넓음 — 청구서의 egress 줄을 같이 보는 것에서 시작하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/developer-platform/products/r2/"
         }
       ],
       "se": {
@@ -385,7 +398,8 @@
         {
           "competitor": "Salt Security",
           "vsKo": "엣지 인라인(별도 센서·미러링 없음)과 WAF·봇 신호 통합이 강점. API 전문 벤더는 오프라인 행위 분석의 깊이를 내세움 — 트래픽이 이미 Cloudflare를 지난다면 총비용과 배포 속도에서 이깁니다.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://developers.cloudflare.com/api-shield/"
         }
       ],
       "ae": {
@@ -409,7 +423,8 @@
         {
           "competitor": "Zscaler Isolation",
           "vsKo": "픽셀 스트리밍 방식의 구형 RBI 대비, 그리기 명령 전송이라 \"로컬 같다\"는 체감 성능이 강점 — 상대 제품의 현재 렌더링 방식은 단정하지 말고, 구형 RBI에 데인 고객일수록 데모 한 번으로 판단하게 하세요.",
-          "grounding": "internal-reviewed"
+          "grounding": "internal-reviewed",
+          "sourceUrl": "https://www.cloudflare.com/zero-trust/products/browser-isolation/"
         }
       ]
     },
