@@ -34,7 +34,8 @@
 }
 
 .app-main {
-  margin: 0 auto;
-  max-width: 72rem;
+  /* The shell sets no width cap — each page decides its own width
+     (ratio-based for the visualizations), so wide monitors get content,
+     not shell margins. A rem cap here silently clamped every page. */
   padding: 1rem;
 }

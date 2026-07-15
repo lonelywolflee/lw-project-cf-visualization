@@ -11,9 +11,11 @@
   --lm-canvas: #f6f7fa;
   --lm-verified: #1f7a43;
   margin: 0 auto;
-  /* Wide screens get map, not margins — 67 nodes want the room. */
-  max-width: 1760px;
-  padding: 1.25rem 1.5rem 4rem;
+  /* Wide screens get map, not margins — 67 nodes want the room. The cap
+     is a ratio, not pixels, so the margin stays proportional on any
+     monitor width instead of growing without bound. */
+  max-width: 96%;
+  padding: 1.25rem 0 4rem;
 }
 
 .head-row {
