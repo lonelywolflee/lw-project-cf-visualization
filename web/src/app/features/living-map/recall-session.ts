@@ -116,6 +116,31 @@ export function buildRecallPool(
   };
 }
 
+/**
+ * Autocomplete for the verify session's free-recall input. Suggestions
+ * open only from three typed characters — the learner must retrieve the
+ * name's beginning, not recognize it in a list — and never include ids
+ * already entered. Matching is case-insensitive over name and id.
+ */
+export function suggestProducts(
+  catalog: Catalog,
+  query: string,
+  enteredIds: ReadonlySet<string>,
+  limit = 8,
+): readonly RecallChip[] {
+  const needle = query.trim().toLowerCase();
+  if (needle.length < 3) return [];
+  return catalog.products
+    .filter(
+      (product) =>
+        !enteredIds.has(product.id) &&
+        (product.name.toLowerCase().includes(needle) || product.id.includes(needle)),
+    )
+    .map((product) => ({ id: product.id, name: product.name }))
+    .sort(compareChips)
+    .slice(0, limit);
+}
+
 /** Per-answer outcome of a submitted session. */
 export interface RecallResult {
   readonly productId: string;

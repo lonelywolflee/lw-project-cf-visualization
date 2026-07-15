@@ -549,16 +549,86 @@
   background: #fff;
   border: 2px dashed #9aa4b6;
   border-radius: 12px;
-  cursor: pointer;
   display: grid;
   gap: 0.25rem;
   padding: 0.9rem 1rem;
   text-align: left;
 }
 
-.area-card:hover {
+.area-actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.area-verify {
+  background: #333;
+  border: 1.5px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
+}
+
+.area-practice {
+  background: #fff;
+  border: 1.5px solid var(--lm-line);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+}
+
+.area-practice:hover,
+.area-verify:hover {
   border-color: var(--lm-accent);
-  border-style: solid;
+}
+
+.verify-input {
+  margin-bottom: 0.8rem;
+  position: relative;
+}
+
+.verify-input input {
+  border: 2px solid #9aa4b6;
+  border-radius: 10px;
+  font-size: 1rem;
+  padding: 0.6rem 0.8rem;
+  width: min(100%, 34rem);
+}
+
+.verify-input input:focus {
+  border-color: var(--lm-accent);
+  outline: none;
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.suggestion {
+  background: var(--lm-canvas);
+  border: 1.5px solid var(--lm-line);
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.suggestion:hover {
+  border-color: var(--lm-accent);
+}
+
+.wrong-entries {
+  color: var(--lm-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem;
 }
 
 .area-lane {

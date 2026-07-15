@@ -1,4 +1,4 @@
-import type { RecallEntry } from '../../core/learning/progress-store';
+import type { NodeReview, RecallEntry } from '../../core/learning/progress-store';
 
 /**
  * Spaced-repetition re-fog, derived entirely from the recall log. The only
@@ -47,12 +47,41 @@ export function addDays(isoDate: string, days: number): string {
   return `${String(date.getFullYear())}-${paddedMonth}-${paddedDay}`;
 }
 
+/** Node-level review posture derived from per-node verify records. */
+export interface NodeReviewState {
+  readonly productId: string;
+  /** First local date on which the node counts as re-fogged. */
+  readonly dueDate: string;
+  readonly stale: boolean;
+}
+
+/**
+ * The primary re-fog signal since recall v2: each node carries its own
+ * verify date and streak, so intervals are per item (the SM-2 property
+ * the area grouping lost). Nodes verified before v2 have no record here
+ * and fall back to {@link areaReviewStates} over verify sessions.
+ */
+export function nodeReviewStates(
+  reviews: Readonly<Record<string, NodeReview>>,
+  todayDate: string,
+): ReadonlyMap<string, NodeReviewState> {
+  const states = new Map<string, NodeReviewState>();
+  for (const [productId, review] of Object.entries(reviews)) {
+    const intervalIndex = Math.min(Math.max(review.streak, 1), REFOG_INTERVALS_DAYS.length) - 1;
+    const interval = REFOG_INTERVALS_DAYS[intervalIndex] ?? 1;
+    const dueDate = addDays(review.last, interval);
+    states.set(productId, { productId, dueDate, stale: todayDate >= dueDate });
+  }
+  return states;
+}
+
 /**
  * Computes the review state of every area present in the recall log. The
  * log is trusted to be append-only in time order (recordRecall only ever
  * appends "today"). `todayDate` is injected so the function stays pure and
  * the specs stay clock-free; fixed-width ISO dates make staleness a plain
- * lexicographic comparison.
+ * lexicographic comparison. Callers should pass verify sessions only —
+ * practice is a scaffold and must not reschedule reviews.
  */
 export function areaReviewStates(
   recallLog: readonly RecallEntry[],

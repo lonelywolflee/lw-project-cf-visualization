@@ -13,7 +13,12 @@ import { CURATED_LANES, type CuratedLane, type CuratedLayer } from '@cf-viz/cata
 
 import { CatalogStore } from '../../core/catalog/catalog-store';
 import { CuratedStore } from '../../core/catalog/curated-store';
-import { localToday, ProgressStore, type NodeStatus } from '../../core/learning/progress-store';
+import {
+  localToday,
+  ProgressStore,
+  type NodeStatus,
+  type RecallKind,
+} from '../../core/learning/progress-store';
 import { firstParamValue } from '../../core/routing/query-params';
 import { buildMapModel, LANE_LABELS, LAYER_LABELS, type MapModel } from '../map/map-selectors';
 import {
@@ -24,8 +29,15 @@ import {
   type LearningCardView,
   type LensView,
 } from './living-map-selectors';
-import { areaReviewStates } from './re-fog';
-import { buildRecallPool, scoreRecall, type RecallPool, type RecallScore } from './recall-session';
+import { areaReviewStates, nodeReviewStates } from './re-fog';
+import {
+  buildRecallPool,
+  scoreRecall,
+  suggestProducts,
+  type RecallChip,
+  type RecallPool,
+  type RecallScore,
+} from './recall-session';
 
 /**
  * The Living Map: one full-screen map where learning happens as modes.
@@ -60,6 +72,8 @@ export class LivingMapPage {
   readonly mode = input<string | undefined>();
   /** Raw `?area=` value; the recall layer, validated against the lanes. */
   readonly area = input<string | undefined>();
+  /** Raw `?kind=` value; 'practice' for chips, anything else = verify. */
+  readonly kind = input<string | undefined>();
   /** Raw `?lens=` value; a scenario or solution id, validated below. */
   readonly lens = input<string | undefined>();
   /** Raw `?stop=` value; the 1-based replay stop, clamped to the journey. */
@@ -184,9 +198,17 @@ export class LivingMapPage {
   /** Downloads the measurement report (progress + derived recall rate). */
   protected exportReport(): void {
     const total = this.slotTotal();
+    const curated = this.curatedStore.curated();
+    // Content-learning rate: of the products that HAVE a note, how many
+    // has the learner at least opened — surfaces the "verified without
+    // ever reading" decoupling the adversarial review flagged.
+    const noteIds = curated?.learningNotes.map((note) => note.productId) ?? [];
+    const states = this.progress.state().nodeStates;
+    const openedNotes = noteIds.filter((id) => states[id] !== undefined).length;
     const json = this.progress.exportJson({
       recallRate: total === 0 ? null : this.verifiedSlotCount() / total,
       slotTotal: total,
+      noteReadRate: noteIds.length === 0 ? null : openedNotes / noteIds.length,
       staleAreas: this.staleAreas().map((area) => area.layer),
       exportedAt: new Date().toISOString(),
     });
@@ -263,9 +285,21 @@ export class LivingMapPage {
     return LAYER_LABELS[layer];
   }
 
-  protected setMode(mode: 'explore' | 'recall' | 'replay'): void {
+  /** True for a chip practice session; free-recall verify otherwise. */
+  protected readonly recallKind = computed<RecallKind>(() =>
+    firstParamValue(this.kind()) === 'practice' ? 'practice' : 'verify',
+  );
+
+  private resetSession(): void {
     this.picked.set(new Set());
     this.score.set(null);
+    this.query.set('');
+    this.entered.set(new Set());
+    this.wrongEntries.set([]);
+  }
+
+  protected setMode(mode: 'explore' | 'recall' | 'replay'): void {
+    this.resetSession();
     this.playing.set(false);
     void this.router.navigate([], {
       relativeTo: this.route,
@@ -273,12 +307,11 @@ export class LivingMapPage {
     });
   }
 
-  protected startArea(layer: string): void {
-    this.picked.set(new Set());
-    this.score.set(null);
+  protected startArea(layer: string, kind: RecallKind): void {
+    this.resetSession();
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { mode: 'recall', area: layer },
+      queryParams: { mode: 'recall', area: layer, kind },
     });
   }
 
@@ -297,7 +330,8 @@ export class LivingMapPage {
     });
   }
 
-  protected submitRecall(): void {
+  /** Chip practice submit: recognition scaffold, marks at most. */
+  protected submitPractice(): void {
     const pool = this.pool();
     const areaValue = this.recallArea();
     if (pool === null || areaValue === null || this.score() !== null) return;
@@ -307,6 +341,65 @@ export class LivingMapPage {
       areaValue.layer,
       result.results.map(({ productId, correct }) => ({ productId, correct })),
       result.totalSlots,
+      'practice',
+    );
+  }
+
+  // ------------------------------------------------------ verify (free recall)
+
+  protected readonly query = signal('');
+  protected readonly entered = signal<ReadonlySet<string>>(new Set());
+  /** Entered products that belong elsewhere — shown after grading. */
+  protected readonly wrongEntries = signal<readonly RecallChip[]>([]);
+
+  /** Autocomplete candidates; empty until three typed characters. */
+  protected readonly suggestions = computed(() => {
+    const catalog = this.store.catalog();
+    if (catalog === undefined) return [];
+    return suggestProducts(catalog, this.query(), this.entered());
+  });
+
+  protected readonly enteredChips = computed<readonly RecallChip[]>(() => {
+    const catalog = this.store.catalog();
+    if (catalog === undefined) return [];
+    const nameById = new Map(catalog.products.map((product) => [product.id, product.name]));
+    return [...this.entered()].map((id) => ({ id, name: nameById.get(id) ?? id }));
+  });
+
+  protected onQueryInput(event: Event): void {
+    const target = event.target;
+    if (target instanceof HTMLInputElement) this.query.set(target.value);
+  }
+
+  protected addEntry(productId: string): void {
+    if (this.score() !== null) return;
+    this.entered.update((entered) => new Set(entered).add(productId));
+    this.query.set('');
+  }
+
+  protected removeEntry(productId: string): void {
+    if (this.score() !== null) return;
+    this.entered.update((entered) => {
+      const next = new Set(entered);
+      next.delete(productId);
+      return next;
+    });
+  }
+
+  /** Free-recall submit: the only path to `verified`. */
+  protected submitVerify(): void {
+    const pool = this.pool();
+    const areaValue = this.recallArea();
+    if (pool === null || areaValue === null || this.score() !== null) return;
+    const result = scoreRecall(pool, this.entered());
+    this.score.set(result);
+    const answerIds = new Set(pool.answers.map((answer) => answer.id));
+    this.wrongEntries.set(this.enteredChips().filter((chip) => !answerIds.has(chip.id)));
+    this.progress.recordRecall(
+      areaValue.layer,
+      result.results.map(({ productId, correct }) => ({ productId, correct })),
+      result.totalSlots,
+      'verify',
     );
   }
 
@@ -315,28 +408,50 @@ export class LivingMapPage {
   /** Page-load date; a session crossing midnight just misses one nudge. */
   private readonly todayDate = localToday();
 
-  private readonly reviewStates = computed(() =>
-    areaReviewStates(this.progress.state().recallLog, this.todayDate),
+  /**
+   * Legacy fallback: area posture from verify sessions only. Nodes
+   * verified before per-node reviews existed have no node record, so
+   * their area's last verify session stands in for their date.
+   */
+  private readonly legacyAreaReviews = computed(() =>
+    areaReviewStates(
+      this.progress.state().recallLog.filter((entry) => entry.kind === 'verify'),
+      this.todayDate,
+    ),
   );
 
+  /** Primary re-fog signal: per-node verify dates and streaks. */
+  private readonly nodeReviews = computed(() =>
+    nodeReviewStates(this.progress.state().nodeReviews, this.todayDate),
+  );
+
+  /** Node staleness — node record first, legacy area fallback second. */
+  private isNodeStale(productId: string): boolean {
+    const nodeState = this.nodeReviews().get(productId);
+    if (nodeState !== undefined) return nodeState.stale;
+    const layers = this.layersByProduct().get(productId);
+    if (layers === undefined) return false;
+    const areaReviews = this.legacyAreaReviews();
+    return layers.some((layer) => areaReviews.get(layer)?.stale === true);
+  }
+
   /**
-   * Areas due for review: past their re-fog date AND still holding
-   * verified nodes — an area with nothing verified has nothing to lose,
-   * so it never nags.
+   * Areas due for review: still holding verified nodes whose review date
+   * passed — an area with nothing verified has nothing to lose, so it
+   * never nags.
    */
   protected readonly staleAreas = computed(() => {
     const curated = this.curatedStore.curated();
     if (curated === undefined) return [];
-    const reviews = this.reviewStates();
     const states = this.progress.state().nodeStates;
-    return this.areas().filter(({ layer }) => {
-      if (reviews.get(layer)?.stale !== true) return false;
-      return curated.products.some(
+    return this.areas().filter(({ layer }) =>
+      curated.products.some(
         (entry) =>
           states[entry.productId] === 'verified' &&
-          entry.placements.some((placement) => placement.layer === layer),
-      );
-    });
+          entry.placements.some((placement) => placement.layer === layer) &&
+          this.isNodeStale(entry.productId),
+      ),
+    );
   });
 
   private readonly staleLayerSet = computed(
@@ -356,13 +471,10 @@ export class LivingMapPage {
     return map;
   });
 
-  /** Verified but past due in one of its areas — rendered as re-fogged. */
+  /** Verified but past its review date — rendered as re-fogged. */
   protected isRefogged(productId: string): boolean {
     if (this.statusOf(productId) !== 'verified') return false;
-    const layers = this.layersByProduct().get(productId);
-    if (layers === undefined) return false;
-    const stale = this.staleLayerSet();
-    return layers.some((layer) => stale.has(layer));
+    return this.isNodeStale(productId);
   }
 
   protected isAreaStale(layer: string): boolean {

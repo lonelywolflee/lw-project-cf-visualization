@@ -1,6 +1,6 @@
 import type { Catalog, CuratedData } from '@cf-viz/catalog';
 
-import { buildRecallPool, scoreRecall } from './recall-session';
+import { buildRecallPool, scoreRecall, suggestProducts } from './recall-session';
 
 const source = {
   id: 'products-overview',
@@ -159,5 +159,21 @@ describe('scoreRecall', () => {
     expect(
       scoreRecall(pool, new Set(['waf', 'ddos', 'bot-management', 'rate-limiting'])).correctSlots,
     ).toBe(4);
+  });
+});
+
+describe('suggestProducts', () => {
+  it('opens only from three characters and matches case-insensitively', () => {
+    expect(suggestProducts(catalog, 'wa', new Set())).toEqual([]);
+    const hits = suggestProducts(catalog, 'WAF', new Set());
+    expect(hits.map((chip) => chip.id)).toContain('waf');
+  });
+
+  it('excludes already-entered ids and respects the limit', () => {
+    expect(suggestProducts(catalog, 'waf', new Set(['waf'])).map((chip) => chip.id)).not.toContain(
+      'waf',
+    );
+    const limited = suggestProducts(catalog, 'a', new Set(), 2);
+    expect(limited).toEqual([]); // still gated by the 3-char rule
   });
 });
