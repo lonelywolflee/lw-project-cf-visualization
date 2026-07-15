@@ -201,6 +201,149 @@
       "ae": {
         "valueKo": "월 egress 청구서가 큰 고객(미디어, AI 학습 데이터)일수록 절감 스토리가 강합니다."
       }
+    },
+    {
+      "productId": "api-shield",
+      "whyKo": "공식 문서대로 \"발견(discovery)·스키마 검증·남용 탐지로 API 취약점을 식별·해결\"하기 위해 존재합니다. \"수천 개의 API — 존재조차 모르는 것까지\" 가진 회사가 흔하다는 것이 출발점입니다.",
+      "misconceptionKo": "WAF의 부속 기능이 아닙니다 — WAF가 알려진 공격 패턴을 거른다면(네거티브 모델), API Shield는 몰랐던 엔드포인트를 찾아내고 스키마에 맞지 않는 요청을 거릅니다(포지티브 모델).",
+      "customerQuestionKo": "\"API 목록은 우리가 다 알고 있는데요?\" — 공식 문서의 전제가 정확히 반대입니다. 디스커버리를 먼저 돌려 그림자 API 개수를 세어 보이는 것이 대화의 시작입니다.",
+      "se": {
+        "archKo": "핵심은 포지티브 보안 모델입니다 — OpenAPI 스키마를 올리면 스키마 밖 요청을 거르고, mTLS로 클라이언트 인증서 인증을 겹치며, 시퀀스 분석이 정상 호출 순서를 학습합니다.",
+        "limitsKo": "스키마 검증은 스키마 품질만큼만 정확합니다 — 스키마가 낡으면 정상 트래픽이 오탐됩니다. 스키마 갱신 파이프라인을 함께 설계하세요."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/api-shield/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "browser-isolation",
+      "whyKo": "\"신뢰할 수 없는 웹 코드 전부를 네트워크 엣지에서 실행(runs all untrusted web code at the edge)\"하기 위해 존재합니다 — 악성 코드가 기기에 닿기 전에 격리 환경에서 터지게 합니다.",
+      "misconceptionKo": "\"픽셀 스트리밍이라 느리다\"는 구형 RBI의 인상입니다 — 공식 페이지는 \"로컬 브라우징과 똑같이 느껴진다(feels just like local browsing)\"를 내세웁니다. Gateway의 대체가 아니라 보완입니다: 차단하기 애매한 회색 사이트를 격리로 엽니다.",
+      "customerQuestionKo": "\"차단이 있는데 왜 격리가 필요하죠?\" — 차단은 흑백 결정이고, 업무상 열어야 하는 회색 사이트가 항상 남습니다. \"차단 대신 격리\"가 생산성과 보안을 같이 잡는 답입니다.",
+      "se": {
+        "archKo": "렌더링이 엣지에서 실행되고 기기에는 그리기 명령만 내려옵니다 — 파일과 스크립트가 기기에 도달하지 않는 구조라 zero-day에도 유효합니다."
+      },
+      "ae": {
+        "pitchKo": "랜섬웨어나 드라이브바이 다운로드 사고 경험을 물으세요 — '한 번의 클릭'이 뚫는 경로를 격리가 끊는다는 서사가 통합니다."
+      },
+      "sourceUrl": "https://www.cloudflare.com/zero-trust/products/browser-isolation/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "wan",
+      "whyKo": "공식 설명대로 \"지사, 멀티클라우드 VPC, 데이터센터를 연결·보호(connects and secures branch sites, multi-cloud VPCs, and data centers)\"하며 MPLS를 대체하기 위해 존재합니다 — \"light-branch, heavy-cloud\" 접근입니다.",
+      "misconceptionKo": "SD-WAN 박스의 또 다른 브랜드가 아닙니다 — 지점 장비는 트래픽을 Cloudflare에 올리는 역할까지만 하고, 라우팅·보안은 네트워크에서 수행됩니다. Magic Transit(인바운드 방어)과 방향이 다른 사설 WAN입니다.",
+      "customerQuestionKo": "\"MPLS 계약이 아직 남았는데요?\" — 전면 교체가 아니라 회선 갱신 시점마다 지점 단위로 옮기는 병행 전환이 표준 경로라고 답합니다.",
+      "se": {
+        "archKo": "지점은 Cloudflare One Appliance(물리/가상)나 기존 장비의 GRE/IPsec 터널로 접속하고, 사이트 간 트래픽이 Cloudflare 백본을 사설 WAN처럼 탑니다."
+      },
+      "ae": {
+        "valueKo": "MPLS 회선비와 지점 장비 스택 축소가 직접 절감 항목입니다 — \"expensive MPLS or SD-WAN deployments\" 의존 축소가 공식 문구입니다."
+      },
+      "sourceUrl": "https://www.cloudflare.com/network-services/products/magic-wan/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "ssl",
+      "whyKo": "방문자와 사이트 사이를 TLS로 암호화하기 위해 존재합니다 — 그리고 실무의 핵심은 모드입니다: 공식 문서의 암호화 모드(Off/Flexible/Full/Full (strict))가 \"어느 구간까지 암호화되는가\"를 정의합니다.",
+      "misconceptionKo": "\"Cloudflare를 붙이면 끝까지 암호화된다\"가 가장 위험한 오해입니다 — Flexible 모드는 \"Cloudflare에서 Origin 구간은 암호화되지 않습니다(traffic from Cloudflare to the origin server is not)\". 공식 권고는 Full 또는 Full (strict)입니다.",
+      "customerQuestionKo": "\"TLS는 어디서 종료되나요?\" — 방문자의 TLS는 엣지에서 종료되고, Origin 구간은 모드가 결정합니다. Full (strict)이면 엣지→Origin 구간도 인증서 검증을 포함해 다시 암호화됩니다.",
+      "se": {
+        "archKo": "종료 지점 2개로 설명하세요: 방문자↔엣지(Universal SSL 인증서), 엣지↔Origin(암호화 모드 + Origin 인증서). 기본 권장은 Full (strict)입니다.",
+        "opsKo": "점검 순서: 암호화 모드 확인 → Origin 인증서 유효성(만료·이름 불일치가 526 오류의 단골) → 필요 시 Cloudflare Origin CA 인증서 발급."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "keyless-ssl",
+      "whyKo": "공식 문서대로 \"TLS 개인 키를 노출하지 않고(without exposing their TLS private keys)\" 커스텀 인증서로 Cloudflare를 쓰기 위해 존재합니다 — 개인 키는 고객의 키 서버에 남습니다.",
+      "misconceptionKo": "\"Cloudflare가 우리 키를 갖게 된다\"는 규제 산업의 1차 반대인데, Keyless SSL이 정확히 그 반대를 위해 설계됐습니다 — 핸드셰이크의 개인 키 연산만 고객 인프라로 위임됩니다.",
+      "customerQuestionKo": "\"그럼 매 요청마다 우리 키 서버를 왕복하나요?\" — 아니요, 핸드셰이크의 서명 연산뿐이고 세션이 수립된 뒤에는 키 서버가 개입하지 않습니다.",
+      "se": {
+        "limitsKo": "Enterprise 전용이며 유효한 CA에서 구매한 자체 인증서 보유가 전제입니다. 키 서버 가용성이 곧 TLS 협상 가용성이 되므로 이중화가 필수입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/ssl/keyless-ssl/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "advanced-certificate-manager",
+      "whyKo": "인증서의 제어권을 위해 존재합니다 — 공식 문서대로 \"최대 50개 호스트, CA 선택, 검증 방법, 유효기간\"을 직접 고르는 유료 애드온입니다.",
+      "misconceptionKo": "Universal SSL의 상위 등급이 아니라 제어권의 문제입니다 — 무료 Universal은 자동이지만 CA·유효기간·다중 레벨 서브도메인을 못 고릅니다. 감사 요건이나 CA 정책이 있는 조직이 ACM을 씁니다.",
+      "customerQuestionKo": "\"무료 인증서로 충분하지 않나요?\" — 암호화 자체는 충분합니다. 다중 레벨 wildcard, 특정 CA 요구, 짧은 유효기간 정책이 나오는 순간 ACM 대화가 됩니다.",
+      "se": {
+        "limitsKo": "인증서당 호스트 50개(zone apex 포함 필수). 다중 레벨 서브도메인(*.a.example.com)은 Universal이 못 덮는 대표 사례입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/ssl/edge-certificates/advanced-certificate-manager/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "workers-ai",
+      "whyKo": "\"GPU 관리도 용량 계획도 없이, API 호출 한 번으로 전역 AI 추론(run AI inference globally with one API call)\"을 실행하기 위해 존재합니다. LLM·이미지·음성·임베딩 등 100개 이상의 모델이 엣지 GPU에서 돕니다.",
+      "misconceptionKo": "\"우리 모델을 올리는 GPU 호스팅\"이 아닙니다 — 제공 모델 카탈로그에서 골라 쓰는 서버리스 추론입니다. 유휴 비용 없는 pay-per-inference가 GPU 임대와의 근본 차이입니다.",
+      "customerQuestionKo": "\"OpenAI API와 뭐가 다른가요?\" — 모델이 사용자 가까이(200개 이상 도시)에서 돌고 Workers·Vectorize·AI Gateway와 한 플랫폼에서 조립된다는 점입니다. 프런티어 모델이 필요하면 AI Gateway로 외부 모델을 섞습니다.",
+      "se": {
+        "archKo": "Workers에서 바인딩 한 줄로 호출하고 임베딩은 Vectorize에 저장하는 조립이 표준 패턴입니다. 모델별 과금 단위(뉴런)는 요금 카드에서 확인하세요."
+      },
+      "sourceUrl": "https://www.cloudflare.com/developer-platform/products/workers-ai/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "ai-gateway",
+      "whyKo": "\"AI 앱에 대한 가시성과 제어(visibility and control over your AI apps)\"를 위해 존재합니다 — 앱과 모델 사이에서 요청·토큰·비용을 보여주고 캐싱·속도 제한·재시도·모델 폴백을 겹칩니다. \"코드 한 줄로 시작\"이 공식 문구입니다.",
+      "misconceptionKo": "Workers AI 전용이 아닙니다 — OpenAI, Anthropic, Google Gemini 같은 외부 제공자 앞에도 세웁니다. 모델을 파는 제품이 아니라 모델 소비를 관측·통제하는 게이트웨이입니다.",
+      "customerQuestionKo": "\"LLM 비용이 왜 이렇게 나오는지 모르겠어요\" — 정확히 이 질문을 위한 제품입니다. 요청·토큰·비용 대시보드와 캐싱(\"캐시에서 응답해 더 빠르고 싸게\")이 답입니다.",
+      "se": {
+        "opsKo": "도입은 base URL 교체 수준입니다. 동일 프롬프트 반복이 많은 워크로드부터 캐싱을 켜고, 주 모델 장애에 대비한 폴백 체인을 함께 설계하세요."
+      },
+      "ae": {
+        "valueKo": "AI 비용 청구서가 불투명하다는 불만이 도입 트리거입니다 — 토큰·비용 가시화만으로 대화가 열립니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/ai-gateway/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "vectorize",
+      "whyKo": "\"전역 분산 벡터 데이터베이스(globally distributed vector database)\"로서 임베딩을 저장·질의해 \"검색·유사도·추천·분류\" 기능을 만들기 위해 존재합니다.",
+      "misconceptionKo": "일반 DB의 대체가 아닙니다 — 벡터 검색 결과는 참조이고, 실제 객체는 \"R2의 이미지, KV의 문서, D1의 프로필\"로 연결하는 조합이 공식 패턴입니다.",
+      "customerQuestionKo": "\"Pinecone 같은 걸 이미 쓰는데요?\" — 데이터가 Workers 플랫폼 안에 있다면 외부 왕복 없이 같은 엣지에서 검색까지 끝나는 지역성이 차별점이라고 답합니다.",
+      "se": {
+        "archKo": "Workers AI로 임베딩 생성 → Vectorize에 저장 → 질의 시 유사도 검색 → R2/KV/D1에서 원본 조회가 표준 RAG 조립입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/vectorize/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "agents",
+      "whyKo": "상태를 가진 AI 에이전트를 만들기 위해 존재합니다 — 공식 문서대로 \"각 에이전트 세션은 내구성 있는 정체성, 로컬 SQL 저장소, 실시간 연결, 예약 작업, 복구 가능한 실행\"을 가집니다.",
+      "misconceptionKo": "프롬프트 루프 라이브러리가 아닙니다 — 단발 LLM 호출과 달리 세션이 살아남고(\"no sessions to reconstruct\"), 전역에서 수천만 인스턴스로 확장되는 실행 기반입니다.",
+      "customerQuestionKo": "\"챗봇이랑 뭐가 다르죠?\" — 챗봇은 묻고 답하면 끝나지만 에이전트는 기억을 갖고 예약 작업을 스스로 이어갑니다. \"대화\"가 아니라 \"업무 위임\"이라고 설명하세요.",
+      "se": {
+        "archKo": "채팅·음성·이메일·Slack·웹훅을 하나의 내구 런타임에 연결하고, MCP 도구(Browser, Sandbox, AI Search 등)로 행동력을 붙입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/agents/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "ai-search",
+      "whyKo": "\"검색 인프라 전체를 만들지 않고도 앱이나 에이전트에 검색을 붙이기(add search to any application or agent without having to build an entire retrieval infrastructure)\" 위해 존재합니다 — 데이터를 주면 색인·임베딩·검색이 자동입니다.",
+      "misconceptionKo": "Vectorize와 경쟁하지 않습니다 — Vectorize가 벡터 DB(부품)라면 AI Search는 색인부터 검색까지의 완성 파이프라인(조립품)입니다. \"지속적 자동 재색인\"이 수동 재처리와의 차이입니다.",
+      "customerQuestionKo": "\"RAG를 직접 구축 중인데요?\" — 청킹·임베딩·리트리버 유지보수가 목적이 아니라면, 시맨틱+키워드 하이브리드 질의와 MCP 엔드포인트가 기본 제공되는 쪽이 빠르다고 답합니다.",
+      "se": {
+        "limitsKo": "전 플랜 제공. Workers 바인딩·REST·MCP 세 경로로 질의합니다 — AI 에이전트 연동은 내장 MCP 엔드포인트가 표준입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/ai-search/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "productId": "ai-security-for-apps",
+      "whyKo": "LLM을 쓰는 앱의 고유 위협 — 공식 문서대로 \"프롬프트 주입 공격, 프롬프트 내 PII 노출, 위험 주제\" — 을 막기 위해 존재합니다. 기존 WAF 룰을 보완하는 LLM 전용 탐지입니다.",
+      "misconceptionKo": "특정 모델 전용이 아닙니다 — \"model-agnostic: 어떤 LLM을 쓰든 탐지가 동작\"이 공식 문구입니다. 별도 프록시 설치도 아닙니다 — 코드 수정 없이 WAF 탐지 필드로 들어옵니다.",
+      "customerQuestionKo": "\"챗봇에 보안이 왜 따로 필요하죠?\" — 사용자가 입력창에 무엇이든 넣을 수 있다는 것 자체가 새 공격면입니다. 주입 한 줄로 시스템 프롬프트가 새는 사례로 설명하세요.",
+      "se": {
+        "opsKo": "LLM 엔드포인트에 cf-llm 라벨을 붙이면 탐지 필드가 채워지고 WAF 표현식에서 씁니다. 엔드포인트 디스커버리는 전 플랜, 전체 탐지(PII·주입 점수)는 Enterprise 애드온입니다."
+      },
+      "sourceUrl": "https://developers.cloudflare.com/waf/detections/firewall-for-ai/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
     }
   ],
   "products": [
