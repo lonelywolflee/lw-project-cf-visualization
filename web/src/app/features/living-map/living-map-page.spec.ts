@@ -169,6 +169,7 @@ const curatedData: CuratedData = {
           competitor: 'Akamai',
           vsKo: '엣지 통합은 강점, 전담 PS 조직은 열세.',
           grounding: 'internal-reviewed',
+          sourceUrl: 'https://www.cloudflare.com/application-services/products/cdn/',
         },
         {
           competitor: 'AWS WAF',
@@ -714,7 +715,9 @@ describe('LivingMapPage', () => {
     expect(card?.textContent).toContain('경쟁 비교');
     // internal-reviewed renders a badge; official renders a citation link.
     expect(card?.querySelector('.bc-badge')?.textContent).toContain('사내 검수 자료');
-    const officialLinks = Array.from(card?.querySelectorAll('.bc-head a') ?? []);
-    expect(officialLinks.some((link) => link.textContent?.includes('공식 근거'))).toBe(true);
+    const cardLinks = Array.from(card?.querySelectorAll('.bc-head a') ?? []);
+    expect(cardLinks.some((link) => link.textContent?.includes('공식 근거'))).toBe(true);
+    // An internal-reviewed card with a sourceUrl shows "우리 측 근거" too.
+    expect(cardLinks.some((link) => link.textContent?.includes('우리 측 근거'))).toBe(true);
   });
 });
