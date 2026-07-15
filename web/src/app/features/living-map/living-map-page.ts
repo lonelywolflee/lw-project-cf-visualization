@@ -24,10 +24,12 @@ import { buildMapModel, LANE_LABELS, LAYER_LABELS, type MapModel } from '../map/
 import {
   buildLensViews,
   learningCardView,
+  solutionCardView,
   totalSlots,
   verifiedSlots,
   type LearningCardView,
   type LensView,
+  type SolutionCardView,
 } from './living-map-selectors';
 import { areaReviewStates, nodeReviewStates } from './re-fog';
 import {
@@ -76,6 +78,8 @@ export class LivingMapPage {
   readonly kind = input<string | undefined>();
   /** Raw `?lens=` value; a scenario or solution id, validated below. */
   readonly lens = input<string | undefined>();
+  /** Raw `?solution=` value; opens the canonical solution card. */
+  readonly solution = input<string | undefined>();
   /** Raw `?stop=` value; the 1-based replay stop, clamped to the journey. */
   readonly stop = input<string | undefined>();
 
@@ -513,13 +517,64 @@ export class LivingMapPage {
     return lens === null ? {} : { lens: lens.id };
   }
 
+  /**
+   * Lens semantics (design §Recommended 2): picking a solution lens opens
+   * its canonical card alongside the filter; clicking the active lens
+   * again clears both. Scenario lenses keep their narrative panel — the
+   * asymmetry is a role difference, not an omission.
+   */
   protected setLens(lensId: string | null): void {
+    const lens = lensId === null ? null : (this.lenses().find((c) => c.id === lensId) ?? null);
+    const params: Record<string, string> = {};
+    if (lens !== null) {
+      params['lens'] = lens.id;
+      if (lens.kind === 'solution') {
+        params['solution'] = lens.id; // open the canonical card
+      }
+    }
     const selected = this.selectedId();
-    const productParam = selected === null ? {} : { product: selected };
+    if (selected !== null && lens?.kind !== 'solution') {
+      params['product'] = selected; // solution card and product card are exclusive
+    }
+    void this.router.navigate([], { relativeTo: this.route, queryParams: params });
+  }
+
+  protected toggleLens(lensId: string): void {
+    this.setLens(this.activeLens()?.id === lensId ? null : lensId);
+  }
+
+  // --------------------------------------------------------- solution card
+
+  /** The canonical solution card; hostile ids collapse to null. */
+  protected readonly solutionCard = computed<SolutionCardView | null>(() => {
+    const raw = firstParamValue(this.solution());
+    if (raw === undefined || raw === '') return null;
+    const catalog = this.store.catalog();
+    const curated = this.curatedStore.curated();
+    if (catalog === undefined || curated === undefined) return null;
+    return solutionCardView(catalog, curated, raw) ?? null;
+  });
+
+  /** Closes the card but keeps the lens filter (design semantics). */
+  protected closeSolutionCard(): void {
+    void this.router.navigate([], { relativeTo: this.route, queryParams: this.lensParam() });
+  }
+
+  /** Boundary-neighbour navigation: swap the card, keep the lens. */
+  protected openSolutionCard(solutionId: string): void {
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: lensId === null ? productParam : { ...productParam, lens: lensId },
+      queryParams: { ...this.lensParam(), solution: solutionId },
     });
+  }
+
+  /**
+   * Solution re-fog visibility (design §Recommended 4): stale solutions
+   * dim their lens chip. Reads the namespaced progress key — inert until
+   * V6-3 starts writing `solution:<id>` reviews, alive the moment it does.
+   */
+  protected isLensStale(lensId: string): boolean {
+    return this.nodeReviews().get(`solution:${lensId}`)?.stale === true;
   }
 
   protected inLens(productId: string): boolean {

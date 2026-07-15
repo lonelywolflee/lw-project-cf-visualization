@@ -801,8 +801,9 @@
   border-style: solid;
 }
 
-/* 검증됐지만 복습 기한이 지난 노드 — 안개가 다시 낀다. */
-.node.st-verified.refog {
+/* 검증됐지만 복습 기한이 지난 노드/솔루션 칩 — 안개가 다시 낀다. */
+.node.st-verified.refog,
+.lens-chip.stale {
   border-style: dashed;
   opacity: 0.55;
 }
@@ -843,6 +844,33 @@
   border-color: #333;
   color: #fff;
   font-weight: 700;
+}
+
+.s-oneliner {
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.55;
+  margin: 0 0 0.7rem;
+}
+
+.s-chips {
+  margin-top: 0.4rem;
+}
+
+.s-neighbour {
+  background: none;
+  border: 0;
+  color: var(--lm-lane2);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 750;
+  padding: 0;
+}
+
+.s-shared {
+  color: var(--lm-muted);
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0;
 }
 
 .lens-kind {

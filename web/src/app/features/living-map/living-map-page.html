@@ -267,9 +267,10 @@
       type="button"
       class="lens-chip"
       [class.on]="activeLens()?.id === lensOption.id"
-      (click)="setLens(lensOption.id)"
+      [class.stale]="lensOption.kind === 'solution' && isLensStale(lensOption.id)"
+      (click)="toggleLens(lensOption.id)"
     >
-      <span class="lens-kind">{{ lensOption.kind === 'scenario' ? '상황' : '솔루션' }}</span>
+      <span class="lens-kind">{{ lensOption.kind === 'scenario' ? '딜 상황' : '솔루션' }}</span>
       {{ lensOption.title }}
     </button>
     }
@@ -295,7 +296,7 @@
     </p>
   </aside>
   } } @if (model(); as m) {
-  <div class="map-layout" [class.card-open]="card() !== null">
+  <div class="map-layout" [class.card-open]="card() !== null || solutionCard() !== null">
     <div class="lanes">
       @for (lane of m.lanes; track lane.lane) {
       <section class="lane lane-{{ lane.lane }}" [attr.aria-label]="lane.title">
@@ -518,6 +519,90 @@
       <button type="button" class="learn-button" (click)="markLearned(c.product.id)">
         익혔음 ✓ — 노드가 밝아집니다
       </button>
+      }
+    </aside>
+    } @else if (solutionCard(); as sc) {
+    <aside class="learning-card" aria-label="솔루션 카드" aria-live="polite">
+      <header class="card-head">
+        <p class="c-eyebrow">솔루션</p>
+        <button
+          type="button"
+          class="card-close"
+          (click)="closeSolutionCard()"
+          aria-label="카드 닫기"
+        >
+          ✕
+        </button>
+      </header>
+      <h2 class="p-name">{{ sc.name }}</h2>
+      @if (sc.note; as snote) {
+      <p class="s-oneliner">{{ snote.oneLinerKo }}</p>
+      <dl class="note">
+        <dt>왜 존재하나</dt>
+        <dd>{{ snote.whyKo }}</dd>
+        <dt>흔한 오해</dt>
+        <dd>{{ snote.misconceptionKo }}</dd>
+        <dt>고객이 실제로 묻는 질문</dt>
+        <dd>{{ snote.customerQuestionKo }}</dd>
+        @if (snote.seAngleKo; as seAngle) {
+        <dt>SE 각도</dt>
+        <dd>{{ seAngle }}</dd>
+        } @if (snote.aeAngleKo; as aeAngle) {
+        <dt>AE 각도</dt>
+        <dd>{{ aeAngle }}</dd>
+        }
+      </dl>
+      <p class="c-src">
+        노트 출처:
+        <a [href]="snote.sourceUrl" target="_blank" rel="noopener noreferrer"
+          >원문 페이지 (새 창)</a
+        >
+        · 확인일 {{ snote.verifiedAt | date: 'mediumDate' }}
+      </p>
+      } @else {
+      <div class="fallback">
+        <span class="fallback-badge">학습 노트 준비 중</span>
+        <p class="fallback-summary" lang="en">{{ sc.summary }}</p>
+        <p class="fallback-hint">지금은 구성 제품과 원문 링크로 학습하세요.</p>
+      </div>
+      }
+
+      <div class="role-layer">
+        <p class="layer-head">구성 제품 {{ sc.products.length }}</p>
+        <div class="recall-chips s-chips">
+          @for (chip of sc.products; track chip.id) {
+          <button type="button" class="recall-chip" (click)="open(chip.id)">{{ chip.name }}</button>
+          }
+        </div>
+      </div>
+
+      @if (sc.boundaries.length > 0) {
+      <div class="role-layer">
+        <p class="layer-head">이웃과의 경계</p>
+        @for (boundary of sc.boundaries; track boundary.solutionId) {
+        <div class="battlecard">
+          <p class="bc-head">
+            <button
+              type="button"
+              class="s-neighbour"
+              (click)="openSolutionCard(boundary.solutionId)"
+            >
+              ↔ {{ boundary.solutionName }}
+            </button>
+          </p>
+          <p class="bc-body">{{ boundary.noteKo }}</p>
+          @if (boundary.sharedProducts.length > 0) {
+          <p class="s-shared">
+            공유: @for (chip of boundary.sharedProducts; track chip.id) {
+            <button type="button" class="recall-chip" (click)="open(chip.id)">
+              {{ chip.name }}
+            </button>
+            }
+          </p>
+          }
+        </div>
+        }
+      </div>
       }
     </aside>
     }

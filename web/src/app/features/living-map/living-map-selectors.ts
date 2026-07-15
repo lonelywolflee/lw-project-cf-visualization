@@ -1,4 +1,4 @@
-import type { Catalog, CuratedData, LearningNote, Product } from '@cf-viz/catalog';
+import type { Catalog, CuratedData, LearningNote, Product, SolutionNote } from '@cf-viz/catalog';
 
 /**
  * Read models specific to the Living Map's learning layer. The map's
@@ -118,6 +118,92 @@ export function buildLensViews(catalog: Catalog, curated: CuratedData): readonly
     }))
     .sort((a, b) => (a.title < b.title ? -1 : a.title > b.title ? 1 : 0));
   return [...scenarios, ...solutions];
+}
+
+/** One product chip on the solution card. */
+export interface SolutionProductChip {
+  readonly id: string;
+  readonly name: string;
+}
+
+/** One neighbour row of the solution card's boundary section. */
+export interface SolutionBoundaryView {
+  readonly solutionId: string;
+  readonly solutionName: string;
+  readonly noteKo: string;
+  /** Derived from composition intersection — never stored (design rule). */
+  readonly sharedProducts: readonly SolutionProductChip[];
+}
+
+/** Everything the canonical solution card renders. */
+export interface SolutionCardView {
+  readonly id: string;
+  readonly name: string;
+  /** Crawled English summary — the fallback body when no note exists. */
+  readonly summary: string;
+  /** The curated note; null → the card shows the fallback. */
+  readonly note: SolutionNote | null;
+  /** Composition members in name order (the recall answers). */
+  readonly products: readonly SolutionProductChip[];
+  /**
+   * Boundary rows: this note's own boundariesKo PLUS mirrored entries from
+   * neighbours whose notes point back here (stored one-directional,
+   * displayed both ways — the design's no-double-truth rule).
+   */
+  readonly boundaries: readonly SolutionBoundaryView[];
+}
+
+/** Joins a solution with its note, members, and mirrored boundaries. */
+export function solutionCardView(
+  catalog: Catalog,
+  curated: CuratedData,
+  solutionId: string,
+): SolutionCardView | undefined {
+  const solution = catalog.solutions.find((candidate) => candidate.id === solutionId);
+  if (solution === undefined) return undefined;
+
+  const nameById = new Map(catalog.products.map((product) => [product.id, product.name]));
+  const solutionNameById = new Map(catalog.solutions.map((entry) => [entry.id, entry.name]));
+  const membersOf = (id: string): readonly string[] =>
+    curated.compositions.find((entry) => entry.solutionId === id)?.productIds ?? [];
+  const toChips = (ids: readonly string[]): SolutionProductChip[] =>
+    ids
+      .map((id) => ({ id, name: nameById.get(id) ?? id }))
+      .sort((a, b) => (a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1));
+
+  const ownMembers = new Set(membersOf(solutionId));
+  const note = curated.solutionNotes.find((entry) => entry.solutionId === solutionId) ?? null;
+
+  const boundaries = new Map<string, SolutionBoundaryView>();
+  const addBoundary = (neighbourId: string, noteKo: string): void => {
+    if (boundaries.has(neighbourId)) return; // own entry wins over mirror
+    boundaries.set(neighbourId, {
+      solutionId: neighbourId,
+      solutionName: solutionNameById.get(neighbourId) ?? neighbourId,
+      noteKo,
+      sharedProducts: toChips(membersOf(neighbourId).filter((id) => ownMembers.has(id))),
+    });
+  };
+  for (const boundary of note?.boundariesKo ?? []) {
+    addBoundary(boundary.solutionId, boundary.noteKo);
+  }
+  for (const other of curated.solutionNotes) {
+    if (other.solutionId === solutionId) continue;
+    for (const boundary of other.boundariesKo ?? []) {
+      if (boundary.solutionId === solutionId) {
+        addBoundary(other.solutionId, boundary.noteKo);
+      }
+    }
+  }
+
+  return {
+    id: solution.id,
+    name: solution.name,
+    summary: solution.summary,
+    note,
+    products: toChips([...ownMembers]),
+    boundaries: [...boundaries.values()],
+  };
 }
 
 /**
