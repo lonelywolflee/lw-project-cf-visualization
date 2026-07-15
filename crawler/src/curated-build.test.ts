@@ -60,6 +60,7 @@ function buildCuratedData(): CuratedData {
     learningNotes: [],
     scenarios: [],
     narration: [],
+    solutionNotes: [],
     products: [
       {
         productId: 'waf',
@@ -229,6 +230,7 @@ describe('buildCuratedArtifact', () => {
         learningNotes: [],
         scenarios: [],
         narration: [],
+        solutionNotes: [],
         schemaVersion: '1',
       }),
     );

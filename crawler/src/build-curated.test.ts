@@ -60,6 +60,7 @@ const VALID_CURATED_SOURCE = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [
     {
       verifiedAt: '2026-07-14T00:00:00Z',
@@ -133,6 +134,7 @@ describe('build-curated CLI', () => {
       learningNotes: [],
       scenarios: [],
       narration: [],
+      solutionNotes: [],
       products: [
         {
           productId: 'waf',

@@ -2015,6 +2015,69 @@
       "productIds": ["d1", "durable-objects", "kv", "queues", "r2", "workers", "workflows"],
       "sourceUrl": "https://www.cloudflare.com/solutions/workflows/",
       "verifiedAt": "2026-07-14T00:00:00Z"
+    },
+    {
+      "solutionId": "healthcare",
+      "productIds": [
+        "network-firewall",
+        "browser-isolation",
+        "email-security",
+        "access",
+        "dlp",
+        "casb",
+        "gateway",
+        "waf",
+        "ddos",
+        "api-shield",
+        "dns"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/healthcare/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "financial-services",
+      "productIds": ["waf", "access", "ddos", "api-shield", "dlp"],
+      "sourceUrl": "https://www.cloudflare.com/financial-services/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "retail",
+      "productIds": [
+        "cdn",
+        "load-balancing",
+        "argo-smart-routing",
+        "images",
+        "stream",
+        "waf",
+        "ddos",
+        "dns",
+        "access",
+        "gateway",
+        "casb",
+        "workers-ai",
+        "ai-gateway",
+        "ai-security-for-apps"
+      ],
+      "sourceUrl": "https://www.cloudflare.com/retail/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "public-sector",
+      "productIds": ["access", "gateway", "ddos", "dns", "email-security", "wan"],
+      "sourceUrl": "https://www.cloudflare.com/public-sector/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "ai-security",
+      "productIds": ["ai-security-for-apps", "ai-gateway", "dlp", "waf"],
+      "sourceUrl": "https://developers.cloudflare.com/waf/detections/firewall-for-ai/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "sase-for-airlines",
+      "productIds": ["access", "gateway", "dlp"],
+      "sourceUrl": "https://www.cloudflare.com/solutions/sase-for-airlines/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
     }
   ],
   "pricing": [
@@ -2707,6 +2770,248 @@
       "productId": "argo-smart-routing",
       "captionKo": "그래도 끝내 Origin까지 가야 하는 요청이라면, 마지막 구간에서도 길을 고릅니다. \"실시간 네트워크 혼잡을 감지해 우회(routes around real-time network congestion)\"하며 막힌 길을 피해 달리고, 왕복은 그만큼 짧아집니다.",
       "sourceUrl": "https://www.cloudflare.com/application-services/products/argo-smart-routing/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    }
+  ],
+  "solutionNotes": [
+    {
+      "solutionId": "security",
+      "oneLinerKo": "웹사이트·앱·API로 들어오는 공격(익스플로잇·봇·DDoS)을 한 플랫폼에서 막는 인바운드 보안 묶음입니다.",
+      "whyKo": "공식 문구는 \"익스플로잇, 봇, 기록적인 DDoS를 수 초 안에 차단 — 340Tbps 이상의 전역 용량\"입니다. 개별 보안 제품을 따로 사는 대신, DNS만 바꾸면 한 경로 위에서 함께 도는 것이 이 묶음의 존재 이유입니다.",
+      "misconceptionKo": "\"보안 솔루션 = Zero Trust\"로 헷갈리기 쉽습니다 — 이 묶음은 바깥에서 들어오는 공격(인바운드)을 막고, 직원의 나가는 트래픽은 SASE(Cloudflare One)의 영역입니다.",
+      "customerQuestionKo": "\"보안 제품이 이미 여러 개인데 왜 묶음인가요?\" — 같은 엣지에서 WAF·봇·DDoS·API 보호가 한 요청을 한 번에 검사하니, 벤더별 왕복과 콘솔이 사라진다고 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "sase",
+          "noteKo": "방향이 반대입니다 — security는 인터넷에서 내 앱으로 들어오는 공격을, SASE는 내 직원이 인터넷으로 나가는 접속을 지킵니다."
+        },
+        {
+          "solutionId": "ai-security",
+          "noteKo": "WAF를 공유하지만, ai-security는 LLM 앱 고유 위협(프롬프트 주입·PII)에 특화된 부분집합입니다."
+        }
+      ],
+      "seAngleKo": "구성 제품들이 같은 요청 경로에서 순서대로 평가됩니다 — DDoS(용량) → WAF/봇(내용·행동) → API Shield(스키마). 층 순서로 설명하면 아키텍처 대화가 잡힙니다.",
+      "sourceUrl": "https://www.cloudflare.com/solutions/security/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "sase",
+      "oneLinerKo": "직원·지사·협력사의 접속을 신원 기반으로 지키는 Zero Trust 네트워크 묶음(Cloudflare One)입니다.",
+      "whyKo": "공식 문구 \"Stop relying on clunky, insecure VPNs\"가 존재 이유입니다 — 접근(Access)·필터링(Gateway)·격리(RBI)·데이터 보호(DLP/CASB)·지사 연결(WAN)이 한 네트워크에서 돕니다.",
+      "misconceptionKo": "\"SASE = VPN의 신형\"이 아닙니다 — 네트워크 전체를 여는 VPN을 앱 단위 최소 권한으로 대체하는 접근 모델의 교체입니다.",
+      "customerQuestionKo": "\"제품이 10개나 되는데 뭐부터 도입하나요?\" — 표준 경로는 Access(사내 앱 몇 개)로 시작해 Gateway(아웃바운드) → DLP/CASB로 넓히는 단계 도입이라고 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "security",
+          "noteKo": "인바운드(security) vs 아웃바운드·사내 접근(SASE)의 방향 차이가 경계입니다."
+        },
+        {
+          "solutionId": "healthcare",
+          "noteKo": "healthcare는 SASE 구성 대부분에 인바운드 방어(WAF·DDoS·API)를 더한 산업 패키징입니다."
+        },
+        {
+          "solutionId": "sase-for-airlines",
+          "noteKo": "airlines는 SASE의 항공 특화 서사(승무원·기내 연결·PNR 보호)입니다 — 엔진은 같습니다."
+        }
+      ],
+      "aeAngleKo": "VPN 헬프데스크 티켓 수와 지사 회선 비용이 딜의 문입니다 — \"hours, not months\" 배포 속도가 공식 문구입니다.",
+      "sourceUrl": "https://www.cloudflare.com/sase/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "ai",
+      "oneLinerKo": "AI 앱과 에이전트를 만들고 배포하는 개발 스택 묶음(AI Cloud)입니다.",
+      "whyKo": "공식 문구대로 \"훈련 데이터 저장부터 추론 실행까지, Cloudflare가 자사 AI에 쓰는 그 네트워크 위에서\" AI 앱을 확장하기 위한 묶음입니다 — GPU 추론(Workers AI)·게이트웨이·벡터·저장이 한 플랫폼에 있습니다.",
+      "misconceptionKo": "\"AI 솔루션 = AI 보안\"이 아닙니다 — 이 묶음은 만들기(빌드) 스택이고, 지키기는 ai-security의 몫입니다.",
+      "customerQuestionKo": "\"OpenAI API로 이미 만들고 있는데요?\" — 그대로 두고 AI Gateway로 관측·캐싱부터 얹은 뒤, 지연·비용이 아픈 부분만 엣지 추론으로 옮기는 병행 경로를 제시하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "ai-security",
+          "noteKo": "빌드(ai) vs 방어(ai-security) — ai-gateway를 공유하지만 목적이 다릅니다."
+        },
+        {
+          "solutionId": "platforms",
+          "noteKo": "둘 다 개발 스택이지만 platforms는 \"고객이 코드를 올리는 SaaS\"를, ai는 \"AI 추론·에이전트\"를 만듭니다."
+        }
+      ],
+      "seAngleKo": "표준 조립: Workers AI(추론) + Vectorize(임베딩) + R2(데이터) + AI Gateway(관측) — RAG 데모가 이 네 조각으로 완성됩니다.",
+      "sourceUrl": "https://www.cloudflare.com/solutions/ai/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "ai-security",
+      "oneLinerKo": "LLM이 들어간 앱의 고유 위협(프롬프트 주입·PII 유출·위험 주제)을 막는 AI 방어 묶음입니다.",
+      "whyKo": "LLM 앱의 입력창은 새 공격면입니다 — 공식 문서대로 \"프롬프트 주입, 프롬프트 내 PII, 위험 주제\"를 WAF 통합 탐지(AI Security for Apps)로 거르고, DLP가 프롬프트 속 민감 데이터를, AI Gateway가 호출 관측을 맡습니다.",
+      "misconceptionKo": "\"기존 WAF로 충분\"이 오해입니다 — 전통 룰은 SQL 주입을 알지, \"이전 지시를 무시해\"라는 자연어 공격을 모릅니다. model-agnostic 탐지가 별도로 필요합니다.",
+      "customerQuestionKo": "\"챗봇에 보안이 왜 따로 필요하죠?\" — 입력창에 시스템 프롬프트를 물어보는 한 줄 시연이 가장 빠른 답입니다.",
+      "boundariesKo": [
+        {
+          "solutionId": "ai",
+          "noteKo": "ai가 만들고 ai-security가 지킵니다 — 도입 순서도 보통 그 순서입니다."
+        },
+        {
+          "solutionId": "security",
+          "noteKo": "security의 WAF 위에 LLM 전용 탐지를 얹은 특화 부분집합입니다."
+        }
+      ],
+      "aeAngleKo": "AI 기능 출시를 앞둔 팀의 보안 검토(security review)가 딜 타이밍입니다 — 검토 통과 요건으로 프레임하세요.",
+      "sourceUrl": "https://developers.cloudflare.com/waf/detections/firewall-for-ai/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "frontends",
+      "oneLinerKo": "웹사이트·웹앱을 전역 엣지에 배포하는 프런트엔드 스택 묶음입니다.",
+      "whyKo": "공식 문구 \"50ms 안에 전 세계 사용자에게 닿는 단일 Worker가 프런트와 백엔드를 함께\" — Git 연결로 배포하고(KV·D1·R2가 데이터), 리전 설계 없이 전 세계가 기본값입니다.",
+      "misconceptionKo": "\"정적 호스팅 묶음\"이 아닙니다 — Workers가 백엔드까지 겸하므로 풀스택 배포가 한 프로젝트입니다.",
+      "customerQuestionKo": "\"Vercel과 뭐가 다르죠?\" — 같은 엣지에 보안(WAF·봇)과 데이터(KV/D1/R2)까지 이어지는 플랫폼 연속성이 축이라고 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "workflows",
+          "noteKo": "같은 Workers 계열이지만 frontends는 요청-응답 화면을, workflows는 오래 걸리는 다단계 작업을 맡습니다."
+        },
+        {
+          "solutionId": "platforms",
+          "noteKo": "frontends는 내 앱을, platforms는 내 고객의 코드를 올리는 멀티테넌트를 만듭니다."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/frontends/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "network",
+      "oneLinerKo": "앱을 전 세계에서 즉각적으로 느끼게 만드는 전송·트래픽 관리 묶음입니다.",
+      "whyKo": "공식 문구 \"anycast 네트워크가 컴퓨트·스토리지·보안을 인터넷 사용자 95%의 50ms 안에\" — 혼잡 우회(Argo), 다중 오리진 분산(Load Balancing), 공격 흡수(DDoS)가 전송 품질을 받칩니다.",
+      "misconceptionKo": "\"네트워크 솔루션 = 사내망(WAN)\"이 아닙니다 — 이 묶음은 공개 웹 트래픽의 전송 최적화이고, 사내망 전환은 SASE의 WAN이 맡습니다.",
+      "customerQuestionKo": "\"CDN이면 충분하지 않나요?\" — 캐시 미스와 동적 API가 남습니다. 경로 최적화(Argo)와 오리진 분산(LB)이 그 나머지 절반이라고 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "security",
+          "noteKo": "ddos를 공유합니다 — network는 빠르게, security는 안전하게라는 목적 차이로 가르세요."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/network/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "platforms",
+      "oneLinerKo": "내 SaaS의 고객이 직접 코드를 올려 실행하는 멀티테넌트 플랫폼 묶음입니다.",
+      "whyKo": "공식 문구 \"고객이 자기 코드를 실행하고 데이터를 저장하고 API를 노출하게 하되, 당신은 인프라 사업에서 빠져라\" — Workers for Platforms가 테넌트 격리를, D1/KV/R2/DO가 테넌트 데이터를 맡습니다.",
+      "misconceptionKo": "\"그냥 Workers 요금제\"가 아닙니다 — 신뢰할 수 없는 고객 코드를 격리 실행하는 별도 아키텍처(디스패치 네임스페이스)입니다.",
+      "customerQuestionKo": "\"고객 커스텀 코드 요청이 늘어나는데 감당이 안 됩니다\" — 정확히 그 상황을 위한 묶음입니다. 격리·과금·한도가 플랫폼 기능으로 제공됩니다.",
+      "boundariesKo": [
+        {
+          "solutionId": "frontends",
+          "noteKo": "내 앱(frontends) vs 고객의 코드(platforms)의 차이입니다."
+        },
+        {
+          "solutionId": "ai",
+          "noteKo": "AI 에이전트가 고객 코드를 만들면 두 묶음이 만납니다 — 실행 격리는 platforms 계열(Sandboxes)의 몫."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/platforms/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "workflows",
+      "oneLinerKo": "타임아웃 없이 며칠씩 이어지는 다단계 작업을 만드는 내구 실행 묶음입니다.",
+      "whyKo": "공식 문구 \"자동 재시도, 상태 보존, 분·시간·일·주 단위 실행\" — Workflows 엔진에 Queues(버퍼)·DO(조정)·D1/KV/R2(상태)가 붙어 배치·승인 흐름·장기 파이프라인을 받칩니다.",
+      "misconceptionKo": "\"cron 묶음\"이 아닙니다 — 예약 실행이 아니라, 중간에 죽어도 체크포인트에서 이어지는 실행 내구성이 본질입니다.",
+      "customerQuestionKo": "\"긴 작업이 자꾸 타임아웃으로 죽습니다\" — 단계(step)로 쪼개면 각 단계가 재시도와 상태를 갖는다고 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "frontends",
+          "noteKo": "화면(요청-응답)은 frontends, 뒤에서 오래 도는 일은 workflows입니다."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/workflows/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "healthcare",
+      "oneLinerKo": "의료 시스템·PHI 접근을 지키면서 환자 경험을 빠르게 하는 의료 산업 묶음입니다.",
+      "whyKo": "공식 문구 \"의료 시스템과 PHI(보호 대상 건강 정보)에 대한 안전한 접근으로 의료 전달을 혁신\" — SASE 계열(Access·Gateway·DLP·CASB·RBI·이메일)과 인바운드 방어(WAF·DDoS·API·DNS)를 한 플랫폼으로 묶은 산업 패키징입니다.",
+      "misconceptionKo": "\"의료용 특수 제품\"이 아닙니다 — 범용 구성의 산업 맞춤 서사이며, 차별점은 PHI·규제(GDPR 등) 중심의 정책 설계입니다.",
+      "customerQuestionKo": "\"HIPAA 대응이 되나요?\" — PHI 접근 통제(신원 기반)·유출 방지(DLP)·증적이 이 묶음의 축이고, 규제 언어는 financial-services처럼 컴플라이언스 프레임으로 답하세요.",
+      "boundariesKo": [
+        {
+          "solutionId": "sase",
+          "noteKo": "SASE 구성의 상위집합에 가깝습니다 — 인바운드 방어가 더해진 산업판."
+        },
+        {
+          "solutionId": "financial-services",
+          "noteKo": "둘 다 규제 산업 패키징입니다 — 지키는 데이터(PHI vs 금융 정보)와 규제 프레임이 다릅니다."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/healthcare/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "financial-services",
+      "oneLinerKo": "규제(PCI DSS 4.0·GDPR·DORA·NIS2) 아래의 금융사를 위한 보안·컴플라이언스 묶음입니다.",
+      "whyKo": "공식 문구 \"zero trust 보안 접근이 지속적 신원 검증과 엄격한 접근 통제를 보장하고… PCI DSS 4.0, GDPR, DORA, NIS2 같은 핵심 규제를 준수\" — 접근 통제(Access)·유출 방지(DLP)·인바운드 방어(WAF·DDoS·API)가 감사 증적과 함께 돕니다.",
+      "misconceptionKo": "\"금융 전용 엔진\"이 아닙니다 — 범용 구성의 규제 중심 패키징이고, 진짜 차별은 규제 언어로 말하는 능력입니다.",
+      "customerQuestionKo": "\"감사가 다가오는데 뭘 먼저 보나요?\" — 접근 증적(누가 언제 어떤 시스템에)과 로그 보존부터 — finance-audit 시나리오 렌즈가 이 대화의 대본입니다.",
+      "boundariesKo": [
+        {
+          "solutionId": "healthcare",
+          "noteKo": "같은 규제 산업 패턴 — 데이터 종류(금융 vs PHI)와 규제 목록이 다릅니다."
+        },
+        {
+          "solutionId": "security",
+          "noteKo": "security의 인바운드 축(waf·ddos·api-shield)을 공유하되 규제·증적 서사가 얹힙니다."
+        }
+      ],
+      "aeAngleKo": "다가오는 감사 일정과 지난 지적 사항이 대화의 문입니다 — 규제 이름(DORA·NIS2)을 정확히 부르는 것 자체가 신뢰를 만듭니다.",
+      "sourceUrl": "https://www.cloudflare.com/financial-services/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "retail",
+      "oneLinerKo": "피크 트래픽에서 살아남고 전환율을 지키는 리테일·이커머스 묶음입니다.",
+      "whyKo": "공식 문구 \"고객 유지율을 높이고 비용과 리스크를 줄이는\" 리테일 패키징 — 전송(CDN·LB·Argo·Images·Stream), 방어(WAF·DDoS), 접근(Access·Gateway·CASB), AI(Workers AI·AI Gateway·AI 방어)까지 폭이 가장 넓은 산업 묶음입니다.",
+      "misconceptionKo": "\"CDN 중심 성능 묶음\"으로만 보면 절반입니다 — 봇(사재기)·플래시 세일 폭주·AI 기능 보안까지가 리테일의 실제 전장입니다.",
+      "customerQuestionKo": "\"세일 날이 무섭습니다\" — flash-sale-surge 시나리오 렌즈가 이 묶음의 대본입니다: 대기실·캐시·봇 차단을 한 경로에서.",
+      "boundariesKo": [
+        {
+          "solutionId": "security",
+          "noteKo": "waf·ddos를 공유합니다 — retail은 여기에 전송·전환(성능)과 AI까지 묶은 산업판입니다."
+        },
+        {
+          "solutionId": "network",
+          "noteKo": "전송 축(argo·load-balancing)을 공유합니다 — network는 범용, retail은 커머스 서사."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/retail/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "public-sector",
+      "oneLinerKo": "공공기관의 사이버 복원력과 규정 준수(FedRAMP 등)를 위한 공공 부문 묶음입니다.",
+      "whyKo": "공식 문구 \"통합 플랫폼이 공공 부문의 사이버 복원력을 높이고 네트워크·앱 성능을 가속\" — FedRAMP Moderate 승인(High 진행 중), TIC 3.0, NIST CSF 정렬이 이 묶음의 자격증입니다.",
+      "misconceptionKo": "\"정부 전용 제품군\"이 아닙니다 — 인증(FedRAMP) 범위 안에서 제공되는 범용 구성이며, 차별은 조달·인증 요건 충족입니다.",
+      "customerQuestionKo": "\"FedRAMP 승인 없이는 검토도 못 합니다\" — Moderate 승인 완료·High 진행 중이라는 사실 확인부터가 대화의 시작입니다.",
+      "boundariesKo": [
+        {
+          "solutionId": "sase",
+          "noteKo": "접근·필터링 축(access·gateway·wan)을 공유합니다 — 차이는 인증·조달 프레임입니다."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/public-sector/",
+      "verifiedAt": "2026-07-15T00:00:00Z"
+    },
+    {
+      "solutionId": "sase-for-airlines",
+      "oneLinerKo": "승무원·협력사·기내 연결까지 지키는 항공 특화 SASE 묶음입니다.",
+      "whyKo": "공식 문구 \"이동하는 승무원, 서드파티 파트너, AI 에이전트, 기내 승객을 연결하고 보호\" — PNR·결제·승무원 PII가 미승인 LLM으로 새는 것을 막고(EASA Part-IS·NIS2·PCI DSS 4.0 대응), 조종사·정비 벤더의 VPN을 대체합니다.",
+      "misconceptionKo": "\"별도 항공 엔진\"이 아닙니다 — SASE 구성(Access·Gateway·DLP)의 항공 서사 패키징입니다. 허브·라운지·콜센터를 전부 비신뢰 네트워크로 보고 클라우드에서 지킵니다.",
+      "customerQuestionKo": "\"기내 Starlink 연결에서 인증서 설치 없이 되나요?\" — 승객 기기에 커스텀 인증서 없이 동작한다는 것이 공식 서사의 축입니다.",
+      "boundariesKo": [
+        {
+          "solutionId": "sase",
+          "noteKo": "엔진은 SASE 그대로 — 항공 규제(EASA)와 기내 연결 시나리오가 얹힌 특화판입니다."
+        }
+      ],
+      "sourceUrl": "https://www.cloudflare.com/solutions/sase-for-airlines/",
       "verifiedAt": "2026-07-15T00:00:00Z"
     }
   ]

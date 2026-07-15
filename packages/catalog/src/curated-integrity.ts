@@ -3,7 +3,14 @@ import type { CatalogIssue } from './errors.js';
 import type { Catalog } from './schema.js';
 
 function collectUniqueIds(
-  collection: 'products' | 'compositions' | 'pricing' | 'learningNotes' | 'scenarios' | 'narration',
+  collection:
+    | 'products'
+    | 'compositions'
+    | 'pricing'
+    | 'learningNotes'
+    | 'solutionNotes'
+    | 'scenarios'
+    | 'narration',
   key: 'productId' | 'solutionId' | 'id',
   ids: readonly string[],
   issues: CatalogIssue[],
@@ -67,8 +74,24 @@ export function collectCuratedIntegrityIssues(curated: CuratedData): CatalogIssu
     curated.narration.map((entry) => entry.productId),
     issues,
   );
+  collectUniqueIds(
+    'solutionNotes',
+    'solutionId',
+    curated.solutionNotes.map((entry) => entry.solutionId),
+    issues,
+  );
   return issues;
 }
+
+/**
+ * Product ids that are ALSO solution ids in the current catalog. Progress
+ * keys for solutions must be namespaced (`solution:<id>`) because of these
+ * collisions — a raw solution id would corrupt the product's verified
+ * state, streak, and re-fog. This snapshot makes the collision set a
+ * contract: a NEW collision fails validation until the snapshot (and the
+ * namespace reasoning) is consciously revisited.
+ */
+export const KNOWN_PRODUCT_SOLUTION_COLLISIONS: readonly string[] = ['workflows'];
 
 /**
  * Collects every reference from a valid curated dataset to a product or
@@ -165,6 +188,46 @@ export function collectCuratedReferenceIssues(
       });
     }
   });
+
+  curated.solutionNotes.forEach((entry, index) => {
+    if (!solutionIds.has(entry.solutionId)) {
+      issues.push({
+        code: 'unknown-entity-reference',
+        path: `solutionNotes[${String(index)}].solutionId`,
+        message: `Unknown solutions id '${entry.solutionId}'`,
+      });
+    }
+    (entry.boundariesKo ?? []).forEach((boundary, boundaryIndex) => {
+      if (!solutionIds.has(boundary.solutionId)) {
+        issues.push({
+          code: 'unknown-entity-reference',
+          path: `solutionNotes[${String(index)}].boundariesKo[${String(boundaryIndex)}].solutionId`,
+          message: `Unknown solutions id '${boundary.solutionId}'`,
+        });
+      }
+      if (boundary.solutionId === entry.solutionId) {
+        issues.push({
+          code: 'duplicate-id',
+          path: `solutionNotes[${String(index)}].boundariesKo[${String(boundaryIndex)}].solutionId`,
+          message: `Solution '${entry.solutionId}' cannot bound itself`,
+        });
+      }
+    });
+  });
+
+  // Snapshot check: solution progress keys are namespaced because product
+  // and solution ids collide. A collision outside the known snapshot means
+  // the namespace contract must be consciously re-confirmed.
+  const knownCollisions = new Set(KNOWN_PRODUCT_SOLUTION_COLLISIONS);
+  for (const solution of catalog.solutions) {
+    if (productIds.has(solution.id) && !knownCollisions.has(solution.id)) {
+      issues.push({
+        code: 'duplicate-id',
+        path: `catalog.solutions[${solution.id}]`,
+        message: `New product∩solution id collision '${solution.id}' — update KNOWN_PRODUCT_SOLUTION_COLLISIONS after re-confirming the progress-key namespace contract`,
+      });
+    }
+  }
 
   return issues;
 }

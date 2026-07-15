@@ -23,6 +23,7 @@ function buildValidCuratedData(): CuratedData {
     learningNotes: [],
     scenarios: [],
     narration: [],
+    solutionNotes: [],
     products: [buildCuratedProduct('waf')],
     compositions: [
       {

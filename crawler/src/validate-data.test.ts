@@ -62,6 +62,7 @@ const VALID_CURATED_SOURCE = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'waf',

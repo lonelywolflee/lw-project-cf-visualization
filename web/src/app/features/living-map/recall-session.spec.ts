@@ -45,6 +45,7 @@ const curated = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [
     {
       productId: 'waf',

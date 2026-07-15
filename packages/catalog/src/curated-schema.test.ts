@@ -8,6 +8,7 @@ function buildValidCuratedData(): CuratedData {
     learningNotes: [],
     scenarios: [],
     narration: [],
+    solutionNotes: [],
     products: [
       {
         productId: 'waf',
@@ -92,6 +93,7 @@ describe('curatedDataSchema', () => {
       learningNotes: [],
       scenarios: [],
       narration: [],
+      solutionNotes: [],
       products: [],
       compositions: [],
       pricing: [],

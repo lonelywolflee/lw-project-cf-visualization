@@ -10,6 +10,7 @@ export const EMPTY_CURATED: CuratedData = {
   learningNotes: [],
   scenarios: [],
   narration: [],
+  solutionNotes: [],
   products: [],
   compositions: [],
   pricing: [],
