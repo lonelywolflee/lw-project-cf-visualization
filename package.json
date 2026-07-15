@@ -9,13 +9,14 @@
     "node": "^22.22.3 || ^24.15.0"
   },
   "scripts": {
-    "dev": "pnpm --filter @cf-viz/web run start",
+    "build:contracts": "pnpm --filter @cf-viz/catalog run build",
+    "dev": "pnpm run build:contracts && pnpm --filter @cf-viz/web run start",
     "build": "pnpm -r run build",
-    "crawl": "pnpm --filter @cf-viz/crawler run crawl",
-    "build:curated": "pnpm --filter @cf-viz/crawler run build:curated",
-    "validate:data": "pnpm --filter @cf-viz/crawler run validate:data",
-    "lint": "pnpm --filter @cf-viz/catalog run build && pnpm -r run lint",
-    "test": "pnpm -r run test",
+    "crawl": "pnpm run build:contracts && pnpm --filter @cf-viz/crawler run crawl",
+    "build:curated": "pnpm run build:contracts && pnpm --filter @cf-viz/crawler run build:curated",
+    "validate:data": "pnpm run build:contracts && pnpm --filter @cf-viz/crawler run validate:data",
+    "lint": "pnpm run build:contracts && pnpm -r run lint",
+    "test": "pnpm run build:contracts && pnpm -r run test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

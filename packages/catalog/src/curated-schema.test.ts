@@ -295,8 +295,9 @@ describe('curatedDataSchema', () => {
             battlecard: [
               {
                 competitor: 'Akamai',
-                vsKo: '통합 엣지가 강점, 전용 프로페셔널 서비스는 열세.',
-                grounding: 'internal-reviewed',
+                vsKo: '같은 PoP에서 보안·컴퓨트가 함께 도는 통합 엣지가 강점.',
+                grounding: 'official',
+                sourceUrl: 'https://www.cloudflare.com/application-services/products/cdn/',
               },
             ],
           },
@@ -317,7 +318,8 @@ describe('curatedDataSchema', () => {
     };
     expectShapeIssue({ ...data, learningNotes: [{ ...note, se: {} }] }, 'learningNotes[0].se');
     expectShapeIssue({ ...data, learningNotes: [{ ...note, ae: {} }] }, 'learningNotes[0].ae');
-    // 'official' grounding demands a citation — the whole point of the badge.
+    // Public deployment: every comparison must cite an approved page,
+    // and the retired 'internal-reviewed' grounding must not parse.
     expectShapeIssue(
       {
         ...data,
@@ -329,6 +331,25 @@ describe('curatedDataSchema', () => {
         ],
       },
       'learningNotes[0].battlecard[0].sourceUrl',
+    );
+    expectShapeIssue(
+      {
+        ...data,
+        learningNotes: [
+          {
+            ...note,
+            battlecard: [
+              {
+                competitor: 'Akamai',
+                vsKo: '비교.',
+                grounding: 'internal-reviewed',
+                sourceUrl: 'https://www.cloudflare.com/application-services/products/waf/',
+              },
+            ],
+          },
+        ],
+      },
+      'learningNotes[0].battlecard[0].grounding',
     );
     expectShapeIssue(
       {

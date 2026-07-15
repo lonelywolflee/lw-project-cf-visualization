@@ -142,10 +142,12 @@ artifact는 독립적인 lifecycle을 가진 별도 document다.
   placements(lane/layer), `roleKo`, compositions, pricing tier(사용량 meter 포함).
 - 모든 entry는 approved hostname의 `sourceUrl`과 `verifiedAt`을 필수로 가진다. 요금 수치는
   인용한 공식 page에서 `verifiedAt` 시점에 확인한 값만 기록한다.
-- **유일한 예외는 battlecard(경쟁 비교)다**: 경쟁 비교는 공식 page에 존재하지 않으므로
-  `grounding` field로 근거를 명시한다 — `'official'`은 approved host `sourceUrl` 필수(schema가
-  강제), `'internal-reviewed'`는 사람 검수를 거친 사내 지식이며 UI가 "사내 검수 자료" badge로
-  공식 인용과 시각적으로 구분한다. 이 예외를 다른 collection으로 확장하지 않는다.
+- **battlecard(경쟁 비교)도 예외가 아니다**: public 배포 결정(2026-07-16)으로 과거의
+  `'internal-reviewed'` grounding(무출처 사내 지식)은 폐지됐다. 경쟁 비교는 approved host
+  `sourceUrl`을 인용할 수 있을 때만 존재하고(`grounding: 'official'`만 schema가 허용),
+  인용할 수 없는 경쟁사 주장은 label을 붙이는 게 아니라 **삭제한다**. 경쟁 제품의 품질·조직·
+  아키텍처에 대한 무출처 평가는 어떤 field(objections 포함)에도 담지 않는다 — 경쟁사명을
+  연동·지원 대상으로 나열하는 것(공식 문서 사실)은 허용된다.
 - Curated entry가 참조하는 product/solution id는 commit된 catalog에 존재해야 한다.
   `pnpm validate:data`가 shape, cross-reference, artifact 신선도(source 재빌드 byte와
   일치)를 함께 검증한다.

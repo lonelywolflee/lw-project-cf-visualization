@@ -188,28 +188,18 @@ const aeLayerSchema = z
   );
 
 /**
- * One honest competitor comparison. Competitive claims rarely exist on
- * Cloudflare's own pages, so grounding is explicit: 'official' entries
- * must cite an approved-host page; 'internal-reviewed' entries render
- * with a distinct badge so they never impersonate a cited fact.
+ * One honest competitor comparison. The tool deploys publicly, so a
+ * comparison ships ONLY when an approved-host page backs it — the
+ * 'internal-reviewed' grounding (unsourced internal knowledge) was
+ * retired with the public-deployment decision; claims that cannot cite
+ * an official page are deleted, not labelled.
  */
-const battlecardSchema = z
-  .strictObject({
-    competitor: nonBlankString(40),
-    vsKo: nonBlankString(400),
-    grounding: z.enum(['official', 'internal-reviewed']),
-    sourceUrl: canonicalSourceUrl.optional(),
-  })
-  .check((ctx) => {
-    if (ctx.value.grounding === 'official' && ctx.value.sourceUrl === undefined) {
-      ctx.issues.push({
-        code: 'custom',
-        message: "grounding 'official' requires a sourceUrl",
-        path: ['sourceUrl'],
-        input: undefined,
-      });
-    }
-  });
+const battlecardSchema = z.strictObject({
+  competitor: nonBlankString(40),
+  vsKo: nonBlankString(400),
+  grounding: z.literal('official'),
+  sourceUrl: canonicalSourceUrl,
+});
 
 /**
  * Learner-facing note for one product, written quote-first: each field

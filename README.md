@@ -40,6 +40,11 @@ TypeScript crawler가 공식 web source를 수집해 JSON으로 구조화하고,
 ## 동작 방식
 
 ```text
+              packages/catalog — 공유 data contract
+        (모든 명령이 pnpm build:contracts로 자동 선행 빌드)
+                            |
+            +---------------+----------------+
+            |                                |
 Cloudflare official sources          data/curated/ (hand-edited)
             |                                  |
        pnpm crawl                     pnpm build:curated
@@ -58,6 +63,12 @@ URL)을 수집하고, **curation**은 공식 page에 구조화되어 있지 않�
 위치, 한국어 역할 설명, 솔루션 구성, 요금제)을 담습니다. 두 쪽 모두 모든 record가 공식
 source URL과 확인 시각을 포함하며, 수집·검증이 실패하면 기존 정상 data file을 변경하지
 않습니다.
+
+두 갈래 모두의 전제가 `packages/catalog`(schema·type·validator)입니다. 이 package는
+빌드 산출물(`dist/`)로만 소비되므로, 이를 쓰는 모든 root 명령(`dev`, `crawl`,
+`build:curated`, `validate:data`, `lint`, `test`)은 내부에서 `pnpm build:contracts`를
+먼저 실행합니다 — fresh clone에서 어떤 명령을 먼저 실행해도 됩니다. (`pnpm build`는
+workspace 의존 순서를 따르므로 자연히 contract가 먼저 빌드됩니다.)
 
 ## 프로젝트 구조
 
@@ -103,38 +114,50 @@ TypeScript type, validator를 제공하며 data 구조의 single source of truth
 
 ## 설정과 실행
 
-다음 command를 repository root에서 실행합니다.
+최초 설정은 두 command뿐입니다 (repository root 기준).
 
 ```bash
-corepack enable
+corepack enable   # root package.json의 packageManager field로 pnpm version 고정
 pnpm install
+```
 
-# 공식 source 수집과 web data 갱신 (network 사용)
-pnpm crawl
+이후의 모든 root 명령은 공유 contract(`@cf-viz/catalog`)의 빌드를 스스로 선행하므로,
+fresh clone에서 아래 어떤 명령을 어떤 순서로 실행해도 됩니다.
 
-# Curated source를 검증·정규화해 web artifact 갱신 (offline)
-pnpm build:curated
-
-# 갱신된 data를 시각화 (Angular dev server)
+```bash
+# 일상 개발: commit된 data를 시각화 (Angular dev server, http://localhost:4200)
 pnpm dev
 
-# 품질 검증과 production build
+# 공식 source 수집과 web data 갱신 (network 사용 — 유일하게 online인 명령)
+pnpm crawl
+
+# Curated source(data/curated/curated.json) 편집 후 web artifact 갱신 (offline)
+pnpm build:curated
+
+# 품질 게이트 — CI와 동일한 검증
+pnpm format:check   # 또는 pnpm format (쓰기)
 pnpm lint
 pnpm test
+pnpm validate:data  # commit된 data(catalog + curated)의 schema·정합성·신선도 (offline)
+
+# Production static build (web/dist/web/browser)
 pnpm build
 
-# Commit된 data(catalog + curated)의 schema·정합성 validation (offline)
-pnpm validate:data
+# 공유 contract만 다시 빌드 (위 명령들이 내부적으로 호출하는 그 단계)
+pnpm build:contracts
 ```
 
 `pnpm crawl`은 승인된 source를 수집하고 전체 결과가 schema validation을 통과한 경우에만
 `web/public/data/catalog.json`을 원자적으로 교체합니다. 수집이나 검증이 실패하면 기존 data
-file은 변경되지 않습니다. 일반적인 사용 순서는 `pnpm crawl` 후 `pnpm dev`입니다.
+file은 변경되지 않습니다.
 
 Curated data를 수정할 때는 `data/curated/curated.json`을 편집한 뒤 `pnpm build:curated`를
 실행합니다. Schema, 중복, catalog 참조 검증을 통과한 경우에만 `web/public/data/curated.json`이
 정규화된 형태로 교체되며, source만 고치고 rebuild를 잊으면 `pnpm validate:data`가
 freshness 단계에서 실패합니다.
+
+`packages/catalog`의 schema나 type을 수정했다면 그 반영도 자동입니다 — 각 명령이
+`build:contracts`를 선행하므로 오래된 dist가 남아 다른 package를 속이는 일은 없습니다.
 
 ## 공식 Source
 
@@ -146,15 +169,44 @@ freshness 단계에서 실패합니다.
 
 ## 배포
 
-Target hosting은 Cloudflare Pages입니다. `pnpm build`가 만든 static output
-(`web/dist/web/browser`)을 순수 static asset으로 배포하며 server-side runtime은 필요하지
-않습니다. Route 직접 진입과 새로고침은 Cloudflare Pages의 내장 SPA fallback이 처리합니다
-(`404.html`이 없으면 존재하지 않는 경로에 `index.html`을 자동 제공; 별도 `_redirects` 규칙은
-필요 없고, `/* /index.html 200` 형태는 Pages가 무한 루프로 판정해 무시합니다). 실제 file이
-있는 asset(`/data/catalog.json`, `/data/curated.json`, hashed chunk)은 언제나 그대로 제공됩니다. Cache 정책은
-`web/public/_headers`가 정의합니다. 모든 pull
-request는 GitHub Actions CI(`.github/workflows/ci.yml`)가 `pnpm lint`, `pnpm test`,
-`pnpm validate:data`, `pnpm build`로 검증합니다.
+Target hosting은 Cloudflare Pages이고, **배포 경로는 git integration 하나입니다** —
+`main`에 merge되면 Pages가 스스로 빌드해서 올립니다. 별도 배포 script나 GitHub Actions
+배포 단계는 없습니다. 역할 분담:
+
+- **GitHub Actions CI** (`.github/workflows/ci.yml`) — merge 전 품질 게이트. 모든 pull
+  request에서 `build:contracts → lint → test → validate:data → build`를 검증합니다.
+  배포는 하지 않습니다.
+- **Cloudflare Pages** — 배포 담당. `main` push(=merge)에 반응해 build command를 실행하고
+  성공 시 production으로 배포합니다. 다른 branch push는 preview URL로 배포됩니다.
+  Pages는 test를 돌리지 않으므로, merge 전 검증은 CI의 몫입니다.
+
+`pnpm build`가 만든 static output(`web/dist/web/browser`)을 순수 static asset으로 배포하며
+server-side runtime은 필요하지 않습니다. Route 직접 진입과 새로고침은 Cloudflare Pages의
+내장 SPA fallback이 처리합니다 (`404.html`이 없으면 존재하지 않는 경로에 `index.html`을
+자동 제공; 별도 `_redirects` 규칙은 필요 없고, `/* /index.html 200` 형태는 Pages가 무한
+루프로 판정해 무시합니다). 실제 file이 있는 asset(`/data/catalog.json`,
+`/data/curated.json`, hashed chunk)은 언제나 그대로 제공됩니다. Cache 정책은
+`web/public/_headers`가 정의합니다.
+
+### 릴리스 흐름
+
+```text
+feature branch ──PR──▶ 통합 branch(develop) ──PR──▶ main ──▶ Pages production 배포
+                        (CI가 PR 검증)              (merge = 배포 트리거)
+```
+
+`main`으로의 merge가 곧 production 배포이므로, 배포 전 아래 checklist를 로컬에서
+확인한 뒤 develop → main PR을 만듭니다.
+
+```bash
+# 1. 품질 게이트 + data 정합성 + production build가 전부 green인지
+pnpm lint && pnpm test && pnpm validate:data && pnpm build
+
+# 2. Pages와 같은 조건(SPA fallback, _headers)의 local static server로 최종 스모크
+pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
+
+# 3. 이상 없으면 develop → main PR 생성, CI green 확인 후 merge → 자동 배포
+```
 
 ### Data 갱신
 
@@ -176,8 +228,10 @@ pnpm dlx wrangler pages dev web/dist/web/browser --port 8788
 ```
 
 `http://127.0.0.1:8788`에서 세 화면의 직접 진입(`/`, `/solutions`, `/calculator`)과 딥링크
-(`/?product=<id>`, `/?lens=<id>`, `/?mode=replay&stop=<n>`,
+(`/?product=<id>`, `/?lens=<id>`, `/?lens=<id>&solution=<id>`(솔루션 카드),
+`/?mode=replay&stop=<n>`,
 `/?mode=recall&area=<layer>&kind=<verify|practice>`,
+`/?mode=recall&area=solution:<id>`(솔루션 회상),
 `/solutions?solution=<id>`, `/calculator?products=<id,...>`),
 은퇴한 v1 경로의 redirect
 (`/browse`, `/discovery` → `/`, `/relationships` → `/solutions`,
@@ -199,7 +253,32 @@ Dashboard에서 git integration으로 GitHub repository를 연결하고 다음 �
 
 Pages build system(v2)은 root `package.json`의 `packageManager` field로 pnpm version을,
 `.nvmrc`로 Node.js version을 결정합니다. `main`이 production을 추적하고 다른 branch
-push는 preview deployment로 배포됩니다.
+push는 preview deployment로 배포됩니다. Build command의 `pnpm build`는 workspace 의존
+순서를 따르므로 공유 contract가 먼저 빌드됩니다 — Pages에 추가 설정은 필요 없습니다.
+
+### 공개 범위
+
+모든 내용이 공식 공개 자료(`cloudflare.com`, `developers.cloudflare.com`)에서 만들어졌고
+record마다 출처 URL과 확인 시각이 붙어 있으므로, **접근 제어 없이 public으로
+배포합니다**. 학습 진도는 각자의 browser localStorage에만 저장되어 서버로 전송되지
+않습니다.
+
+이후 공개 범위를 좁힐 일이 생기면 배포 구조 변경 없이 Cloudflare Access를 켜는 것으로
+충분합니다 (Zero Trust dashboard → Access → Applications에서 production·preview 도메인에
+정책 추가 — Access는 CDN 앞단에서 동작하므로 static 배포와 충돌하지 않습니다).
+
+### 수동 배포 (첫 배포·비상용)
+
+Git integration이 기본 경로지만, dashboard 연결 전 첫 배포나 비상 시에는 build 산출물을
+wrangler로 직접 올릴 수 있습니다.
+
+```bash
+pnpm validate:data && pnpm build
+pnpm dlx wrangler pages deploy web/dist/web/browser --project-name <pages-project>
+```
+
+직접 업로드는 git integration과 같은 project에서 혼용하지 않는 것을 권장합니다 —
+deployment 이력의 원천이 둘이 되면 rollback 지점 추적이 어려워집니다.
 
 ### Rollback
 

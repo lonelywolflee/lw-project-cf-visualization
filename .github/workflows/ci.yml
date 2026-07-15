@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Every package consumes @cf-viz/catalog through its dist exports;
+      # build the contract explicitly so no later step depends on another
+      # step's side effect for it.
+      - name: Build the shared data contract
+        run: pnpm run build:contracts
+
       - name: Lint
         run: pnpm lint
 
